@@ -84,9 +84,12 @@ import {
 } from "lucide-react";
 
 export default function App() {
-  // Theme State - Default to true for rich black UI/UX
+  // Theme State - Respect system preference, then localStorage
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem("theme") !== "light";
+    const stored = localStorage.getItem("theme");
+    if (stored === "light") return false;
+    if (stored === "dark") return true;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
   // Auth State
@@ -248,9 +251,11 @@ export default function App() {
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
+      document.documentElement.style.colorScheme = "dark";
       localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
+      document.documentElement.style.colorScheme = "light";
       localStorage.setItem("theme", "light");
     }
   }, [darkMode]);

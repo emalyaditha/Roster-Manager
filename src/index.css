@@ -2,7 +2,9 @@
 
 @layer base {
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
+    background-color: #f8fafc;
+    color: #1e293b;
   }
   
   html.dark {
@@ -11,17 +13,19 @@
     color: #f4f4f5;
   }
 
+  body {
+    min-height: 100vh;
+    background-color: inherit;
+    color: inherit;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   html,
   body {
     max-width: 100%;
     overflow-x: clip;
-  }
-
-  body {
-    min-height: 100vh;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   #root {
@@ -721,4 +725,6 @@ td, th {
 .dark .picker-confirm-btn:disabled { background: #27272a; color: #71717a; }
 .dark .picker-cancel-btn { color: #a1a1aa; border-color: #27272a; }
 .dark .picker-cancel-btn:hover { background: #27272a; }
+.dark .leave-warn-banner { background: #3d2c12; border-color: #6d5a1f; color: #f5c66b; }
+.dark .leave-mobile-title { color: #fff; }
 
