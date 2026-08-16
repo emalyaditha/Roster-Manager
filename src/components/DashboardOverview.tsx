@@ -123,13 +123,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
   const breakdownFor = (item: { entry: RosterEntry; res: OtDayResult }) => {
     const { entry, res } = item;
-    const morning = (entry.otMorningHours || 0) > 0
+    const rawMorning = (entry.otMorningHours || 0) > 0
       ? entry.otMorningHours as number
       : res.earlyInMinutes > 0 ? parseFloat((res.earlyInMinutes / 60).toFixed(2)) : 0;
-    const night = (entry.otNightHours || 0) > 0
+    const rawNight = (entry.otNightHours || 0) > 0
       ? entry.otNightHours as number
       : res.lateOutMinutes > 0 ? parseFloat((res.lateOutMinutes / 60).toFixed(2)) : 0;
-    const total = parseFloat((morning + night).toFixed(2));
+    const rawTotal = rawMorning + rawNight;
+    const billable = res.billableOtMinutes / 60;
+    const morning = rawTotal > 0 ? parseFloat((billable * (rawMorning / rawTotal)).toFixed(2)) : 0;
+    const night = rawTotal > 0 ? parseFloat((billable * (rawNight / rawTotal)).toFixed(2)) : 0;
+    const total = parseFloat(billable.toFixed(2));
     return { morning, night, total };
   };
 
@@ -374,7 +378,11 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="space-y-3">
             {allOtEntries.map((item) => {
               const { entry, res } = item;
-              const { morning, night, total } = breakdownFor(item);
+              const { total } = breakdownFor(item);
+              const hasEarlyOt = res.earlyInMinutes > 0;
+              const hasLateOt = res.lateOutMinutes > 0;
+              const otStartTime = hasEarlyOt ? (res.actualClockIn || '-') : (hasLateOt ? (res.scheduledEnd || '-') : '-');
+              const otEndTime = hasLateOt ? (res.actualClockOut || '-') : (hasEarlyOt ? (res.scheduledStart || '-') : '-');
 
               return (
                 <div key={entry.id} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2.5">
@@ -386,27 +394,36 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                       {entry.currentStatusId}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-600 dark:text-slate-300 font-mono">
-                    {res.actualClockIn && res.actualClockOut ? `${res.actualClockIn} - ${res.actualClockOut}` : 'Not Specified'}
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">In Time</div>
+                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
+                        {res.actualClockIn || '-'}
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Out Time</div>
+                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
+                        {res.actualClockOut || '-'}
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">OT Start</div>
+                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
+                        {otStartTime}
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">OT End</div>
+                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
+                        {otEndTime}
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Morning</div>
-                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {morning > 0 ? formatHoursMinutes(morning) : '-'}
-                      </div>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Night</div>
-                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {night > 0 ? formatHoursMinutes(night) : '-'}
-                      </div>
-                    </div>
-                    <div className="bg-purple-50 dark:bg-purple-950/40 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-purple-500 dark:text-purple-400 tracking-wider">Total</div>
-                      <div className="text-xs font-mono font-extrabold text-purple-600 dark:text-purple-400 mt-0.5">
-                        {total > 0 ? formatHoursMinutes(total) : '-'}
-                      </div>
+                  <div className="bg-purple-50 dark:bg-purple-950/40 rounded-lg py-1.5 text-center">
+                    <div className="text-[9px] font-bold uppercase text-purple-500 dark:text-purple-400 tracking-wider">Total H</div>
+                    <div className="text-xs font-mono font-extrabold text-purple-600 dark:text-purple-400 mt-0.5">
+                      {total > 0 ? formatHoursMinutes(total) : '-'}
                     </div>
                   </div>
                 </div>
@@ -425,36 +442,38 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <thead>
                 <tr className="border-b border-slate-200 dark:border-zinc-800 text-slate-400 dark:text-zinc-500 font-extrabold text-[10px] uppercase">
                   <th className="py-2.5 px-3">Date</th>
-                  <th className="py-2.5 px-3">Active Status</th>
-                  <th className="py-2.5 px-3">Clock In - Out</th>
-                  <th className="py-2.5 px-3 text-right">Morning OT</th>
-                  <th className="py-2.5 px-3 text-right">Night OT</th>
-                  <th className="py-2.5 px-3 text-right">Total OT</th>
+                  <th className="py-2.5 px-3">In Time</th>
+                  <th className="py-2.5 px-3">Out Time</th>
+                  <th className="py-2.5 px-3">OT Start Time</th>
+                  <th className="py-2.5 px-3">OT End Time</th>
+                  <th className="py-2.5 px-3 text-right">Total H</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
                 {allOtEntries.map((item) => {
                   const { entry, res } = item;
-                  const { morning, night, total } = breakdownFor(item);
+                  const { total } = breakdownFor(item);
+                  const hasEarlyOt = res.earlyInMinutes > 0;
+                  const hasLateOt = res.lateOutMinutes > 0;
+                  const otStartTime = hasEarlyOt ? (res.actualClockIn || '-') : (hasLateOt ? (res.scheduledEnd || '-') : '-');
+                  const otEndTime = hasLateOt ? (res.actualClockOut || '-') : (hasEarlyOt ? (res.scheduledStart || '-') : '-');
 
                   return (
                     <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
                       <td className="py-2.5 px-3 font-extrabold text-slate-900 dark:text-white">
                         {entry.date} ({entry.day})
                       </td>
-                      <td className="py-2.5 px-3">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">
-                          {entry.currentStatusId}
-                        </span>
+                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
+                        {res.actualClockIn || '-'}
                       </td>
                       <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {res.actualClockIn && res.actualClockOut ? `${res.actualClockIn} - ${res.actualClockOut}` : 'Not Specified'}
+                        {res.actualClockOut || '-'}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-medium text-slate-600 dark:text-slate-400 font-mono">
-                        {morning > 0 ? formatHoursMinutes(morning) : '-'}
+                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
+                        {otStartTime}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-medium text-slate-600 dark:text-slate-400 font-mono">
-                        {night > 0 ? formatHoursMinutes(night) : '-'}
+                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
+                        {otEndTime}
                       </td>
                       <td className="py-2.5 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
                         {total > 0 ? formatHoursMinutes(total) : '-'}
@@ -465,14 +484,8 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/60">
-                  <td colSpan={3} className="py-3 px-3 font-extrabold text-slate-900 dark:text-white">
+                  <td colSpan={5} className="py-3 px-3 font-extrabold text-slate-900 dark:text-white">
                     Total OT (All Dates)
-                  </td>
-                  <td className="py-3 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
-                    {formatHoursMinutes(otTotals.morning)}
-                  </td>
-                  <td className="py-3 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
-                    {formatHoursMinutes(otTotals.night)}
                   </td>
                   <td className="py-3 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
                     {formatHoursMinutes(otTotals.total)}

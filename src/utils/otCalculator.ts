@@ -4,7 +4,7 @@ export const DEFAULT_OT_SETTINGS: OtCalculationSettings = {
   gracePeriodMinutes: 15,
   minimumOtThresholdMinutes: 30,
   roundingRule: 'down',
-  roundingBlockMinutes: 15,
+  roundingBlockMinutes: 30,
   wfhEligibleForOt: false,
   trainingEligibleForOt: false,
   hourlyOtRate: 0,
