@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "rosterEntries": {
+      "title": "Roster Entries",
+      "description": "Duty roster entries for employees",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "currentStatusId": { "type": "string" },
+        "action": { "type": "string" },
+        "ot": { "type": "boolean" },
+        "notes": { "type": "string" },
+        "googleCalendarSyncStatus": { "type": "string" }
+      },
+      "required": ["id", "date", "currentStatusId"]
+    },
+    "settings": {
+      "title": "App Settings",
+      "description": "Global application configuration and allowed accounts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userName": { "type": "string" },
+        "timezone": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Roster Manager",
+  "description": "Professional roster management system preserving original office rosters vs changes with audit logging, history, and Google Calendar sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

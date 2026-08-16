@@ -1,0 +1,54 @@
+[
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "calc_date": "2026-08-17",
+    "roster_code": "LEAVE",
+    "scheduled_start": null,
+    "scheduled_end": null,
+    "actual_clock_in": null,
+    "actual_clock_out": null,
+    "raw_ot_minutes": 0,
+    "billable_ot_minutes": 0,
+    "ot_type": "none",
+    "calculated_at": "2026-08-16T11:10:03.464Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "calc_date": "2026-08-18",
+    "roster_code": "NWD",
+    "scheduled_start": "08:15",
+    "scheduled_end": "17:30",
+    "actual_clock_in": null,
+    "actual_clock_out": null,
+    "raw_ot_minutes": 0,
+    "billable_ot_minutes": 0,
+    "ot_type": "none",
+    "calculated_at": "2026-08-16T10:35:04.402Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "calc_date": "2026-08-13",
+    "roster_code": "NWD",
+    "scheduled_start": "08:15",
+    "scheduled_end": "17:30",
+    "actual_clock_in": "2026-08-13T08:15:00+05:30",
+    "actual_clock_out": "2026-08-13T00:30:00+05:30",
+    "raw_ot_minutes": 0,
+    "billable_ot_minutes": 0,
+    "ot_type": "none",
+    "calculated_at": "2026-08-16T11:08:23.868Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "calc_date": "2026-09-13",
+    "roster_code": "DOS",
+    "scheduled_start": "10:15",
+    "scheduled_end": "19:30",
+    "actual_clock_in": null,
+    "actual_clock_out": null,
+    "raw_ot_minutes": 0,
+    "billable_ot_minutes": 0,
+    "ot_type": "day_off_settlement",
+    "calculated_at": "2026-08-16T11:04:32.260Z"
+  }
+]

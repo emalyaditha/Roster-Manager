@@ -1,0 +1,550 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  
+  html.dark {
+    color-scheme: dark;
+    background-color: #09090b;
+    color: #f4f4f5;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(147, 51, 234, 0.4);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(63, 63, 70, 0.5);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 82, 91, 0.8);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Table styling enhancements */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+td, th {
+  border-color: rgba(226, 232, 240, 0.8);
+}
+.dark td, .dark th {
+  border-color: rgba(39, 39, 42, 0.8);
+}
+
+/* Leave Balance Card (Pinterest theme) */
+.leave-card {
+  --leave-card-border: #ebebeb;
+  --leave-card-bg: #fff;
+  --leave-card-head-bg: #fafafa;
+  --leave-card-pill-bg: #f0f0f0;
+  --leave-card-pill-color: #555;
+  --leave-card-sub-color: #999;
+  border: 1.5px solid var(--leave-card-border);
+  border-radius: 16px;
+  background: var(--leave-card-bg);
+  overflow: hidden;
+}
+
+.dark .leave-card {
+  --leave-card-border: #27272a;
+  --leave-card-bg: #18181b;
+  --leave-card-head-bg: #1f1f23;
+  --leave-card-pill-bg: #27272a;
+  --leave-card-pill-color: #a1a1aa;
+  --leave-card-sub-color: #71717a;
+}
+
+.leave-card .leave-card-year {
+  background: var(--leave-card-pill-bg);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--leave-card-pill-color);
+}
+
+.leave-card .summary-cell {
+  padding: 14px 20px;
+  border-right: 1px solid var(--leave-card-border);
+  text-align: center;
+}
+.leave-card .summary-cell:last-child {
+  border-right: none;
+}
+.leave-card .summary-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--leave-card-sub-color);
+}
+.leave-card .summary-num {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.leave-card th {
+  font-size: 11px;
+  font-weight: 700;
+  color: #767676;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.leave-card th:not(:first-child) {
+  text-align: right;
+}
+.leave-card td:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.leave-card .bar-bg {
+  height: 6px;
+  border-radius: 9999px;
+  background: #f0f0f0;
+  min-width: 60px;
+  flex: 1;
+}
+.dark .leave-card .bar-bg {
+  background: #27272a;
+}
+.leave-card .bar-fill {
+  height: 6px;
+  border-radius: 9999px;
+}
+
+.leave-card tr.short-leave-row {
+  background: #fff8f8;
+}
+.dark .leave-card tr.short-leave-row {
+  background: #241518;
+}
+
+.leave-card .na-val {
+  color: #bbb;
+  font-size: 13px;
+}
+.dark .leave-card .na-val {
+  color: #71717a;
+}
+
+.leave-card .footer-note {
+  font-size: 11px;
+  color: #bbb;
+}
+.dark .leave-card .footer-note {
+  color: #71717a;
+}
+
+.leave-card .sync-btn {
+  background: #E60023;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.leave-card .sync-btn:hover:not(:disabled) {
+  background: #c0001e;
+}
+.leave-card .sync-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* DOS/DOF Ledger */
+.ledger-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--leave-card-border);
+}
+.banner-warn { background: #fff8e1; color: #8d6e20; }
+.banner-err { background: #fce4ec; color: #880e4f; }
+.dark .banner-warn { background: #3d2c12; color: #f5c66b; }
+.dark .banner-err { background: #3f1220; color: #f59bb0; }
+
+.ledger-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.type-dos { background: #e3f2fd; color: #1565c0; }
+.type-dof { background: #fce4ec; color: #c62828; }
+.dark .type-dos { background: #123250; color: #7cb9e8; }
+.dark .type-dof { background: #3f1220; color: #f59bb0; }
+
+.ledger-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Mobile leave balance — stacked cards */
+.leave-mobile-list {
+  display: flex;
+  flex-direction: column;
+}
+.leave-mobile-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--leave-card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.leave-mobile-item:last-child {
+  border-bottom: none;
+}
+.leave-mobile-item.short-leave-row {
+  background: #fff8f8;
+}
+.dark .leave-mobile-item.short-leave-row {
+  background: #241518;
+}
+.leave-mobile-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.leave-mobile-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.leave-mobile-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111;
+}
+.leave-mobile-sub {
+  font-size: 11px;
+  color: var(--leave-card-sub-color);
+  margin-top: 1px;
+}
+.leave-mobile-balance {
+  margin-left: auto;
+  text-align: right;
+}
+.leave-mobile-balance-num {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.leave-mobile-balance-label {
+  font-size: 10px;
+  color: var(--leave-card-sub-color);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 700;
+}
+.leave-mobile-bar {
+  min-width: 0;
+}
+.leave-mobile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.leave-mobile-stat {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+}
+.leave-mobile-stat-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--leave-card-sub-color);
+}
+.leave-mobile-stat-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+.dark .leave-mobile-title { color: #fff; }
+.dark .leave-mobile-stat { background: #1f1f23; }
+.dark .leave-mobile-stat-value { color: #fff; }
+
+/* Leave Picker (Pinterest theme) */
+.leave-picker {
+  background: #fff;
+  border: 1.5px solid #ebebeb;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+.leave-picker-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: #111;
+}
+.leave-picker-sub {
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+}
+.leave-picker-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #767676;
+  margin: 12px 0 8px;
+}
+.leave-picker-reason {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  border: 1.5px solid #ebebeb;
+  border-radius: 12px;
+  outline: none;
+  color: #111;
+}
+.leave-picker-reason:focus {
+  border-color: #E60023;
+}
+
+.leave-warn-banner {
+  background: #fff8e1;
+  border: 1.5px solid #ffe082;
+  color: #8d6e20;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.leave-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border: 1.5px solid transparent;
+  width: 100%;
+  background: #fff;
+}
+.leave-option:hover { background: #f5f5f5; }
+.leave-option.selected { border-color: #E60023; background: #fff8f8; }
+.leave-option.zero-balance { opacity: 0.55; }
+
+.leave-option-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.leave-option-label { font-size: 14px; font-weight: 600; color: #111; }
+.leave-option-sub { font-size: 11px; color: #999; margin-top: 1px; }
+.leave-option-bal { margin-left: auto; font-size: 12px; font-weight: 700; }
+.bal-ok { color: #2e7d32; }
+.bal-warn { color: #bf360c; }
+
+.after-apply-box {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 12px 0 4px;
+  font-size: 13px;
+  color: #333;
+}
+.after-apply-box.ok { background: #e8f5e9; color: #2e7d32; }
+.after-apply-box.warn { background: #fff3e0; color: #bf360c; }
+.after-apply-box.err { background: #fce4ec; color: #880e4f; }
+
+.picker-confirm-btn {
+  width: 100%;
+  height: 42px;
+  background: #E60023;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.picker-confirm-btn:hover:not(:disabled) { background: #c0001e; }
+.picker-confirm-btn:disabled {
+  background: #f0f0f0;
+  color: #bbb;
+  cursor: not-allowed;
+}
+.picker-cancel-btn {
+  width: 100%;
+  height: 42px;
+  background: transparent;
+  color: #767676;
+  border: 1.5px solid #ebebeb;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.picker-cancel-btn:hover { background: #f5f5f5; }
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid #ebebeb;
+  border-left-width: 4px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 12px 14px;
+  max-width: 340px;
+  cursor: pointer;
+  animation: toast-in 0.2s ease;
+}
+.toast-success { border-left-color: #2e7d32; }
+.toast-warn { border-left-color: #f59e0b; }
+.toast-error { border-left-color: #e11d48; }
+.toast-message { font-size: 13px; font-weight: 700; color: #111; }
+.toast-sub { font-size: 11px; color: #666; margin-top: 2px; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dark .leave-picker {
+  background: #18181b;
+  border-color: #27272a;
+}
+.dark .leave-picker-title { color: #fff; }
+.dark .leave-picker-sub { color: #71717a; }
+.dark .leave-picker-label { color: #a1a1aa; }
+.dark .leave-option { background: #18181b; }
+.dark .leave-option:hover { background: #27272a; }
+.dark .leave-option.selected { border-color: #E60023; background: #3f1a1d; }
+.dark .leave-option-label { color: #fff; }
+.dark .leave-option-sub { color: #71717a; }
+.dark .leave-picker-reason {
+  background: #1f1f23;
+  border-color: #27272a;
+  color: #fff;
+}
+.dark .after-apply-box.ok { background: #10351f; color: #7fce9b; }
+.dark .after-apply-box.warn { background: #3d2c12; color: #f5c66b; }
+.dark .after-apply-box.err { background: #3f1220; color: #f59bb0; }
+.dark .after-apply-box { background: #1f1f23; color: #d4d4d8; }
+.dark .toast-card { background: #18181b; border-color: #27272a; }
+.dark .toast-message { color: #fff; }
+.dark .toast-sub { color: #a1a1aa; }
+.dark .picker-confirm-btn:disabled { background: #27272a; color: #71717a; }
+.dark .picker-cancel-btn { color: #a1a1aa; border-color: #27272a; }
+.dark .picker-cancel-btn:hover { background: #27272a; }
+

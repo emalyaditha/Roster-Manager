@@ -1,0 +1,50 @@
+[
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "year": 2026,
+    "leave_type": "Short Leave",
+    "entitlement": 24,
+    "opening_utilized": 0,
+    "updated_at": "2026-08-15T09:14:58.579Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "year": 2026,
+    "leave_type": "Annual Leave",
+    "entitlement": 14,
+    "opening_utilized": 2.5,
+    "updated_at": "2026-08-16T00:00:00.000Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "year": 2026,
+    "leave_type": "Casual Leave",
+    "entitlement": 7,
+    "opening_utilized": 7,
+    "updated_at": "2026-08-16T00:00:00.000Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "year": 2026,
+    "leave_type": "Lieu Leave",
+    "entitlement": null,
+    "opening_utilized": 0,
+    "updated_at": "2026-08-16T00:00:00.000Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "year": 2026,
+    "leave_type": "Medical Leave",
+    "entitlement": 7,
+    "opening_utilized": 0,
+    "updated_at": "2026-08-16T00:00:00.000Z"
+  },
+  {
+    "employee_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+    "year": 2026,
+    "leave_type": "Short Leave",
+    "entitlement": 24,
+    "opening_utilized": 0,
+    "updated_at": "2026-08-15T11:05:47.328Z"
+  }
+]
