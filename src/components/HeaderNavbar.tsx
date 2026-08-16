@@ -247,7 +247,7 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
           </div>
 
           {/* Integration & Settings Right */}
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
             <button
               onClick={onSyncCalendarClick}
               disabled={isSyncing}

@@ -796,8 +796,8 @@ export default function App() {
 
         {/* Quick Month Stats Summary Banner */}
         {monthSummary && (
-          <div className="flex overflow-x-auto snap-x scrollbar-none gap-3 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 lg:grid-cols-7 mb-6">
-            <div className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
               <span className="text-[10px] font-extrabold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
                 Total Days
               </span>
@@ -806,7 +806,7 @@ export default function App() {
               </span>
             </div>
 
-            <div className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
               <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">
                 Duty / Working
               </span>
@@ -818,7 +818,7 @@ export default function App() {
               </span>
             </div>
 
-            <div className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
               <span className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
                 Days Off (DOF)
               </span>
@@ -830,7 +830,7 @@ export default function App() {
               </span>
             </div>
 
-            <div className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
               <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
                 Holidays (HOL)
               </span>
@@ -842,7 +842,7 @@ export default function App() {
               </span>
             </div>
 
-            <div className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
               <span className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block mb-1">
                 Leaves / Absence
               </span>
@@ -856,7 +856,7 @@ export default function App() {
 
             <div
               onClick={() => setIsOtCalculatorModalOpen(true)}
-              className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-orange-50/60 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800/80 shadow-xs cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors group"
+              className="p-3.5 rounded-3xl bg-orange-50/60 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800/80 shadow-xs cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors group"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-extrabold text-orange-600 dark:text-orange-400 uppercase tracking-wider block mb-1">
@@ -874,7 +874,7 @@ export default function App() {
               </span>
             </div>
 
-            <div className="min-w-[130px] sm:min-w-0 snap-start p-3.5 rounded-3xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/80 shadow-xs">
+            <div className="p-3.5 rounded-3xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/80 shadow-xs">
               <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-400 uppercase tracking-wider block mb-1">
                 Roster Changed
               </span>

@@ -18,6 +18,7 @@ import { calculateDayOt, DEFAULT_OT_SETTINGS } from '../utils/otCalculator';
 import { LeaveBalanceCard } from './LeaveBalanceCard';
 import { LeaveRow } from '../types/roster';
 import { DosDofLedger } from './DosDofLedger';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface DashboardOverviewProps {
   entries: RosterEntry[];
@@ -39,6 +40,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   onSyncLeave,
 }) => {
   const [history, setHistory] = useState<RosterChangeHistory[]>([]);
+  const isMobile = useIsMobile(640);
 
   useEffect(() => {
     let active = true;
@@ -291,6 +293,30 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="py-8 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
             No roster changes recorded for this month.
           </div>
+        ) : isMobile ? (
+          <div className="space-y-3">
+            {changedEntries.map((e) => {
+              const entryHistory = history
+                .filter((h) => h.rosterEntryId === e.id || h.date === e.date)
+                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+              const reason = entryHistory[0]?.reason || e.notes || e.action || 'Roster status changed';
+
+              return (
+                <div key={e.id} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2">
+                  <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                    {e.date} ({e.day})
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="text-slate-500 dark:text-zinc-400 font-medium">Original: {e.originalStatusId}</span>
+                    <span className="text-slate-300 dark:text-zinc-700">→</span>
+                    <span className="font-extrabold text-purple-600 dark:text-purple-400">{e.currentStatusId}</span>
+                  </div>
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">{reason}</div>
+                  {e.notes && <div className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">{e.notes}</div>}
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
@@ -343,6 +369,55 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
         {calculatedOtEntries.length === 0 ? (
           <div className="py-8 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
             No overtime entries recorded for this month.
+          </div>
+        ) : isMobile ? (
+          <div className="space-y-3">
+            {allOtEntries.map((item) => {
+              const { entry, res } = item;
+              const { morning, night, total } = breakdownFor(item);
+
+              return (
+                <div key={entry.id} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-extrabold text-slate-900 dark:text-white text-xs">
+                      {entry.date} ({entry.day})
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 shrink-0">
+                      {entry.currentStatusId}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-600 dark:text-slate-300 font-mono">
+                    {res.actualClockIn && res.actualClockOut ? `${res.actualClockIn} - ${res.actualClockOut}` : 'Not Specified'}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Morning</div>
+                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
+                        {morning > 0 ? formatHoursMinutes(morning) : '-'}
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Night</div>
+                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
+                        {night > 0 ? formatHoursMinutes(night) : '-'}
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 dark:bg-purple-950/40 rounded-lg py-1.5">
+                      <div className="text-[9px] font-bold uppercase text-purple-500 dark:text-purple-400 tracking-wider">Total</div>
+                      <div className="text-xs font-mono font-extrabold text-purple-600 dark:text-purple-400 mt-0.5">
+                        {total > 0 ? formatHoursMinutes(total) : '-'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <div className="flex items-center justify-between border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-800/60 rounded-xl px-4 py-3">
+              <span className="font-extrabold text-slate-900 dark:text-white text-xs">Total OT (All Dates)</span>
+              <span className="font-extrabold text-purple-600 dark:text-purple-400 font-mono text-sm">
+                {formatHoursMinutes(otTotals.total)}
+              </span>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">

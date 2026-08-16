@@ -33,7 +33,7 @@ export const RosterCalendarView: React.FC<RosterCalendarViewProps> = ({
   return (
     <div className="bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 rounded-3xl shadow-sm overflow-hidden transition-all mb-24">
       {/* Calendar Bar */}
-      <div className="p-4 border-b border-slate-200 dark:border-zinc-800/80 flex items-center justify-between gap-3 bg-slate-50/80 dark:bg-zinc-950/60">
+      <div className="p-4 border-b border-slate-200 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80 dark:bg-zinc-950/60">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
             <CalendarIcon className="w-4 h-4" />

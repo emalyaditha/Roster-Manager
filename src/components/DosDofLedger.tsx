@@ -2,6 +2,7 @@ import React from 'react';
 import { RosterEntry, DosDofMatch } from '../types/roster';
 import { buildDosDofLedger } from '../utils/otCalculator';
 import { CalendarClock, AlertTriangle, HelpCircle } from 'lucide-react';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface DosDofLedgerProps {
   entries: RosterEntry[];
@@ -29,6 +30,7 @@ function formatDate(dateStr: string): string {
 }
 
 export const DosDofLedger: React.FC<DosDofLedgerProps> = ({ entries }) => {
+  const isMobile = useIsMobile(640);
   const ledger = React.useMemo(() => buildDosDofLedger(entries), [entries]);
 
   // Expand each settlement match into rows. Plain DOF days (GENERAL_DOF, i.e. a
@@ -129,46 +131,70 @@ export const DosDofLedger: React.FC<DosDofLedgerProps> = ({ entries }) => {
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', minWidth: 460 }}>
-          <thead>
-            <tr style={{ background: 'var(--leave-card-head-bg)' }}>
-              <th style={{ width: '32%', textAlign: 'left', padding: '10px 20px' }}>Date</th>
-              <th style={{ width: '14%', textAlign: 'left', padding: '10px 20px' }}>Type</th>
-              <th style={{ width: '26%', textAlign: 'left', padding: '10px 20px' }}>Reference</th>
-              <th style={{ width: '28%', textAlign: 'right', padding: '10px 20px' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={4} style={{ padding: '18px 20px', textAlign: 'center', color: 'var(--leave-card-sub-color)', fontSize: 12 }}>
-                  No DOS/DOF entries in this cycle.
-                </td>
+      {isMobile ? (
+        <div className="leave-mobile-list">
+          {rows.length === 0 && (
+            <div style={{ padding: '18px 20px', textAlign: 'center', color: 'var(--leave-card-sub-color)', fontSize: 12 }}>
+              No DOS/DOF entries in this cycle.
+            </div>
+          )}
+          {rows.map((row) => {
+            const st = STATUS_STYLE[row.status];
+            return (
+              <div key={row.id} className="leave-mobile-item" title={row.notes}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="leave-mobile-title">{formatDate(row.date)}</div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className={`ledger-type type-${row.type.toLowerCase()}`}>{row.type}</span>
+                    </div>
+                  </div>
+                  <span className="ledger-badge shrink-0" style={{ background: st.bg, color: st.text }}>
+                    {st.label}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', minWidth: 460 }}>
+            <thead>
+              <tr style={{ background: 'var(--leave-card-head-bg)' }}>
+                <th style={{ width: '38%', textAlign: 'left', padding: '10px 20px' }}>Date</th>
+                <th style={{ width: '26%', textAlign: 'left', padding: '10px 20px' }}>Type</th>
+                <th style={{ width: '36%', textAlign: 'right', padding: '10px 20px' }}>Status</th>
               </tr>
-            )}
-            {rows.map((row) => {
-              const st = STATUS_STYLE[row.status];
-              return (
-                <tr key={row.id} title={row.notes}>
-                  <td style={{ padding: '10px 20px', fontWeight: 600, fontSize: 13 }}>{formatDate(row.date)}</td>
-                  <td style={{ padding: '10px 20px', fontSize: 12 }}>
-                    <span className={`ledger-type type-${row.type.toLowerCase()}`}>{row.type}</span>
-                  </td>
-                  <td style={{ padding: '10px 20px', fontSize: 12, color: 'var(--leave-card-sub-color)' }}>
-                    {row.reference === 'N/A' || row.reference === '—' ? '—' : formatDate(row.reference)}
-                  </td>
-                  <td style={{ padding: '10px 20px', textAlign: 'right' }}>
-                    <span className="ledger-badge" style={{ background: st.bg, color: st.text }}>
-                      {st.label}
-                    </span>
+            </thead>
+            <tbody>
+              {rows.length === 0 && (
+                <tr>
+                  <td colSpan={3} style={{ padding: '18px 20px', textAlign: 'center', color: 'var(--leave-card-sub-color)', fontSize: 12 }}>
+                    No DOS/DOF entries in this cycle.
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              )}
+              {rows.map((row) => {
+                const st = STATUS_STYLE[row.status];
+                return (
+                  <tr key={row.id} title={row.notes}>
+                    <td style={{ padding: '10px 20px', fontWeight: 600, fontSize: 13 }}>{formatDate(row.date)}</td>
+                    <td style={{ padding: '10px 20px', fontSize: 12 }}>
+                      <span className={`ledger-type type-${row.type.toLowerCase()}`}>{row.type}</span>
+                    </td>
+                    <td style={{ padding: '10px 20px', textAlign: 'right' }}>
+                      <span className="ledger-badge" style={{ background: st.bg, color: st.text }}>
+                        {st.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

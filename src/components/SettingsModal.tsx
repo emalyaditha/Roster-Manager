@@ -554,8 +554,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* GOOGLE CALENDAR TAB */}
             {activeTab === 'google' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <div>
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="min-w-0">
                     <span className="font-bold text-slate-900 dark:text-white block text-sm">
                       Google Calendar Sync Status
                     </span>
@@ -566,7 +566,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     {formData.googleCalendar.connected && (
                       <button
                         onClick={handleDisconnectGoogle}
@@ -633,7 +633,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* STATUSES TAB */}
             {activeTab === 'statuses' && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-bold text-slate-900 dark:text-white">
                     Centralized Roster Status Configuration
                   </span>
@@ -644,9 +644,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   {statusList.map((st, idx) => (
                     <div
                       key={st.code}
-                      className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between gap-3"
+                      className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between gap-3"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
                         <input
                           type="color"
                           value={st.color}
@@ -655,9 +655,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             updated[idx].color = e.target.value;
                             setStatusList(updated);
                           }}
-                          className="w-6 h-6 rounded cursor-pointer border-0"
+                          className="w-6 h-6 rounded cursor-pointer border-0 shrink-0"
                         />
-                        <div>
+                        <div className="min-w-0">
                           <span className="font-bold text-slate-900 dark:text-white block">
                             {st.code}
                           </span>

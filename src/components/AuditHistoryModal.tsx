@@ -142,7 +142,7 @@ export const AuditHistoryModal: React.FC<AuditHistoryModalProps> = ({
                       </div>
 
                       {/* Status Transition */}
-                      <div className="flex items-center gap-2 py-1">
+                      <div className="flex flex-wrap items-center gap-2 py-1">
                         <span className="text-slate-500">Changed:</span>
                         <StatusBadge statusId={record.previousStatusId} statuses={statuses} size="sm" />
                         <span className="text-slate-400">→</span>

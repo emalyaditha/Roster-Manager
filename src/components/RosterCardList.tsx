@@ -97,14 +97,14 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
             {/* Middle Content: Status & Times */}
             <div className="py-3 flex items-center justify-between gap-2">
               {/* Effective Status */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 min-w-0">
                 <span className="text-[9px] font-extrabold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                   ROSTER STATUS
                 </span>
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                   <CurrentEffectiveTooltip entry={entry} statuses={statuses} size="md" />
                   {isChanged && (
-                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1 truncate">
                       (Was {entry.originalStatusId})
                     </span>
                   )}
@@ -112,7 +112,7 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
               </div>
 
               {/* Clock Times / OT */}
-              <div className="flex flex-col items-end gap-1">
+              <div className="flex flex-col items-end gap-1 shrink-0">
                 {entry.clockIn || entry.clockOut ? (
                   <div className="inline-flex items-center gap-1 text-xs font-mono font-bold text-slate-800 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700">
                     <Clock className="w-3 h-3 text-purple-500 shrink-0" />

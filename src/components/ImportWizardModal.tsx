@@ -1013,24 +1013,24 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
 
                   {/* Preview Table */}
                   <div className="max-h-64 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
-                    <table className="w-full text-left text-xs border-collapse">
+                    <table className="w-full table-fixed text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                          <th className="p-2.5">Date</th>
-                          <th className="p-2.5">Day</th>
-                          <th className="p-2.5">Original Roster</th>
-                          <th className="p-2.5">Action / Shift Title</th>
-                          <th className="p-2.5">OT</th>
+                          <th className="p-2.5 w-[20%]">Date</th>
+                          <th className="p-2.5 w-[13%]">Day</th>
+                          <th className="p-2.5 w-[20%]">Original Roster</th>
+                          <th className="p-2.5 w-[32%]">Action / Shift Title</th>
+                          <th className="p-2.5 w-[15%]">OT</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
                         {previewRows.map((r, i) => (
                           <tr key={r.date || `row-${i}`} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td className="p-2.5 font-bold font-mono text-slate-900 dark:text-white">
+                            <td className="p-2.5 font-bold font-mono text-slate-900 dark:text-white break-words">
                               {r.date}
                             </td>
                             <td className="p-2.5 text-slate-600 dark:text-slate-400">{r.day}</td>
-                            <td className="p-2.5 font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                            <td className="p-2.5 font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2 break-words">
                               <span>{r.originalStatus}</span>
                               {r.isAutoFilled && (
                                 <span className="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 text-[9px] font-bold">
@@ -1038,7 +1038,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                                 </span>
                               )}
                             </td>
-                            <td className="p-2.5 text-slate-700 dark:text-slate-300">{r.action}</td>
+                            <td className="p-2.5 text-slate-700 dark:text-slate-300 break-words">{r.action}</td>
                             <td className="p-2.5">
                               {r.ot ? (
                                 <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 font-bold text-[10px]">

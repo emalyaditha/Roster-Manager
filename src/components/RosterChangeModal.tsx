@@ -471,11 +471,11 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                   {showCalculator && (
                     <div className="mt-2.5 p-2.5 bg-white dark:bg-slate-900/60 rounded-lg border border-purple-100 dark:border-purple-950/80 space-y-3">
                       <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-[10px] text-slate-500">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-slate-500">
                           <span className="font-semibold text-slate-700 dark:text-slate-300">Morning (Early Arrival):</span>
                           <span>Expected Start: <strong className="text-purple-700 dark:text-purple-300">{getExpectedTimes().startLabel}</strong></span>
                         </div>
-                        <div className="flex gap-2 items-center">
+                        <div className="flex flex-wrap gap-2 items-center">
                           <span className="text-[10px] text-slate-400">Arrived:</span>
                           <input
                             type="time"
@@ -500,11 +500,11 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                       </div>
 
                       <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/60">
-                        <div className="flex items-center justify-between text-[10px] text-slate-500">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-slate-500">
                           <span className="font-semibold text-slate-700 dark:text-slate-300">Night (Late Departure):</span>
                           <span>Expected End: <strong className="text-purple-700 dark:text-purple-300">{getExpectedTimes().endLabel}</strong></span>
                         </div>
-                        <div className="flex gap-2 items-center">
+                        <div className="flex flex-wrap gap-2 items-center">
                           <span className="text-[10px] text-slate-400">Departed:</span>
                           <input
                             type="time"

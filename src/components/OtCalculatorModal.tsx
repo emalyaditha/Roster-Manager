@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RosterEntry, AppSettings, OtCalculationSettings } from '../types/roster';
 import { ClockTimePicker } from './ClockTimePicker';
 import { api } from '../services/api';
+import { useIsMobile } from '../hooks/useIsMobile';
 import {
   calculateDayOt,
   buildDosDofLedger,
@@ -50,6 +51,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
   onSyncComplete,
 }) => {
   const [activeTab, setActiveTab] = useState<'timesheet' | 'ledger' | 'audit' | 'settings'>('timesheet');
+  const isMobile = useIsMobile(640);
 
   // OT Settings state
   const otSettings: OtCalculationSettings = settings.otCalculationSettings || DEFAULT_OT_SETTINGS;
@@ -275,15 +277,15 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl shadow-2xl overflow-hidden my-8 flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-900/50">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2.5 rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400 shrink-0">
               <Calculator className="w-6 h-6" />
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
                 OT Calculation & Day-Off Settlement Engine
-                <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/80 text-orange-700 dark:text-orange-300 font-medium">
+                <span className="hidden sm:inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/80 text-orange-700 dark:text-orange-300 font-medium">
                   Payroll Specification Compliant
                 </span>
               </h2>
@@ -294,15 +296,15 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4 overflow-x-auto">
-          <div className="flex gap-2 py-2">
+        <div className="px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2 py-2">
             <button
               onClick={() => setActiveTab('timesheet')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
@@ -438,6 +440,55 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                   <div className="py-6 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-xl">
                     No overtime records found for this period.
                   </div>
+                ) : isMobile ? (
+                  <div className="space-y-2.5">
+                    {entriesWithOt.map((e, i) => {
+                      const formatDuration = (totalMinutes: number) => {
+                        if (!totalMinutes || totalMinutes <= 0) return '0 min';
+                        const hrs = Math.floor(totalMinutes / 60);
+                        const mins = totalMinutes % 60;
+                        if (hrs > 0 && mins > 0) return `${hrs}h ${mins}min`;
+                        if (hrs > 0) return `${hrs}h`;
+                        return `${mins}min`;
+                      };
+
+                      const formatTimeAMPM = (timeStr?: string) => {
+                        if (!timeStr) return '-';
+                        const parts = timeStr.split(':');
+                        if (parts.length < 2) return timeStr;
+                        let h = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10);
+                        if (isNaN(h) || isNaN(m)) return timeStr;
+                        const ampm = h >= 12 ? 'PM' : 'AM';
+                        h = h % 12;
+                        h = h ? h : 12;
+                        return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
+                      };
+
+                      return (
+                        <div key={i} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-extrabold text-slate-900 dark:text-white text-xs">{e.date}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                              {e.statusCode}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs gap-2">
+                            <span className="text-slate-400 dark:text-zinc-500">
+                              In: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{formatTimeAMPM(e.actualClockIn)}</span>
+                            </span>
+                            <span className="text-slate-400 dark:text-zinc-500">
+                              Out: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{formatTimeAMPM(e.actualClockOut)}</span>
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs border-t border-slate-100 dark:border-zinc-800 pt-2">
+                            <span className="text-slate-400 dark:text-zinc-500">Raw OT</span>
+                            <span className="font-mono font-bold text-orange-600 dark:text-orange-400">{formatDuration(e.rawOtMinutes)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
@@ -501,12 +552,12 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
               </div>
 
               {/* Table Toolbar */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Info className="w-4 h-4 text-purple-500" />
+                  <Info className="w-4 h-4 text-purple-500 shrink-0" />
                   Enter actual clock-in/out times to evaluate OT. Early-In and Late-Out are calculated against scheduled window baselines.
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
                   <button
                     onClick={async () => {
                       try {
@@ -542,6 +593,122 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
               </div>
 
               {/* Calculation Table */}
+              {isMobile ? (
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800/60">
+                  {entries.map((entry, idx) => {
+                    const result = dayResults[idx];
+                    const clock = clockTimes[entry.id] || { clockIn: '', clockOut: '' };
+
+                    return (
+                      <div
+                        key={entry.id}
+                        className={`p-3.5 space-y-3 ${
+                          result.billableOtMinutes > 0 ? 'bg-orange-50/20 dark:bg-orange-950/10' : ''
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="font-medium text-slate-900 dark:text-white text-xs">{entry.date}</div>
+                            <div className="text-[10px] text-slate-400">{entry.day}</div>
+                          </div>
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
+                              result.statusCode === 'NWD'
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-200'
+                                : result.statusCode === 'RTD'
+                                ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-200'
+                                : result.statusCode === 'OT'
+                                ? 'bg-orange-100 text-orange-800 dark:bg-orange-950/80 dark:text-orange-200'
+                                : result.statusCode.startsWith('DOS')
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-200'
+                                : result.statusCode.startsWith('DOF')
+                                ? 'bg-red-100 text-red-800 dark:bg-red-950/80 dark:text-red-200'
+                                : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200'
+                            }`}
+                          >
+                            {entry.currentStatusId}
+                          </span>
+                        </div>
+
+                        <div className="text-[11px] text-slate-600 dark:text-slate-300 font-mono">
+                          Scheduled: {result.scheduledStart && result.scheduledEnd ? (
+                            `${result.scheduledStart} - ${result.scheduledEnd}`
+                          ) : (
+                            <span className="text-slate-400 italic">No scheduled window</span>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="min-w-0">
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1">
+                              Clock In
+                            </label>
+                            <ClockTimePicker
+                              value={clock.clockIn}
+                              onChange={(val) => handleClockChange(entry.id, 'clockIn', val)}
+                              placeholder="08:15 AM"
+                              className="w-full"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1">
+                              Clock Out
+                            </label>
+                            <ClockTimePicker
+                              value={clock.clockOut}
+                              onChange={(val) => handleClockChange(entry.id, 'clockOut', val)}
+                              placeholder="05:30 PM"
+                              className="w-full"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                          {result.earlyInMinutes > 0 && <div>Early In: -{result.earlyInMinutes}m</div>}
+                          {result.lateOutMinutes > 0 && <div>Late Out: +{result.lateOutMinutes}m</div>}
+                          {result.earlyInMinutes === 0 && result.lateOutMinutes === 0 && '-'}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 text-xs">
+                          <span className="text-slate-400 dark:text-zinc-500">
+                            Raw OT: <span className="font-mono text-slate-600 dark:text-slate-400">
+                              {result.rawOtMinutes > 0 ? `${result.rawOtMinutes}m` : '-'}
+                            </span>
+                          </span>
+                          <span className="font-bold text-orange-600 dark:text-orange-400 font-mono text-right">
+                            {result.billableOtMinutes > 0 ? (
+                              `${result.billableOtHours} hrs (${result.billableOtMinutes}m)`
+                            ) : (
+                              <span className="text-slate-400 font-normal">Billable: 0</span>
+                            )}
+                          </span>
+                        </div>
+
+                        <input
+                          type="text"
+                          placeholder="Type remark..."
+                          value={entryRemarks[entry.id] ?? (entry.notes || '')}
+                          onChange={(e) => handleRemarkChange(entry.id, e.target.value)}
+                          className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400"
+                        />
+
+                        {result.flags.length > 0 ? (
+                          <div className="space-y-1">
+                            {result.flags.map((flag, fIdx) => (
+                              <div key={fIdx} className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3 shrink-0" />
+                                {flag}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 text-[10px]">OK</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
               <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-slate-900">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
@@ -666,6 +833,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                   </tbody>
                 </table>
               </div>
+              )}
             </div>
           )}
 
@@ -716,6 +884,62 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                   <span className="text-[10px] text-slate-500">DOS = Work | DOF = Settled Off</span>
                 </div>
 
+                {isMobile ? (
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                    {ledger.matches.length === 0 && (
+                      <div className="py-6 text-center text-slate-400 text-xs">
+                        No DOS or DOF entries found in this roster cycle.
+                      </div>
+                    )}
+                    {ledger.matches.map((item, idx) => (
+                      <div key={idx} className="p-3.5 space-y-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                              DOS Worked Date
+                            </div>
+                            <div className="font-medium text-slate-900 dark:text-white font-mono text-xs mt-0.5">
+                              {item.dosDate}{' '}
+                              <span className="font-bold text-blue-600 dark:text-blue-400">({item.dosCode})</span>
+                            </div>
+                          </div>
+                          <div className="shrink-0">
+                            {item.status === 'SETTLED' && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/80 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                SETTLED
+                              </span>
+                            )}
+                            {item.status === 'PENDING' && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-100 dark:bg-amber-950/80 dark:text-amber-300 px-2 py-0.5 rounded-full">
+                                <Clock className="w-3 h-3 text-amber-500" />
+                                PENDING
+                              </span>
+                            )}
+                            {item.status === 'ORPHANED_DOF' && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 dark:bg-red-950/80 dark:text-red-300 px-2 py-0.5 rounded-full">
+                                <XCircle className="w-3 h-3 text-red-500" />
+                                ORPHANED DOF
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="border-t border-slate-100 dark:border-zinc-800 pt-2">
+                          <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                            DOF Cashing Date
+                          </div>
+                          <div className="font-medium text-slate-900 dark:text-white font-mono text-xs mt-0.5">
+                            {item.dofDate || '—'}{' '}
+                            {item.dofCode ? <span className="font-bold text-red-600 dark:text-red-400">({item.dofCode})</span> : null}
+                          </div>
+                        </div>
+                        {item.notes && (
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{item.notes}</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                     <tr>
@@ -777,6 +1001,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                     )}
                   </tbody>
                 </table>
+                )}
               </div>
             </div>
           )}
@@ -785,10 +1010,10 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
           {activeTab === 'audit' && (
             <div className="space-y-6">
               {/* Audit Header Banner */}
-              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                  <div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-3 min-w-0">
+                  <ShieldCheck className="w-6 h-6 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <div className="min-w-0">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                       Roster & OT Compliance Scanner
                     </h3>
@@ -798,7 +1023,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
                   <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
                     {audit.passCount} Passed
                   </span>
@@ -874,7 +1099,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
               <div className="space-y-4 text-xs">
                 {/* Grace Period */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">Grace Period (Minutes)</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -894,7 +1119,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Minimum Threshold */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">Minimum OT Threshold (Minutes)</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -917,7 +1142,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Rounding Rule */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">Rounding Direction</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -941,7 +1166,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Rounding Block Size */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">Rounding Block Interval</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -964,7 +1189,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Hourly OT Rate */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">Hourly OT Pay Rate ($ / LKR)</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -984,7 +1209,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* WFH OT Eligibility */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">WFH Eligible for OT</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -1000,7 +1225,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Training OT Eligibility */}
-                <div className="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
                   <div>
                     <label className="font-bold text-slate-900 dark:text-white">Training Eligible for OT</label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
