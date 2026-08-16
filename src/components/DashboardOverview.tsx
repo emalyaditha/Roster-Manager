@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import { formatMonthYearDisplay } from '../utils/date';
 import { LayoutDashboard, BarChart2, TrendingUp, PieChart as PieIcon } from 'lucide-react';
-import { calculateDayOt, DEFAULT_OT_SETTINGS } from '../utils/otCalculator';
+import { calculateDayOt, DEFAULT_OT_SETTINGS, formatTo12hDisplay } from '../utils/otCalculator';
 import { LeaveBalanceCard } from './LeaveBalanceCard';
 import { LeaveRow } from '../types/roster';
 import { DosDofLedger } from './DosDofLedger';
@@ -381,8 +381,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               const { total } = breakdownFor(item);
               const hasEarlyOt = res.earlyInMinutes > 0;
               const hasLateOt = res.lateOutMinutes > 0;
-              const otStartTime = hasEarlyOt ? (res.actualClockIn || '-') : (hasLateOt ? (res.scheduledEnd || '-') : '-');
-              const otEndTime = hasLateOt ? (res.actualClockOut || '-') : (hasEarlyOt ? (res.scheduledStart || '-') : '-');
 
               return (
                 <div key={entry.id} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2.5">
@@ -398,25 +396,31 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
                       <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">In Time</div>
                       <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {res.actualClockIn || '-'}
+                        {res.actualClockIn ? formatTo12hDisplay(res.actualClockIn) : '-'}
                       </div>
                     </div>
                     <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
                       <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Out Time</div>
                       <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {res.actualClockOut || '-'}
+                        {res.actualClockOut ? formatTo12hDisplay(res.actualClockOut) : '-'}
                       </div>
                     </div>
                     <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
                       <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">OT Start</div>
                       <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {otStartTime}
+                        {hasEarlyOt && formatTo12hDisplay(res.actualClockIn)}
+                        {hasEarlyOt && hasLateOt && <br />}
+                        {hasLateOt && formatTo12hDisplay(res.scheduledEnd)}
+                        {!hasEarlyOt && !hasLateOt && '-'}
                       </div>
                     </div>
                     <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
                       <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">OT End</div>
                       <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {otEndTime}
+                        {hasEarlyOt && formatTo12hDisplay(res.scheduledStart)}
+                        {hasEarlyOt && hasLateOt && <br />}
+                        {hasLateOt && formatTo12hDisplay(res.actualClockOut)}
+                        {!hasEarlyOt && !hasLateOt && '-'}
                       </div>
                     </div>
                   </div>
@@ -455,8 +459,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   const { total } = breakdownFor(item);
                   const hasEarlyOt = res.earlyInMinutes > 0;
                   const hasLateOt = res.lateOutMinutes > 0;
-                  const otStartTime = hasEarlyOt ? (res.actualClockIn || '-') : (hasLateOt ? (res.scheduledEnd || '-') : '-');
-                  const otEndTime = hasLateOt ? (res.actualClockOut || '-') : (hasEarlyOt ? (res.scheduledStart || '-') : '-');
 
                   return (
                     <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
@@ -464,16 +466,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                         {entry.date} ({entry.day})
                       </td>
                       <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {res.actualClockIn || '-'}
+                        {res.actualClockIn ? formatTo12hDisplay(res.actualClockIn) : '-'}
                       </td>
                       <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {res.actualClockOut || '-'}
+                        {res.actualClockOut ? formatTo12hDisplay(res.actualClockOut) : '-'}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {otStartTime}
+                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono leading-relaxed">
+                        {hasEarlyOt && formatTo12hDisplay(res.actualClockIn)}
+                        {hasEarlyOt && hasLateOt && <br />}
+                        {hasLateOt && formatTo12hDisplay(res.scheduledEnd)}
+                        {!hasEarlyOt && !hasLateOt && '-'}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {otEndTime}
+                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono leading-relaxed">
+                        {hasEarlyOt && formatTo12hDisplay(res.scheduledStart)}
+                        {hasEarlyOt && hasLateOt && <br />}
+                        {hasLateOt && formatTo12hDisplay(res.actualClockOut)}
+                        {!hasEarlyOt && !hasLateOt && '-'}
                       </td>
                       <td className="py-2.5 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
                         {total > 0 ? formatHoursMinutes(total) : '-'}
