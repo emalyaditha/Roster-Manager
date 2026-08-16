@@ -17,10 +17,10 @@ interface LedgerRow {
   notes?: string;
 }
 
-const STATUS_STYLE: Record<LedgerRow['status'], { bg: string; text: string; label: string }> = {
-  SETTLED: { bg: '#e8f5e9', text: '#2e7d32', label: 'Settled' },
-  PENDING: { bg: '#fff3e0', text: '#bf360c', label: 'Pending' },
-  ORPHANED_DOF: { bg: '#fce4ec', text: '#880e4f', label: 'Orphaned' },
+const STATUS_STYLE: Record<LedgerRow['status'], { cssClass: string; label: string }> = {
+  SETTLED: { cssClass: 'ledger-badge-settled', label: 'Settled' },
+  PENDING: { cssClass: 'ledger-badge-pending', label: 'Pending' },
+  ORPHANED_DOF: { cssClass: 'ledger-badge-orphaned', label: 'Orphaned' },
 };
 
 function formatDate(dateStr: string): string {
@@ -149,7 +149,7 @@ export const DosDofLedger: React.FC<DosDofLedgerProps> = ({ entries }) => {
                       <span className={`ledger-type type-${row.type.toLowerCase()}`}>{row.type}</span>
                     </div>
                   </div>
-                  <span className="ledger-badge shrink-0" style={{ background: st.bg, color: st.text }}>
+                  <span className={`ledger-badge shrink-0 ${st.cssClass}`}>
                     {st.label}
                   </span>
                 </div>
@@ -184,7 +184,7 @@ export const DosDofLedger: React.FC<DosDofLedgerProps> = ({ entries }) => {
                       <span className={`ledger-type type-${row.type.toLowerCase()}`}>{row.type}</span>
                     </td>
                     <td style={{ padding: '10px 20px', textAlign: 'right' }}>
-                      <span className="ledger-badge" style={{ background: st.bg, color: st.text }}>
+                      <span className={`ledger-badge ${st.cssClass}`}>
                         {st.label}
                       </span>
                     </td>

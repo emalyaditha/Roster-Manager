@@ -969,7 +969,7 @@ export default function App() {
                   type="checkbox"
                   checked={changedOnlyFilter}
                   onChange={(e) => setChangedOnlyFilter(e.target.checked)}
-                  className="rounded-md border-slate-300 dark:border-zinc-700 text-purple-600 focus:ring-purple-500 bg-zinc-950 cursor-pointer"
+                  className="rounded-md border-slate-300 dark:border-zinc-700 text-purple-600 focus:ring-purple-500 bg-white dark:bg-zinc-950 cursor-pointer"
                 />
                 <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse shrink-0" />
                 <span>Show Changed Only</span>

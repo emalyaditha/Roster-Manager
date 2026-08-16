@@ -454,7 +454,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                       max="24"
                       value={otMorningHours}
                       onChange={(e) => setOtMorningHours(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -465,7 +465,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                       max="24"
                       value={otNightHours}
                       onChange={(e) => setOtNightHours(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
                     />
                   </div>
                 </div>

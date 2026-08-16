@@ -13,6 +13,20 @@ import {
   Cell,
 } from 'recharts';
 import { formatMonthYearDisplay } from '../utils/date';
+
+function useIsDarkMode(): boolean {
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false
+  );
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
 import { LayoutDashboard, BarChart2, TrendingUp, PieChart as PieIcon } from 'lucide-react';
 import { calculateDayOt, DEFAULT_OT_SETTINGS, formatTo12hDisplay } from '../utils/otCalculator';
 import { LeaveBalanceCard } from './LeaveBalanceCard';
@@ -41,6 +55,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 }) => {
   const [history, setHistory] = useState<RosterChangeHistory[]>([]);
   const isMobile = useIsMobile(640);
+  const isDark = useIsDarkMode();
 
   useEffect(() => {
     let active = true;
@@ -210,7 +225,9 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <Tooltip
                       contentStyle={{
                         borderRadius: 12,
-                        border: '1px solid #ebebeb',
+                        border: `1px solid ${isDark ? '#3f3f46' : '#ebebeb'}`,
+                        background: isDark ? '#18181b' : '#fff',
+                        color: isDark ? '#e4e4e7' : '#111',
                         fontSize: 12,
                         fontWeight: 600,
                       }}
@@ -268,9 +285,18 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={comparisonData}>
-                <XAxis dataKey="status" stroke="#a1a1aa" fontSize={11} />
-                <YAxis stroke="#a1a1aa" fontSize={11} />
-                <Tooltip />
+                <XAxis dataKey="status" stroke={isDark ? '#71717a' : '#a1a1aa'} fontSize={11} />
+                <YAxis stroke={isDark ? '#71717a' : '#a1a1aa'} fontSize={11} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: `1px solid ${isDark ? '#3f3f46' : '#ebebeb'}`,
+                    background: isDark ? '#18181b' : '#fff',
+                    color: isDark ? '#e4e4e7' : '#111',
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                />
                 <Bar dataKey="Original" fill="#71717a" radius={[6, 6, 0, 0]} name="Original Office" />
                 <Bar dataKey="Current" fill="#a855f7" radius={[6, 6, 0, 0]} name="Current Active" />
               </BarChart>

@@ -146,9 +146,12 @@
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.04) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
+}
+.dark .animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
 }
 
 /* Glassmorphism utilities */
@@ -315,6 +318,34 @@ td, th {
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
+.dark .leave-card th {
+  color: #a1a1aa;
+}
+.ledger-badge-settled {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.dark .ledger-badge-settled {
+  background: rgba(46, 125, 50, 0.2);
+  color: #66bb6a;
+}
+.ledger-badge-pending {
+  background: #fff3e0;
+  color: #bf360c;
+}
+.dark .ledger-badge-pending {
+  background: rgba(191, 54, 12, 0.2);
+  color: #ff8a65;
+}
+.ledger-badge-orphaned {
+  background: #fce4ec;
+  color: #880e4f;
+}
+.dark .ledger-badge-orphaned {
+  background: rgba(136, 14, 79, 0.2);
+  color: #f06292;
+}
+
 .leave-card th:not(:first-child) {
   text-align: right;
 }

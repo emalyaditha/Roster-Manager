@@ -542,7 +542,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </>
                       )}
                     </button>
-                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 font-mono text-[10px] text-slate-500 max-h-24 overflow-y-auto border border-slate-100 dark:border-slate-850">
+                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 font-mono text-[10px] text-slate-500 max-h-24 overflow-y-auto border border-slate-100 dark:border-slate-800">
                       -- Creates roster_statuses, roster_entries, roster_history, and system tables...
                       {"\n"}-- Automatically sets up primary keys, relations, and defaults.
                     </div>
