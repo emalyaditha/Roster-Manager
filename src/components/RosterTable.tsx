@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { RosterEntry, RosterStatusConfig } from '../types/roster';
 import { StatusBadge } from './StatusBadge';
 import { CurrentEffectiveTooltip } from './CurrentEffectiveTooltip';
@@ -11,12 +12,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   Clock,
-  ArrowRight,
   Calendar,
   MessageSquare,
   CheckSquare,
   Square,
-  Sparkles,
 } from 'lucide-react';
 
 interface RosterTableProps {
@@ -72,15 +71,17 @@ export const RosterTable: React.FC<RosterTableProps> = ({
       {/* Main Roster Schedule Table */}
       <div className="w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/90 shadow-sm backdrop-blur-md">
         {entries.length === 0 ? (
-          <div className="py-16 text-center text-slate-500 dark:text-zinc-400">
-            <div className="flex flex-col items-center justify-center gap-3">
-              <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-zinc-800/80 text-slate-400">
-                <Calendar className="w-8 h-8" />
+          <div className="py-20 text-center text-slate-500 dark:text-zinc-400">
+            <div className="flex flex-col items-center justify-center gap-4">
+              <div className="p-4 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800/80 dark:to-zinc-900/80 text-slate-400 shadow-inner">
+                <Calendar className="w-10 h-10" />
               </div>
-              <p className="font-extrabold text-sm text-slate-800 dark:text-zinc-200">No roster entries found</p>
-              <p className="text-xs text-slate-400 dark:text-zinc-500 max-w-sm">
-                Try adjusting your search query, status filters, or import a new monthly roster file.
-              </p>
+              <div className="space-y-1">
+                <p className="font-extrabold text-sm text-slate-800 dark:text-zinc-200">No roster entries found</p>
+                <p className="text-xs text-slate-400 dark:text-zinc-500 max-w-sm leading-relaxed">
+                  Try adjusting your search query, status filters, or import a new monthly roster file.
+                </p>
+              </div>
             </div>
           </div>
         ) : (
@@ -122,7 +123,7 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                   return (
                     <tr
                       key={entry.id}
-                      className={`group transition-colors relative ${
+                      className={`group transition-all duration-150 relative ${
                         isToday
                           ? 'bg-purple-50/50 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/30'
                           : isChanged
@@ -156,7 +157,7 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                                 {formatDateDisplay(entry.date)}
                               </span>
                               {isToday && (
-                                <span className="px-1.5 py-0.2 bg-purple-600 text-white font-black text-[9px] rounded-md tracking-wider uppercase shadow-2xs">
+                                <span className="px-1.5 py-0.2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-[9px] rounded-lg tracking-wider uppercase shadow-sm">
                                   TODAY
                                 </span>
                               )}
@@ -268,27 +269,30 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                       {/* Row Actions */}
                       <td className="py-3.5 pr-4 pl-2 align-middle text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button
+                          <motion.button
+                            whileTap={{ scale: 0.85 }}
                             onClick={() => onChangeRosterClick(entry)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer"
+                            className="p-1.5 rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer"
                             title="Edit Roster Status"
                           >
                             <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
+                            whileTap={{ scale: 0.85 }}
                             onClick={() => onHistoryClick(entry)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer"
+                            className="p-1.5 rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer"
                             title="View Audit History"
                           >
                             <History className="w-4 h-4" />
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
+                            whileTap={{ scale: 0.85 }}
                             onClick={() => onDeleteClick(entry)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all cursor-pointer"
+                            className="p-1.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all cursor-pointer"
                             title="Delete Entry"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </motion.button>
                         </div>
                       </td>
                     </tr>

@@ -1,9 +1,10 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { RosterEntry, RosterStatusConfig } from '../types/roster';
 import { StatusBadge } from './StatusBadge';
 import { CurrentEffectiveTooltip } from './CurrentEffectiveTooltip';
 import { formatDateDisplay, getTodayDateString } from '../utils/date';
-import { Edit3, History, Trash2, CheckCircle2, AlertTriangle, RefreshCw, Clock, ArrowRight, MessageSquare } from 'lucide-react';
+import { Edit3, History, Trash2, CheckCircle2, RefreshCw, Clock, MessageSquare } from 'lucide-react';
 
 interface RosterCardListProps {
   entries: RosterEntry[];
@@ -32,18 +33,21 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
 
   return (
     <div className="flex flex-col gap-3 md:hidden mb-20">
-      {entries.map((entry) => {
+      {entries.map((entry, idx) => {
         const isChanged = !!entry.changedStatusId;
         const isSelected = selectedIds.includes(entry.id);
         const isToday = entry.date === todayStr;
         const totalOtHours = (entry.otMorningHours || 0) + (entry.otNightHours || 0);
 
         return (
-          <div
+          <motion.div
             key={entry.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(idx * 0.03, 0.3), duration: 0.25 }}
             className={`p-4 rounded-2xl border transition-all shadow-xs ${
               isToday
-                ? 'bg-purple-50/70 dark:bg-purple-950/30 border-purple-300 dark:border-purple-800'
+                ? 'bg-gradient-to-br from-purple-50/80 to-purple-100/40 dark:from-purple-950/30 dark:to-purple-900/20 border-purple-300 dark:border-purple-800'
                 : isChanged
                 ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-800/80'
                 : isSelected
@@ -70,7 +74,7 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
                     ({entry.day.substring(0, 3)})
                   </span>
                   {isToday && (
-                    <span className="px-1.5 py-0.5 bg-purple-600 text-white font-black text-[9px] rounded-md tracking-wider uppercase">
+                    <span className="px-1.5 py-0.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-[9px] rounded-lg tracking-wider uppercase shadow-sm">
                       TODAY
                     </span>
                   )}
@@ -114,7 +118,7 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
               {/* Clock Times / OT */}
               <div className="flex flex-col items-end gap-1 shrink-0">
                 {entry.clockIn || entry.clockOut ? (
-                  <div className="inline-flex items-center gap-1 text-xs font-mono font-bold text-slate-800 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-zinc-700">
+                  <div className="inline-flex items-center gap-1 text-xs font-mono font-bold text-slate-800 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-zinc-700">
                     <Clock className="w-3 h-3 text-purple-500 shrink-0" />
                     <span>{entry.clockIn || '--:--'}</span>
                     <span>-</span>
@@ -125,7 +129,7 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
                 )}
 
                 {totalOtHours > 0 && (
-                  <span className="text-[10px] font-extrabold text-orange-600 dark:text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20">
+                  <span className="text-[10px] font-extrabold text-orange-600 dark:text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
                     + {totalOtHours.toFixed(1)}h OT
                   </span>
                 )}
@@ -142,31 +146,34 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
 
             {/* Bottom Row: Quick 1-Tap Touch Actions */}
             <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2">
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 onClick={() => onChangeRosterClick(entry)}
-                className="flex-1 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-98 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-98 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm shadow-purple-600/20 cursor-pointer transition-all"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 Change Status
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={() => onHistoryClick(entry)}
                 className="p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300 transition-colors cursor-pointer"
                 title="Audit History"
               >
                 <History className="w-4 h-4" />
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={() => onDeleteClick(entry)}
                 className="p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
                 title="Delete Entry"
               >
                 <Trash2 className="w-4 h-4" />
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>

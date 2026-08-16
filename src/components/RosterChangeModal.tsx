@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { RosterEntry, RosterStatusConfig } from '../types/roster';
 import { StatusBadge } from './StatusBadge';
 import { ClockTimePicker } from './ClockTimePicker';
@@ -140,8 +141,6 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
     }
   }, [entry]);
 
-  if (!isOpen || !entry) return null;
-
   // When status selection changes, auto-suggest the standard description for action
   const handleStatusSelect = (code: string) => {
     setNewStatusId(code);
@@ -179,9 +178,23 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
   const activeStatuses = statuses.filter((s) => s.active);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transition-all my-8">
+    <AnimatePresence>
+      {isOpen && entry && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs"
+        >
+          <div className="flex min-h-full items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transition-all my-8"
+            >
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
@@ -595,8 +608,10 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
-  </div>
+  </motion.div>
+  )}
+  </AnimatePresence>
 );
 };

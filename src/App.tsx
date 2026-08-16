@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { motion } from "motion/react";
 import {
   RosterEntry,
   RosterStatusConfig,
@@ -653,8 +654,8 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex transition-colors">
-        <div className="flex flex-col items-center gap-3">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 transition-colors">
+        <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
           <p className="text-xs font-bold text-slate-500 dark:text-zinc-400">
             Verifying access permissions...
@@ -710,23 +711,32 @@ export default function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Sync Notification Banner */}
         {syncNotice && (
-          <div className="mb-4 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold flex items-center justify-between shadow-sm animate-fadeIn">
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mb-4 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold flex items-center justify-between shadow-sm"
+          >
             <span className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               {syncNotice}
             </span>
             <button
               onClick={() => setSyncNotice(null)}
-              className="text-emerald-500 hover:text-emerald-800"
+              className="text-emerald-500 hover:text-emerald-800 transition-colors"
             >
               ✕
             </button>
-          </div>
+          </motion.div>
         )}
 
         {/* Supabase Connection Alert Banner */}
         {supabaseStatus?.configured && supabaseStatus?.tablesMissing && (
-          <div className="mb-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm animate-fadeIn">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm"
+          >
             <div className="flex items-start gap-3">
               <Database className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div>
@@ -789,7 +799,7 @@ export default function App() {
                 ✕
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
 
@@ -797,28 +807,43 @@ export default function App() {
         {/* Quick Month Stats Summary Banner */}
         {monthSummary && (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0 }}
+              className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs hover-lift"
+            >
               <span className="text-[10px] font-extrabold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
                 Total Days
               </span>
               <span className="text-xl font-extrabold text-slate-900 dark:text-white">
                 {monthSummary.totalDays}
               </span>
-            </div>
+            </motion.div>
 
-            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.03 }}
+              className="p-3.5 rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-200/80 dark:border-emerald-800/50 shadow-xs hover-lift"
+            >
               <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">
                 Duty / Working
               </span>
               <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
                 {monthSummary.workingDays}{" "}
-                <span className="text-xs font-normal text-slate-400">
+                <span className="text-xs font-normal text-emerald-400/60">
                   days
                 </span>
               </span>
-            </div>
+            </motion.div>
 
-            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.06 }}
+              className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs hover-lift"
+            >
               <span className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
                 Days Off (DOF)
               </span>
@@ -828,35 +853,48 @@ export default function App() {
                   days
                 </span>
               </span>
-            </div>
+            </motion.div>
 
-            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.09 }}
+              className="p-3.5 rounded-3xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 border border-amber-200/80 dark:border-amber-800/50 shadow-xs hover-lift"
+            >
               <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
                 Holidays (HOL)
               </span>
               <span className="text-xl font-extrabold text-amber-600 dark:text-amber-400">
                 {monthSummary.holDays || 0}{" "}
-                <span className="text-xs font-normal text-slate-400">
+                <span className="text-xs font-normal text-amber-400/60">
                   days
                 </span>
               </span>
-            </div>
+            </motion.div>
 
-            <div className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 }}
+              className="p-3.5 rounded-3xl bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/20 dark:to-indigo-900/10 border border-indigo-200/80 dark:border-indigo-800/50 shadow-xs hover-lift"
+            >
               <span className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block mb-1">
                 Leaves / Absence
               </span>
               <span className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
                 {monthSummary.leaveDays}{" "}
-                <span className="text-xs font-normal text-slate-400">
+                <span className="text-xs font-normal text-indigo-400/60">
                   days
                 </span>
               </span>
-            </div>
+            </motion.div>
 
-            <div
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
               onClick={() => setIsOtCalculatorModalOpen(true)}
-              className="p-3.5 rounded-3xl bg-orange-50/60 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800/80 shadow-xs cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors group"
+              className="p-3.5 rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/10 border border-orange-200 dark:border-orange-800/50 shadow-xs cursor-pointer hover-lift transition-all group"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-extrabold text-orange-600 dark:text-orange-400 uppercase tracking-wider block mb-1">
@@ -868,23 +906,28 @@ export default function App() {
               </div>
               <span className="text-xl font-extrabold text-orange-600 dark:text-orange-400">
                 {monthSummary.otDays}{" "}
-                <span className="text-xs font-normal text-slate-400">
+                <span className="text-xs font-normal text-orange-400/60">
                   shifts
                 </span>
               </span>
-            </div>
+            </motion.div>
 
-            <div className="p-3.5 rounded-3xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/80 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18 }}
+              className="p-3.5 rounded-3xl bg-gradient-to-br from-amber-50/80 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/10 border border-amber-200 dark:border-amber-800/50 shadow-xs hover-lift"
+            >
               <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-400 uppercase tracking-wider block mb-1">
                 Roster Changed
               </span>
               <span className="text-xl font-extrabold text-amber-700 dark:text-amber-400">
                 {monthSummary.changedDays}{" "}
-                <span className="text-xs font-normal text-slate-400">
+                <span className="text-xs font-normal text-amber-400/60">
                   modified
                 </span>
               </span>
-            </div>
+            </motion.div>
           </div>
         )}
 
@@ -937,7 +980,11 @@ export default function App() {
 
         {/* Bulk Selection Banner Bar */}
         {activeTab === "table" && selectedIds.length > 0 && (
-          <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-between text-xs animate-fadeIn">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-between text-xs"
+          >
             <span className="font-extrabold text-purple-900 dark:text-purple-200 flex items-center gap-2">
               <CheckSquare className="w-4 h-4 text-purple-500" />
               {selectedIds.length} entries selected
@@ -954,19 +1001,22 @@ export default function App() {
 
               <button
                 onClick={() => setSelectedIds([])}
-                className="px-2.5 py-1.5 rounded-full text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 font-bold"
+                className="px-2.5 py-1.5 rounded-full text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 font-bold transition-colors"
               >
                 Clear
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Content Views */}
         {loading ? (
-          <div className="py-20 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-3">
-            <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
-            <span>
+          <div className="py-20 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-4">
+            <div className="relative">
+              <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
+              <div className="absolute inset-0 w-6 h-6 rounded-full bg-purple-600/10 animate-ping" />
+            </div>
+            <span className="font-medium">
               Loading roster entries for{" "}
               {formatMonthYearDisplay(currentMonthYear)}...
             </span>
@@ -1031,10 +1081,10 @@ export default function App() {
       </div>
 
       {/* Floating Mobile Bottom Navigation Bar */}
-      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 md:hidden bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-slate-200 dark:border-zinc-800 rounded-full shadow-xl px-4 py-2 flex items-center gap-6">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 md:hidden glass border border-slate-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/30 px-5 py-2.5 flex items-center gap-7">
         <button
           onClick={() => setActiveTab("table")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold transition-colors ${
             activeTab === "table"
               ? "text-purple-600 dark:text-purple-400"
               : "text-slate-400 dark:text-zinc-500"
@@ -1045,7 +1095,7 @@ export default function App() {
         </button>
         <button
           onClick={() => setActiveTab("calendar")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold transition-colors ${
             activeTab === "calendar"
               ? "text-purple-600 dark:text-purple-400"
               : "text-slate-400 dark:text-zinc-500"
@@ -1056,7 +1106,7 @@ export default function App() {
         </button>
         <button
           onClick={() => setActiveTab("dashboard")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold transition-colors ${
             activeTab === "dashboard"
               ? "text-purple-600 dark:text-purple-400"
               : "text-slate-400 dark:text-zinc-500"

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { RosterStatusConfig } from '../types/roster';
 
 interface StatusBadgeProps {
@@ -19,26 +20,31 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const codeDisplay = config ? config.code : statusId;
   const descriptionDisplay = config ? config.description : '';
 
-  // Size styling
   const sizeClasses = {
-    sm: 'px-2 py-0.5 text-xs font-semibold rounded-md',
-    md: 'px-2.5 py-1 text-xs font-bold rounded-lg',
+    sm: 'px-2 py-0.5 text-xs font-semibold rounded-lg',
+    md: 'px-2.5 py-1 text-xs font-bold rounded-xl',
     lg: 'px-3 py-1.5 text-sm font-bold rounded-xl',
   }[size];
 
-  // Fallback styling if status not found in config
   const bg = config?.badgeBg || 'bg-slate-100 dark:bg-slate-800';
   const text = config?.badgeText || 'text-slate-800 dark:text-slate-200';
   const border = config?.badgeBorder || 'border-slate-300 dark:border-slate-700';
 
+  const dotColor = config?.color || '#64748b';
+
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 border ${bg} ${text} ${border} ${sizeClasses} whitespace-nowrap shadow-2xs transition-colors`}
+    <motion.span
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.97 }}
+      className={`inline-flex items-center gap-1.5 border ${bg} ${text} ${border} ${sizeClasses} whitespace-nowrap shadow-xs transition-shadow hover:shadow-md cursor-default`}
+      style={{
+        boxShadow: `0 0 0 0 ${dotColor}00`,
+      }}
       title={descriptionDisplay || codeDisplay}
     >
       <span
-        className="w-2 h-2 rounded-full flex-shrink-0"
-        style={{ backgroundColor: config?.color || '#64748b' }}
+        className="w-2 h-2 rounded-full flex-shrink-0 ring-1 ring-white/20 dark:ring-black/20"
+        style={{ backgroundColor: dotColor }}
       />
       <span>{codeDisplay}</span>
       {showDescription && descriptionDisplay && (
@@ -46,6 +52,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
           {descriptionDisplay}
         </span>
       )}
-    </span>
+    </motion.span>
   );
 };

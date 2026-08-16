@@ -53,9 +53,11 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
 
   const visibleRows = rows.filter((row) => row.leaveType !== 'Lieu Leave');
 
-  const totals = visibleRows.reduce(
+  const shortLeaveRow = visibleRows.find((r) => r.leaveType === 'Short Leave');
+  const otherRows = visibleRows.filter((r) => r.leaveType !== 'Short Leave');
+
+  const totals = otherRows.reduce(
     (acc, row) => {
-      if (row.leaveType === 'Short Leave') return acc;
       if (row.entitlement !== null) acc.entitlement += row.entitlement;
       if (row.balance !== null) acc.balance += row.balance;
       acc.utilized += row.utilized;
@@ -111,10 +113,10 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
       {isMobile ? (
         /* Mobile: stacked cards — no horizontal scroll, all data visible */
         <div className="leave-mobile-list">
-          {visibleRows.map((row) => (
+          {otherRows.map((row) => (
             <div
               key={row.leaveType}
-              className={`leave-mobile-item ${row.leaveType === 'Short Leave' ? 'short-leave-row' : ''}`}
+              className="leave-mobile-item"
             >
               <div className="leave-mobile-head">
                 <span
@@ -163,6 +165,35 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
               </div>
             </div>
           ))}
+
+          {shortLeaveRow && (
+            <div className="leave-mobile-item short-leave-row">
+              <div className="leave-mobile-head">
+                <span
+                  className="leave-mobile-dot"
+                  style={{ background: leaveColors['Short Leave'] }}
+                />
+                <div>
+                  <div className="leave-mobile-title">Short Leave</div>
+                  <div className="leave-mobile-sub">2 per month</div>
+                </div>
+                <div className="leave-mobile-balance">
+                  <div className="leave-mobile-balance-num">{shortLeaveRow.utilized.toFixed(2)}</div>
+                  <div className="leave-mobile-balance-label">used</div>
+                </div>
+              </div>
+              <div className="leave-mobile-stats">
+                <div className="leave-mobile-stat">
+                  <span className="leave-mobile-stat-label">Entitlement</span>
+                  <span className="leave-mobile-stat-value">2.00/mo</span>
+                </div>
+                <div className="leave-mobile-stat">
+                  <span className="leave-mobile-stat-label">Utilized</span>
+                  <span className="leave-mobile-stat-value">{shortLeaveRow.utilized.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         /* Desktop: table */
@@ -177,8 +208,8 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
               </tr>
             </thead>
             <tbody>
-              {visibleRows.map((row) => (
-                <tr key={row.leaveType} className={row.leaveType === 'Short Leave' ? 'short-leave-row' : ''}>
+              {otherRows.map((row) => (
+                <tr key={row.leaveType}>
                   <td style={{ padding: '10px 20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div
@@ -192,7 +223,7 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
                       </div>
                     </div>
                   </td>
-                  <td style={{ padding: '10px 20px' }}>
+                  <td style={{ padding: '10px 20px', textAlign: 'right' }}>
                     {row.entitlement !== null ? (
                       row.entitlement.toFixed(2)
                     ) : (
@@ -201,8 +232,11 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
                   </td>
                   <td style={{ padding: '10px 20px' }}>
                     {row.balance !== null ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div className="bar-bg">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+                        <span style={{ minWidth: 36, fontWeight: 600, textAlign: 'right' }}>
+                          {row.balance.toFixed(2)}
+                        </span>
+                        <div className="bar-bg" style={{ width: 80 }}>
                           <div
                             className="bar-fill"
                             style={{
@@ -211,17 +245,38 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
                             }}
                           />
                         </div>
-                        <span style={{ minWidth: 36, fontWeight: 600, textAlign: 'right' }}>
-                          {row.balance.toFixed(2)}
-                        </span>
                       </div>
                     ) : (
                       <span className="na-val">N/A</span>
                     )}
                   </td>
-                  <td style={{ padding: '10px 20px' }}>{row.utilized.toFixed(2)}</td>
+                  <td style={{ padding: '10px 20px', textAlign: 'right' }}>{row.utilized.toFixed(2)}</td>
                 </tr>
               ))}
+              {shortLeaveRow && (
+                <tr className="short-leave-row">
+                  <td style={{ padding: '10px 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div
+                        style={{ width: 10, height: 10, borderRadius: '50%', background: leaveColors['Short Leave'], flexShrink: 0 }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>Short Leave</div>
+                        <div style={{ fontSize: 11, color: 'var(--leave-card-sub-color)' }}>
+                          2 per month
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '10px 20px', textAlign: 'right', fontWeight: 600 }}>
+                    2.00<span style={{ fontSize: 11, fontWeight: 400, opacity: 0.6 }}>/mo</span>
+                  </td>
+                  <td style={{ padding: '10px 20px', textAlign: 'right' }}>
+                    <span className="na-val" style={{ fontSize: 11 }}>—</span>
+                  </td>
+                  <td style={{ padding: '10px 20px', textAlign: 'right' }}>{shortLeaveRow.utilized.toFixed(2)}</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -244,7 +299,7 @@ export const LeaveBalanceCard: React.FC<LeaveBalanceCardProps> = ({ year, rows, 
         }}
       >
         <span className="footer-note">
-          Short leave opens as 24 on Jan 1 each year (2 × 12 months)
+          Short leave: 2 per month (no annual cap tracking)
         </span>
         <button className="sync-btn" onClick={handleSync} disabled={syncing}>
           ↻ Sync

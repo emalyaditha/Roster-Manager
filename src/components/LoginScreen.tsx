@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { googleSignIn } from '../services/googleAuth';
-import { ShieldAlert, Lock, Loader2, UserCheck, ChevronRight } from 'lucide-react';
+import { ShieldAlert, Lock, Loader2, UserCheck, ChevronRight, Sparkles } from 'lucide-react';
 
 interface LoginScreenProps {
   onLoginSuccess: (user: any) => void;
@@ -26,34 +27,64 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, initia
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 transition-colors">
-      <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center space-y-6 relative overflow-hidden">
-        {/* Accent light banner */}
-        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600"></div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-slate-100 to-purple-50 dark:from-zinc-950 dark:via-zinc-950 dark:to-purple-950/30 flex flex-col items-center justify-center p-4 transition-colors relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-500/3 dark:bg-violet-500/5 rounded-full blur-3xl" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 25 }}
+        className="max-w-md w-full bg-white/80 dark:bg-zinc-900/80 glass border border-slate-200/60 dark:border-zinc-800/60 rounded-3xl shadow-2xl shadow-purple-900/5 dark:shadow-black/40 p-8 flex flex-col items-center text-center space-y-6 relative overflow-hidden"
+      >
+        {/* Accent gradient bar */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient" />
 
         {/* Brand Icon */}
-        <div className="p-3.5 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-900/40 shadow-xs">
+        <motion.div
+          initial={{ scale: 0, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
+          className="p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/25"
+        >
           <Lock className="w-7 h-7" />
-        </div>
+        </motion.div>
 
         {/* Typography */}
-        <div className="space-y-1.5">
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="space-y-2"
+        >
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-2">
             Roster Manager
+            <Sparkles className="w-5 h-5 text-purple-500 animate-float" />
           </h1>
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Sign in with your Google Account to access duty roster & schedule sync
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+            Sign in with your Google Account to access<br />duty roster & schedule sync
           </p>
-        </div>
+        </motion.div>
 
         {/* Google Authentication Section */}
-        <div className="w-full text-left space-y-4 pt-1">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="w-full text-left space-y-4 pt-1"
+        >
           {/* Main Primary Google Sign-In Button */}
-          <button
+          <motion.button
             type="button"
             onClick={handleSignIn}
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-center gap-3 shadow-xs hover:shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-3.5 px-4 rounded-2xl bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 hover:border-purple-300 dark:hover:border-purple-700 text-slate-800 dark:text-slate-100 font-bold text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
               <>
@@ -72,11 +103,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, initia
                 <ChevronRight className="w-4 h-4 text-slate-400 ml-auto" />
               </>
             )}
-          </button>
+          </motion.button>
 
           {/* Access Notice */}
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-            <span className="font-bold text-slate-800 dark:text-slate-200 mb-0.5 flex items-center gap-1">
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-100 dark:border-zinc-800 text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+            <span className="font-bold text-slate-800 dark:text-slate-200 mb-0.5 flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-purple-600" /> Authorized Accounts Only
             </span>
             Secured for staff members authorized in system settings.
@@ -84,7 +115,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, initia
 
           {/* Error Message & Authorized Domain Helper */}
           {error && (
-            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-xs flex flex-col gap-3">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-xs flex flex-col gap-3"
+            >
               <div className="flex items-start gap-2.5">
                 <ShieldAlert className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
@@ -107,15 +142,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, initia
                   </ol>
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Footer info */}
-        <p className="text-[10px] text-slate-400 dark:text-slate-500">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-[10px] text-slate-400 dark:text-slate-500"
+        >
           Roster Manager &bull; Google Authentication
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </div>
   );
 };
