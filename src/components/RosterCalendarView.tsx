@@ -29,7 +29,7 @@ const formatTimeShort = (time?: string): string => {
   return `${h12}:${minutes} ${ampm}`;
 };
 
-export const RosterCalendarView: React.FC<RosterCalendarViewProps> = ({
+export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
   entries,
   statuses,
   currentMonthYear,
@@ -206,5 +206,5 @@ export const RosterCalendarView: React.FC<RosterCalendarViewProps> = ({
       </div>
     </div>
   );
-};
+});
 

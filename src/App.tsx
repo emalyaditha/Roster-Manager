@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { motion } from "motion/react";
 import {
   RosterEntry,
@@ -25,21 +25,20 @@ import { LoginScreen } from "./components/LoginScreen";
 import { RosterTable } from "./components/RosterTable";
 import { RosterCardList } from "./components/RosterCardList";
 import { RosterCalendarView } from "./components/RosterCalendarView";
-import { DashboardOverview } from "./components/DashboardOverview";
-import { RosterChangeModal } from "./components/RosterChangeModal";
-import { AuditHistoryModal } from "./components/AuditHistoryModal";
-import { ImportWizardModal } from "./components/ImportWizardModal";
-import { ExportModal } from "./components/ExportModal";
-import { SettingsModal } from "./components/SettingsModal";
-import { BulkEditModal } from "./components/BulkEditModal";
-import { AddRosterModal } from "./components/AddRosterModal";
-import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
-import { TemplateGeneratorModal } from "./components/TemplateGeneratorModal";
-import { OtCalculatorModal } from "./components/OtCalculatorModal";
-import { PrintView } from "./components/PrintView";
-import { LeavePickerModal } from "./components/LeavePickerModal";
 import { Toast, ToastItem } from "./components/Toast";
 import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode } from "./utils/leave";
+
+const LazyDashboardOverview = React.lazy(() => import("./components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
+const LazyRosterChangeModal = React.lazy(() => import("./components/RosterChangeModal").then(m => ({ default: m.RosterChangeModal })));
+const LazyAuditHistoryModal = React.lazy(() => import("./components/AuditHistoryModal").then(m => ({ default: m.AuditHistoryModal })));
+const LazyImportWizardModal = React.lazy(() => import("./components/ImportWizardModal").then(m => ({ default: m.ImportWizardModal })));
+const LazyExportModal = React.lazy(() => import("./components/ExportModal").then(m => ({ default: m.ExportModal })));
+const LazySettingsModal = React.lazy(() => import("./components/SettingsModal").then(m => ({ default: m.SettingsModal })));
+const LazyBulkEditModal = React.lazy(() => import("./components/BulkEditModal").then(m => ({ default: m.BulkEditModal })));
+const LazyAddRosterModal = React.lazy(() => import("./components/AddRosterModal").then(m => ({ default: m.AddRosterModal })));
+const LazyDeleteConfirmModal = React.lazy(() => import("./components/DeleteConfirmModal").then(m => ({ default: m.DeleteConfirmModal })));
+const LazyOtCalculatorModal = React.lazy(() => import("./components/OtCalculatorModal").then(m => ({ default: m.OtCalculatorModal })));
+const LazyLeavePickerModal = React.lazy(() => import("./components/LeavePickerModal").then(m => ({ default: m.LeavePickerModal })));
 import {
   formatMonthYearDisplay,
   getRosterCycleRange,
@@ -191,14 +190,14 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await googleSignOut();
       setCurrentUser(null);
     } catch (e) {
       console.error("Logout error:", e);
     }
-  };
+  }, []);
 
   // Active View Tab ('table' | 'calendar' | 'dashboard')
   const [activeTab, setActiveTab] = useState<
@@ -338,8 +337,7 @@ export default function App() {
     }
   }, [currentMonthYear, currentUser]);
 
-  // Sync All with Google Calendar
-  const handleSyncAllGoogle = async () => {
+  const handleSyncAllGoogle = useCallback(async () => {
     setIsSyncingAll(true);
     try {
       let token = await getAccessToken();
@@ -403,10 +401,9 @@ export default function App() {
     } finally {
       setIsSyncingAll(false);
     }
-  };
+  }, [entries, statuses, currentMonthYear]);
 
-  // Sync Single Entry to Google Calendar
-  const handleSyncSingle = async (entry: RosterEntry) => {
+  const handleSyncSingle = useCallback(async (entry: RosterEntry) => {
     try {
       let token = await getAccessToken();
       if (!token) {
@@ -438,7 +435,7 @@ export default function App() {
       setTimeout(() => setSyncNotice(null), 3000);
       await loadData();
     }
-  };
+  }, [statuses]);
 
   // Save Roster Change (Single)
   const handleSaveRosterChange = async (data: {
@@ -636,22 +633,22 @@ export default function App() {
     });
   }, [entries, searchQuery, statusFilter, changedOnlyFilter]);
 
-  // Bulk Selection Logic
-  const handleToggleSelectAll = () => {
+  const handleToggleSelectAll = useCallback(() => {
     if (selectedIds.length === filteredEntries.length) {
       setSelectedIds([]);
     } else {
       setSelectedIds(filteredEntries.map((e) => e.id));
     }
-  };
+  }, [selectedIds.length, filteredEntries]);
 
-  const handleToggleSelectOne = (id: string) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter((i) => i !== id));
-    } else {
-      setSelectedIds([...selectedIds, id]);
-    }
-  };
+  const handleToggleSelectOne = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((i) => i !== id);
+      }
+      return [...prev, id];
+    });
+  }, []);
 
   const selectedEntries = useMemo(() => {
     return entries.filter((e) => selectedIds.includes(e.id));
@@ -1030,7 +1027,8 @@ export default function App() {
             )}
 
             {activeTab === "dashboard" && (
-              <DashboardOverview
+              <Suspense fallback={<div className="py-20 text-center text-xs text-slate-400"><RefreshCw className="w-5 h-5 animate-spin text-blue-500 mx-auto" /></div>}>
+              <LazyDashboardOverview
                 entries={entries}
                 statuses={statuses}
                 currentMonthYear={currentMonthYear}
@@ -1039,6 +1037,7 @@ export default function App() {
                 leaveLoading={leaveLoading}
                 onSyncLeave={() => loadLeaveBalance(currentLeaveYear)}
               />
+              </Suspense>
             )}
           </>
         )}
@@ -1082,7 +1081,8 @@ export default function App() {
       </div>
 
       {/* Application Modals */}
-      <AddRosterModal
+      <Suspense fallback={null}>
+      <LazyAddRosterModal
         isOpen={isAddRosterModalOpen}
         statuses={statuses}
         onClose={() => setIsAddRosterModalOpen(false)}
@@ -1105,7 +1105,7 @@ export default function App() {
         }}
       />
 
-      <RosterChangeModal
+      <LazyRosterChangeModal
         isOpen={!!changeModalEntry}
         entry={changeModalEntry}
         statuses={statuses}
@@ -1134,7 +1134,7 @@ export default function App() {
         }}
       />
 
-      <LeavePickerModal
+      <LazyLeavePickerModal
         isOpen={!!leavePickerEntry}
         entry={leavePickerEntry}
         leaveRows={leaveRows}
@@ -1180,14 +1180,14 @@ export default function App() {
 
       <Toast toasts={toasts} onDismiss={dismissToast} />
 
-      <AuditHistoryModal
+      <LazyAuditHistoryModal
         isOpen={!!auditModalEntry}
         entry={auditModalEntry}
         statuses={statuses}
         onClose={() => setAuditModalEntry(null)}
       />
 
-      <DeleteConfirmModal
+      <LazyDeleteConfirmModal
         isOpen={!!deleteModalEntry}
         entry={deleteModalEntry}
         onClose={() => setDeleteModalEntry(null)}
@@ -1199,7 +1199,7 @@ export default function App() {
         }}
       />
 
-      <ImportWizardModal
+      <LazyImportWizardModal
         isOpen={isImportModalOpen}
         statuses={statuses}
         onClose={() => setIsImportModalOpen(false)}
@@ -1209,7 +1209,7 @@ export default function App() {
         }}
       />
 
-      <ExportModal
+      <LazyExportModal
         isOpen={isExportModalOpen}
         entries={entries}
         statuses={statuses}
@@ -1218,7 +1218,7 @@ export default function App() {
       />
 
       {settings && (
-        <SettingsModal
+        <LazySettingsModal
           isOpen={isSettingsModalOpen}
           settings={settings}
           statuses={statuses}
@@ -1235,7 +1235,7 @@ export default function App() {
         />
       )}
 
-      <BulkEditModal
+      <LazyBulkEditModal
         isOpen={isBulkEditModalOpen}
         selectedEntries={entries.filter((e) => selectedIds.includes(e.id))}
         statuses={statuses}
@@ -1255,7 +1255,7 @@ export default function App() {
       />
 
       {settings && (
-        <OtCalculatorModal
+        <LazyOtCalculatorModal
           isOpen={isOtCalculatorModalOpen}
           onClose={() => setIsOtCalculatorModalOpen(false)}
           entries={entries}
@@ -1271,6 +1271,7 @@ export default function App() {
           }}
         />
       )}
+      </Suspense>
     </div>
   );
 }

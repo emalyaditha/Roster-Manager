@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+import type { WorkBook } from 'xlsx';
 import Papa from 'papaparse';
 import { RosterStatusConfig, ImportHistoryRecord } from '../types/roster';
 import { api } from '../services/api';
@@ -92,17 +92,7 @@ function parseExcelDate(raw: any): { isoDate: string; dayName: string } | null {
   // Case 1: Excel Serial Number (e.g., 46250 = 2026-08-16)
   if (typeof raw === 'number' && !isNaN(raw)) {
     try {
-      const parsed = XLSX.SSF.parse_date_code(raw);
-      if (parsed && parsed.y && parsed.m && parsed.d) {
-        const yyyy = parsed.y < 100 ? parsed.y + 2000 : parsed.y;
-        const mm = String(parsed.m).padStart(2, '0');
-        const dd = String(parsed.d).padStart(2, '0');
-        const isoDate = `${yyyy}-${mm}-${dd}`;
-        const dayIdx = typeof parsed.q === 'number' ? parsed.q : new Date(yyyy, parsed.m - 1, parsed.d).getDay();
-        return { isoDate, dayName: DAYS[dayIdx] || 'Sunday' };
-      }
-    } catch {
-      // fallback to epoch math
+      // Pure JS Excel serial date conversion (avoids importing xlsx for this)
       const utcDays = raw - 25569;
       const utcValue = utcDays * 86400;
       const dateInfo = new Date(utcValue * 1000);
@@ -111,6 +101,8 @@ function parseExcelDate(raw: any): { isoDate: string; dayName: string } | null {
       const dd = String(dateInfo.getUTCDate()).padStart(2, '0');
       const isoDate = `${yyyy}-${mm}-${dd}`;
       return { isoDate, dayName: DAYS[dateInfo.getUTCDay()] || 'Sunday' };
+    } catch {
+      return null;
     }
   }
 
@@ -257,7 +249,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
     previousImport?: ImportHistoryRecord;
   } | null>(null);
 
-  const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null);
+  const [workbook, setWorkbook] = useState<WorkBook | null>(null);
   const [sheetNames, setSheetNames] = useState<string[]>([]);
   const [selectedSheet, setSelectedSheet] = useState<string>('');
 
@@ -327,7 +319,8 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
   if (!isOpen) return null;
 
   // Download Sample Excel Template
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
+    const XLSX = await import('xlsx');
     const sampleData = [
       {
         DATE: '10/08/2026',
@@ -383,6 +376,8 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
     setIsAnalyzing(true);
 
     try {
+      const XLSX = await import('xlsx');
+
       // Calculate simple hash
       const hash = computeStringHash(`${uploadedFile.name}-${uploadedFile.size}-${uploadedFile.lastModified}`);
       setFileHash(hash);
@@ -424,7 +419,8 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
   };
 
   // Process chosen sheet
-  const processSheetData = (wb: XLSX.WorkBook, sheetName: string) => {
+  const processSheetData = async (wb: WorkBook, sheetName: string) => {
+    const XLSX = await import('xlsx');
     const ws = wb.Sheets[sheetName];
     if (!ws) return;
 

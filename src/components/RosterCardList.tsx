@@ -16,7 +16,7 @@ interface RosterCardListProps {
   onSyncSingleClick: (entry: RosterEntry) => void;
 }
 
-export const RosterCardList: React.FC<RosterCardListProps> = ({
+export const RosterCardList = React.memo<RosterCardListProps>(({
   entries,
   statuses,
   selectedIds = [],
@@ -171,4 +171,4 @@ export const RosterCardList: React.FC<RosterCardListProps> = ({
       })}
     </div>
   );
-};
+});

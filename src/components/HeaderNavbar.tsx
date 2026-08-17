@@ -45,7 +45,7 @@ interface HeaderNavbarProps {
   onSignOut: () => void;
 }
 
-export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
+export const HeaderNavbar = React.memo<HeaderNavbarProps>(({
   currentMonthYear,
   onMonthChange,
   onTodayClick,
@@ -271,4 +271,4 @@ export const HeaderNavbar: React.FC<HeaderNavbarProps> = ({
       </div>
     </header>
   );
-};
+});

@@ -30,7 +30,7 @@ interface RosterTableProps {
   onBulkEditClick: () => void;
 }
 
-export const RosterTable: React.FC<RosterTableProps> = ({
+export const RosterTable = React.memo<RosterTableProps>(({
   entries,
   statuses,
   selectedIds,
@@ -301,4 +301,4 @@ export const RosterTable: React.FC<RosterTableProps> = ({
       </div>
     </div>
   );
-};
+});
