@@ -1,0 +1,4297 @@
+{
+  "communities": {
+    "0": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\data\\defaultStatuses.ts",
+      "file:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts",
+      "file:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts",
+      "file:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts",
+      "file:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts",
+      "file:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts",
+      "module:../../firebase-applet-config.json",
+      "module:../types/roster",
+      "module:../utils/leaveColors",
+      "module:./date"
+    ],
+    "1": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx",
+      "module:../utils/leave",
+      "module:./ClockTimePicker",
+      "module:./CurrentEffectiveTooltip",
+      "module:./StatusBadge"
+    ],
+    "2": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\AuditHistoryModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\CurrentEffectiveTooltip.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\DeleteConfirmModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\HeaderNavbar.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\PrintView.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx",
+      "module:../services/api",
+      "module:../utils/date"
+    ],
+    "3": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx",
+      "module:../hooks/useIsMobile",
+      "module:../utils/otCalculator",
+      "module:./DosDofLedger",
+      "module:./LeaveBalanceCard"
+    ],
+    "4": [
+      "file:D:\\Emkode\\Roster-Manager\\server.ts",
+      "file:D:\\Emkode\\Roster-Manager\\server\\store.ts",
+      "module:../src/data/defaultStatuses.js",
+      "module:../src/types/roster.js",
+      "module:../src/utils/date.js",
+      "module:./server/store.js",
+      "module:./src/utils/otCalculator.js"
+    ],
+    "5": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\App.tsx",
+      "module:./components/HeaderNavbar",
+      "module:./components/LoginScreen",
+      "module:./components/RosterCalendarView",
+      "module:./components/RosterCardList",
+      "module:./components/RosterTable",
+      "module:./components/Toast"
+    ],
+    "6": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\ExportModal.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\LoginScreen.tsx",
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx",
+      "module:../services/googleAuth",
+      "module:../utils/export"
+    ],
+    "7": [
+      "file:D:\\Emkode\\Roster-Manager\\api\\index.ts",
+      "module:../dist/server.cjs"
+    ],
+    "8": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\main.tsx",
+      "module:./App.tsx"
+    ],
+    "9": [
+      "ast:D:\\Emkode\\Roster-Manager\\api\\index.ts:app"
+    ],
+    "10": [
+      "ast:D:\\Emkode\\Roster-Manager\\api\\index.ts:appPromise"
+    ],
+    "11": [
+      "ast:D:\\Emkode\\Roster-Manager\\api\\index.ts:handler"
+    ],
+    "12": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts: ="
+    ],
+    "13": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:PORT"
+    ],
+    "14": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:RT ="
+    ],
+    "15": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:allEntries"
+    ],
+    "16": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:app"
+    ],
+    "17": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:appUrl"
+    ],
+    "18": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:ar ="
+    ],
+    "19": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:art ="
+    ],
+    "20": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:auditRecord"
+    ],
+    "21": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:balance"
+    ],
+    "22": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:calKey"
+    ],
+    "23": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:calcs"
+    ],
+    "24": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:ccessCount ="
+    ],
+    "25": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:changedDays"
+    ],
+    "26": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:clearHandler"
+    ],
+    "27": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:clientId"
+    ],
+    "28": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:clockEventsToSave"
+    ],
+    "29": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:config"
+    ],
+    "30": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:configPath"
+    ],
+    "31": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:createServer"
+    ],
+    "32": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:cur"
+    ],
+    "33": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:current"
+    ],
+    "34": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:cycleKey"
+    ],
+    "35": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:d"
+    ],
+    "36": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:d ="
+    ],
+    "37": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:datedCount ="
+    ],
+    "38": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:dayName"
+    ],
+    "39": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:deletedEntries"
+    ],
+    "40": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:deletedIds"
+    ],
+    "41": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:eatedCount ="
+    ],
+    "42": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:effectiveCurrent"
+    ],
+    "43": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:emp"
+    ],
+    "44": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:employee"
+    ],
+    "45": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:endDate"
+    ],
+    "46": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:endObj"
+    ],
+    "47": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:entries"
+    ],
+    "48": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:entriesChanged"
+    ],
+    "49": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:entry"
+    ],
+    "50": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:entryMap"
+    ],
+    "51": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:evDate"
+    ],
+    "52": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:events"
+    ],
+    "53": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:existing"
+    ],
+    "54": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:existingIndex"
+    ],
+    "55": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:faultForDay ="
+    ],
+    "56": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:formatClockIn"
+    ],
+    "57": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:formatClockOut"
+    ],
+    "58": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:formattedEvents"
+    ],
+    "59": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:getCycleDateRange"
+    ],
+    "60": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:googleAuthUrl"
+    ],
+    "61": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:history"
+    ],
+    "62": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:holDays"
+    ],
+    "63": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:idx"
+    ],
+    "64": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:iginal ="
+    ],
+    "65": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:iledCount ="
+    ],
+    "66": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:iledRows: "
+    ],
+    "67": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:index"
+    ],
+    "68": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:isChanged"
+    ],
+    "69": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:isMatch"
+    ],
+    "70": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:isting ="
+    ],
+    "71": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:istingEntries ="
+    ],
+    "72": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:istingIdx ="
+    ],
+    "73": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:item"
+    ],
+    "74": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:leaveDays"
+    ],
+    "75": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:lidDateRows ="
+    ],
+    "76": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:lidStatuses ="
+    ],
+    "77": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:merged"
+    ],
+    "78": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:mergedEvents"
+    ],
+    "79": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:mergedMap"
+    ],
+    "80": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:month"
+    ],
+    "81": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:nDate ="
+    ],
+    "82": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:nDateStr ="
+    ],
+    "83": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:nerated: "
+    ],
+    "84": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:newChanged"
+    ],
+    "85": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:newCurrent"
+    ],
+    "86": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:newEntry"
+    ],
+    "87": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:newSettings"
+    ],
+    "88": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:now"
+    ],
+    "89": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:nthStr ="
+    ],
+    "90": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:o ="
+    ],
+    "91": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:ocessedDates: "
+    ],
+    "92": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:offDays"
+    ],
+    "93": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:otCalcs"
+    ],
+    "94": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:otDays"
+    ],
+    "95": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:otMorningHours"
+    ],
+    "96": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:otNightHours"
+    ],
+    "97": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:otTotalHours"
+    ],
+    "98": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:otType"
+    ],
+    "99": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:per ="
+    ],
+    "100": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:portedCount ="
+    ],
+    "101": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:previousAction"
+    ],
+    "102": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:previousStatus"
+    ],
+    "103": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:query"
+    ],
+    "104": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:redirectUri"
+    ],
+    "105": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:res"
+    ],
+    "106": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:rmalizedRows ="
+    ],
+    "107": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:rollStartDate"
+    ],
+    "108": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:rows"
+    ],
+    "109": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:rr ="
+    ],
+    "110": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:sUserChange ="
+    ],
+    "111": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:settings"
+    ],
+    "112": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:sqlContent"
+    ],
+    "113": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:sqlPath"
+    ],
+    "114": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:stPath ="
+    ],
+    "115": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:startDate"
+    ],
+    "116": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:status"
+    ],
+    "117": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:statusBreakdown"
+    ],
+    "118": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:statuses"
+    ],
+    "119": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:story ="
+    ],
+    "120": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:storyRecord ="
+    ],
+    "121": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:subDaysStr"
+    ],
+    "122": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:syncAndPersistOtForEntries"
+    ],
+    "123": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:syncResult"
+    ],
+    "124": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:syncedCount"
+    ],
+    "125": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:target"
+    ],
+    "126": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:targetEntries"
+    ],
+    "127": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:tch ="
+    ],
+    "128": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:te ="
+    ],
+    "129": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:teRange ="
+    ],
+    "130": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:teSet ="
+    ],
+    "131": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:teStr ="
+    ],
+    "132": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:totalDays"
+    ],
+    "133": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:tries ="
+    ],
+    "134": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:updated"
+    ],
+    "135": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:updatedCount"
+    ],
+    "136": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:updatedEntries"
+    ],
+    "137": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:updatedEntriesList"
+    ],
+    "138": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:updatedEntry"
+    ],
+    "139": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:updatedRemark"
+    ],
+    "140": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:w ="
+    ],
+    "141": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:wChanged ="
+    ],
+    "142": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:wChangedStatus ="
+    ],
+    "143": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:wCurrent ="
+    ],
+    "144": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:wCurrentStatus ="
+    ],
+    "145": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:wEntry: "
+    ],
+    "146": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:wErrors: "
+    ],
+    "147": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:workingDays"
+    ],
+    "148": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:xDate ="
+    ],
+    "149": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:xDateStr ="
+    ],
+    "150": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:yName ="
+    ],
+    "151": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:yStr ="
+    ],
+    "152": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:yearNum"
+    ],
+    "153": [
+      "ast:D:\\Emkode\\Roster-Manager\\server.ts:yy ="
+    ],
+    "154": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:\n   "
+    ],
+    "155": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = ['Annua"
+    ],
+    "156": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = asy"
+    ],
+    "157": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = await"
+    ],
+    "158": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = doc"
+    ],
+    "159": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = dof"
+    ],
+    "160": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = false;\n"
+    ],
+    "161": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = local"
+    ],
+    "162": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = ups"
+    ],
+    "163": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: = { e"
+    ],
+    "164": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: awa"
+    ],
+    "165": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: e.c"
+    ],
+    "166": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: new"
+    ],
+    "167": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: rea"
+    ],
+    "168": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts: sna"
+    ],
+    "169": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:!=="
+    ],
+    "170": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:\""
+    ],
+    "171": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:(.."
+    ],
+    "172": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:."
+    ],
+    "173": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= `${year"
+    ],
+    "174": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= emp"
+    ],
+    "175": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= for"
+    ],
+    "176": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= new M"
+    ],
+    "177": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= raw"
+    ],
+    "178": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= rea"
+    ],
+    "179": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= rosterC"
+    ],
+    "180": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= sta"
+    ],
+    "181": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= sup"
+    ],
+    "182": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:= {\n "
+    ],
+    "183": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:DEFAULT_SETTINGS"
+    ],
+    "184": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:Date: stri"
+    ],
+    "185": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:DaysRows = ent"
+    ],
+    "186": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:Events = [.."
+    ],
+    "187": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:LOCAL_DATA_DIR"
+    ],
+    "188": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:Map: Record<s"
+    ],
+    "189": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:Opening = new M"
+    ],
+    "190": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:Rows = for"
+    ],
+    "191": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:SupabaseError(conte"
+    ],
+    "192": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:TMP_DATA_DIR"
+    ],
+    "193": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:`\""
+    ],
+    "194": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:`${"
+    ],
+    "195": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:`${year"
+    ],
+    "196": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:adJso"
+    ],
+    "197": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ait"
+    ],
+    "198": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ap = new"
+    ],
+    "199": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:artTime: stri"
+    ],
+    "200": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:await t"
+    ],
+    "201": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:baseEnabled = fal"
+    ],
+    "202": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ch = cod"
+    ],
+    "203": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ckEmp = { i"
+    ],
+    "204": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:content"
+    ],
+    "205": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:cs = readJ"
+    ],
+    "206": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:e = ups"
+    ],
+    "207": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ed = 0;\n    "
+    ],
+    "208": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ed = utilize"
+    ],
+    "209": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:emplo"
+    ],
+    "210": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ent"
+    ],
+    "211": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ents: any[] "
+    ],
+    "212": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:entsFile = 'leav"
+    ],
+    "213": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:es = awa"
+    ],
+    "214": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:essage = err"
+    ],
+    "215": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:estoreDoc = asy"
+    ],
+    "216": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:estoreDocs = asy"
+    ],
+    "217": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ew Map"
+    ],
+    "218": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:filePath"
+    ],
+    "219": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:getReadFilePath"
+    ],
+    "220": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:getWriteFilePath"
+    ],
+    "221": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:his"
+    ],
+    "222": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:isPlaceholder"
+    ],
+    "223": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:isSupabaseEnabled"
+    ],
+    "224": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:lized = entRow?"
+    ],
+    "225": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:lo"
+    ],
+    "226": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:nVal = e.c"
+    ],
+    "227": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ng = eve"
+    ],
+    "228": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ng = exi"
+    ],
+    "229": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ngMap = new"
+    ],
+    "230": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ning"
+    ],
+    "231": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ntext = con"
+    ],
+    "232": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ntit"
+    ],
+    "233": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ntitle"
+    ],
+    "234": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ode = err"
+    ],
+    "235": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:oreDb: any "
+    ],
+    "236": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ow?"
+    ],
+    "237": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:p: Record<s"
+    ],
+    "238": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:pabaseCheck() {\n "
+    ],
+    "239": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ploye"
+    ],
+    "240": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:readJ"
+    ],
+    "241": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:readJsonFile"
+    ],
+    "242": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:restoreDocs = asy"
+    ],
+    "243": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:s: Rost"
+    ],
+    "244": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:seTablesMissing = fal"
+    ],
+    "245": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ssage = err"
+    ],
+    "246": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:supab"
+    ],
+    "247": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:supabaseClient"
+    ],
+    "248": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:supabaseKey"
+    ],
+    "249": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:supabaseUrl"
+    ],
+    "250": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:t t"
+    ],
+    "251": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:tEmpId = emp"
+    ],
+    "252": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:tch = cod"
+    ],
+    "253": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:tedCalcs = cal"
+    ],
+    "254": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:tedEvents = eve"
+    ],
+    "255": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:tmpPath"
+    ],
+    "256": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:ts = await t"
+    ],
+    "257": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:urre"
+    ],
+    "258": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:utVal = e.c"
+    ],
+    "259": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:v"
+    ],
+    "260": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:veRow = {\n   "
+    ],
+    "261": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:vents = awa"
+    ],
+    "262": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:vents = rea"
+    ],
+    "263": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:writeJsonFile"
+    ],
+    "264": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:writePath"
+    ],
+    "265": [
+      "ast:D:\\Emkode\\Roster-Manager\\server\\store.ts:zedEntries = ent"
+    ],
+    "266": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx: = get"
+    ],
+    "267": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:= bal"
+    ],
+    "268": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyAddRosterModal"
+    ],
+    "269": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyAuditHistoryModal"
+    ],
+    "270": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyBulkEditModal"
+    ],
+    "271": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyDashboardOverview"
+    ],
+    "272": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyDeleteConfirmModal"
+    ],
+    "273": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyExportModal"
+    ],
+    "274": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyImportWizardModal"
+    ],
+    "275": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyLeavePickerModal"
+    ],
+    "276": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyOtCalculatorModal"
+    ],
+    "277": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazyRosterChangeModal"
+    ],
+    "278": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:LazySettingsModal"
+    ],
+    "279": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:authRes"
+    ],
+    "280": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:availableCycles"
+    ],
+    "281": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:currentLeaveYear"
+    ],
+    "282": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:cyclesSet"
+    ],
+    "283": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:dismissToast"
+    ],
+    "284": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:fetchedSettings"
+    ],
+    "285": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:filteredEntries"
+    ],
+    "286": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:gcalRes"
+    ],
+    "287": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleAddRoster"
+    ],
+    "288": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleApplyBulkChange"
+    ],
+    "289": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleConfirmDelete"
+    ],
+    "290": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleCopySql"
+    ],
+    "291": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleLogout"
+    ],
+    "292": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleSaveRosterChange"
+    ],
+    "293": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleSyncAllGoogle"
+    ],
+    "294": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleSyncSingle"
+    ],
+    "295": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleToggleSelectAll"
+    ],
+    "296": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:handleToggleSelectOne"
+    ],
+    "297": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:hasOvertime"
+    ],
+    "298": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:id"
+    ],
+    "299": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:isStatusChanged"
+    ],
+    "300": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:loadData"
+    ],
+    "301": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:loadLeaveBalance"
+    ],
+    "302": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:m"
+    ],
+    "303": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:matchesAction"
+    ],
+    "304": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:matchesCurrent"
+    ],
+    "305": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:matchesDate"
+    ],
+    "306": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:matchesDay"
+    ],
+    "307": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:matchesNotes"
+    ],
+    "308": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:matchesOriginal"
+    ],
+    "309": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:migrateRes"
+    ],
+    "310": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:migratedCount"
+    ],
+    "311": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:newEntry"
+    ],
+    "312": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:offset"
+    ],
+    "313": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:ongoingCycle"
+    ],
+    "314": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:pushToast"
+    ],
+    "315": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:q"
+    ],
+    "316": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:realEventId"
+    ],
+    "317": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:res"
+    ],
+    "318": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:sStatus"
+    ],
+    "319": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:se fallb"
+    ],
+    "320": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:selectedEntries"
+    ],
+    "321": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:stored"
+    ],
+    "322": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:syncRes"
+    ],
+    "323": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:syncedEntries"
+    ],
+    "324": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:todayEntry"
+    ],
+    "325": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:todayStr"
+    ],
+    "326": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:token"
+    ],
+    "327": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:unsubscribe"
+    ],
+    "328": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:usCode = lea"
+    ],
+    "329": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:userSession"
+    ],
+    "330": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:yCode = get"
+    ],
+    "331": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\App.tsx:ype = LEA"
+    ],
+    "332": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:AddRosterModalProps"
+    ],
+    "333": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:ampm"
+    ],
+    "334": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:arrivalMinutes"
+    ],
+    "335": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:calculateMorningOT"
+    ],
+    "336": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:calculateNightOT"
+    ],
+    "337": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:calculated"
+    ],
+    "338": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:config"
+    ],
+    "339": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:dayName"
+    ],
+    "340": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:departureMinutes"
+    ],
+    "341": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:diffHours"
+    ],
+    "342": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:displayH"
+    ],
+    "343": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:endTime"
+    ],
+    "344": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:expectedMinutes"
+    ],
+    "345": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:formatTimeLabel"
+    ],
+    "346": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:getExpectedTimes"
+    ],
+    "347": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:h"
+    ],
+    "348": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:handleOriginalStatusSelect"
+    ],
+    "349": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:handleSubmit"
+    ],
+    "350": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:isSelected"
+    ],
+    "351": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AddRosterModal.tsx:startTime"
+    ],
+    "352": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\AuditHistoryModal.tsx:AuditHistoryModalProps"
+    ],
+    "353": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx:BulkEditModal"
+    ],
+    "354": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx:BulkEditModalProps"
+    ],
+    "355": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx:handleStatusSelect"
+    ],
+    "356": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx:handleSubmit"
+    ],
+    "357": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx:isSelected"
+    ],
+    "358": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\BulkEditModal.tsx:selected"
+    ],
+    "359": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:ClockTimePicker"
+    ],
+    "360": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:ClockTimePickerProps"
+    ],
+    "361": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:HOURS"
+    ],
+    "362": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:MINUTES"
+    ],
+    "363": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:containerRef"
+    ],
+    "364": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:displayString"
+    ],
+    "365": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:handleApply"
+    ],
+    "366": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:handleClickOutside"
+    ],
+    "367": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:handleInputBlur"
+    ],
+    "368": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:handleInputChange"
+    ],
+    "369": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:handlePreset"
+    ],
+    "370": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:isSelected"
+    ],
+    "371": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:parsedMins"
+    ],
+    "372": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:parts"
+    ],
+    "373": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:selectedAmpm"
+    ],
+    "374": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:selectedHour"
+    ],
+    "375": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:selectedMinute"
+    ],
+    "376": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:target"
+    ],
+    "377": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ClockTimePicker.tsx:time24"
+    ],
+    "378": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\CurrentEffectiveTooltip.tsx:CurrentEffectiveTooltipProps"
+    ],
+    "379": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\CurrentEffectiveTooltip.tsx:handleMouseEnter"
+    ],
+    "380": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\CurrentEffectiveTooltip.tsx:handleMouseLeave"
+    ],
+    "381": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\CurrentEffectiveTooltip.tsx:isChanged"
+    ],
+    "382": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\CurrentEffectiveTooltip.tsx:records"
+    ],
+    "383": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:;\n  "
+    ],
+    "384": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:DashboardOverviewProps"
+    ],
+    "385": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:active"
+    ],
+    "386": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:allOtEntries"
+    ],
+    "387": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:allStatusKeys"
+    ],
+    "388": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:arlyOt = r"
+    ],
+    "389": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:ason ="
+    ],
+    "390": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:ateOt = r"
+    ],
+    "391": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:b"
+    ],
+    "392": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:billable"
+    ],
+    "393": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:breakdownFor"
+    ],
+    "394": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:calculatedOtEntries"
+    ],
+    "395": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:changedEntries"
+    ],
+    "396": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:comparisonData"
+    ],
+    "397": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:config"
+    ],
+    "398": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:currentCounts"
+    ],
+    "399": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:data"
+    ],
+    "400": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:fetchHistory"
+    ],
+    "401": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:formatHoursMinutes"
+    ],
+    "402": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:h"
+    ],
+    "403": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:isDark"
+    ],
+    "404": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:isMobile"
+    ],
+    "405": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:item"
+    ],
+    "406": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:m"
+    ],
+    "407": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:morning"
+    ],
+    "408": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:night"
+    ],
+    "409": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:observer"
+    ],
+    "410": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:on = e"
+    ],
+    "411": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:originalCounts"
+    ],
+    "412": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:otSettings"
+    ],
+    "413": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:otTotals"
+    ],
+    "414": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:pieData"
+    ],
+    "415": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:rawMorning"
+    ],
+    "416": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:rawNight"
+    ],
+    "417": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:rawTotal"
+    ],
+    "418": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:res"
+    ],
+    "419": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:statusCounts"
+    ],
+    "420": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:t ="
+    ],
+    "421": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:total"
+    ],
+    "422": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:totalDays"
+    ],
+    "423": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:totalMinutes"
+    ],
+    "424": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:tryHistory ="
+    ],
+    "425": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:useIsDarkMode"
+    ],
+    "426": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DashboardOverview.tsx:yHistory = h"
+    ],
+    "427": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DeleteConfirmModal.tsx:DeleteConfirmModalProps"
+    ],
+    "428": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DeleteConfirmModal.tsx:handleDelete"
+    ],
+    "429": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx: ({ "
+    ],
+    "430": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:DosDofLedgerProps"
+    ],
+    "431": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:LedgerRow"
+    ],
+    "432": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:STATUS_STYLE"
+    ],
+    "433": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:TU"
+    ],
+    "434": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:d"
+    ],
+    "435": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:d = led"
+    ],
+    "436": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:ed = led"
+    ],
+    "437": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:formatDate"
+    ],
+    "438": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:g = led"
+    ],
+    "439": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:isMobile"
+    ],
+    "440": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:ledger"
+    ],
+    "441": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:out"
+    ],
+    "442": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\DosDofLedger.tsx:rows"
+    ],
+    "443": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ExportModal.tsx:ExportModal"
+    ],
+    "444": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ExportModal.tsx:ExportModalProps"
+    ],
+    "445": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ExportModal.tsx:filteredEntries"
+    ],
+    "446": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ExportModal.tsx:handleExport"
+    ],
+    "447": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\HeaderNavbar.tsx:HeaderNavbarProps"
+    ],
+    "448": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\HeaderNavbar.tsx:viewOptions"
+    ],
+    "449": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:COLOR_STATUS_MAP"
+    ],
+    "450": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:DAYS"
+    ],
+    "451": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:ImportWizardModalProps"
+    ],
+    "452": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:STATUS_ALIASES"
+    ],
+    "453": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:XLSX"
+    ],
+    "454": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:actionTitle"
+    ],
+    "455": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:autoFilledList"
+    ],
+    "456": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:bestSheet"
+    ],
+    "457": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:buffer"
+    ],
+    "458": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:char"
+    ],
+    "459": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:computeStringHash"
+    ],
+    "460": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:curr"
+    ],
+    "461": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:d"
+    ],
+    "462": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dataObjectRows"
+    ],
+    "463": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dateInfo"
+    ],
+    "464": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dateStr"
+    ],
+    "465": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dayIdx"
+    ],
+    "466": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dayName"
+    ],
+    "467": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dayNames"
+    ],
+    "468": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dayStr"
+    ],
+    "469": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dd"
+    ],
+    "470": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:defaultEmp"
+    ],
+    "471": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:detectedAction"
+    ],
+    "472": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:detectedDate"
+    ],
+    "473": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:detectedDay"
+    ],
+    "474": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:detectedOt"
+    ],
+    "475": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:detectedRoster"
+    ],
+    "476": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:detectedStatus"
+    ],
+    "477": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:dupRes"
+    ],
+    "478": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:empCols"
+    ],
+    "479": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:endDate"
+    ],
+    "480": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:existingDates"
+    ],
+    "481": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:firstSheet"
+    ],
+    "482": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:foundDay"
+    ],
+    "483": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:foundMonth"
+    ],
+    "484": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:foundYear"
+    ],
+    "485": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:generatePreview"
+    ],
+    "486": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:handleConfirmImport"
+    ],
+    "487": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:handleDownloadTemplate"
+    ],
+    "488": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:handleFileUpload"
+    ],
+    "489": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:handleSyncCalendarPostImport"
+    ],
+    "490": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:hash"
+    ],
+    "491": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:headerIdx"
+    ],
+    "492": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:headers"
+    ],
+    "493": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:i"
+    ],
+    "494": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:isOt"
+    ],
+    "495": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:isoCheck"
+    ],
+    "496": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:isoDate"
+    ],
+    "497": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:localHour"
+    ],
+    "498": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:m"
+    ],
+    "499": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:mapped"
+    ],
+    "500": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:maxDateStr"
+    ],
+    "501": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:minDateStr"
+    ],
+    "502": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:mismatches"
+    ],
+    "503": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:mm"
+    ],
+    "504": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:monthNames"
+    ],
+    "505": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:nonEmployeeKeywords"
+    ],
+    "506": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:num"
+    ],
+    "507": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:parseExcelDate"
+    ],
+    "508": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:parsedDate"
+    ],
+    "509": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:parts"
+    ],
+    "510": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:processSheetData"
+    ],
+    "511": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:rawDate"
+    ],
+    "512": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:rawOt"
+    ],
+    "513": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:rawRoster"
+    ],
+    "514": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:rawRows"
+    ],
+    "515": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:res"
+    ],
+    "516": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:sampleData"
+    ],
+    "517": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:startDate"
+    ],
+    "518": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:str"
+    ],
+    "519": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:upperRoster"
+    ],
+    "520": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:utcDays"
+    ],
+    "521": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:utcHour"
+    ],
+    "522": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:utcValue"
+    ],
+    "523": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:wb"
+    ],
+    "524": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:words"
+    ],
+    "525": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:ws"
+    ],
+    "526": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:y"
+    ],
+    "527": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\ImportWizardModal.tsx:yyyy"
+    ],
+    "528": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:LeaveBalanceCardProps"
+    ],
+    "529": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:SummaryCell"
+    ],
+    "530": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:barPct"
+    ],
+    "531": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:handleSync"
+    ],
+    "532": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:handler"
+    ],
+    "533": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:isMobile"
+    ],
+    "534": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:mq"
+    ],
+    "535": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:otherRows"
+    ],
+    "536": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:shortLeaveRow"
+    ],
+    "537": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:subtitles"
+    ],
+    "538": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:totals"
+    ],
+    "539": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:useIsMobile"
+    ],
+    "540": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeaveBalanceCard.tsx:visibleRows"
+    ],
+    "541": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:LeavePickerModalProps"
+    ],
+    "542": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:Pool = i"
+    ],
+    "543": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:alRow = ge"
+    ],
+    "544": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:alance = po"
+    ],
+    "545": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:confirmDisabled"
+    ],
+    "546": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:context"
+    ],
+    "547": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:currentCode"
+    ],
+    "548": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:effectiveCode"
+    ],
+    "549": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:elected = ha"
+    ],
+    "550": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:ero = po"
+    ],
+    "551": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:formatBalance"
+    ],
+    "552": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:getPreviewLabel"
+    ],
+    "553": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:handleClose"
+    ],
+    "554": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:handleConfirm"
+    ],
+    "555": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:handleSelectOption"
+    ],
+    "556": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:handleSelectPool"
+    ],
+    "557": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:hasClockData"
+    ],
+    "558": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:isHalfDay"
+    ],
+    "559": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:isWarnCode"
+    ],
+    "560": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:lected = s"
+    ],
+    "561": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:pool"
+    ],
+    "562": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:reset"
+    ],
+    "563": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:selectedOption"
+    ],
+    "564": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LeavePickerModal.tsx:validation"
+    ],
+    "565": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LoginScreen.tsx:LoginScreenProps"
+    ],
+    "566": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\LoginScreen.tsx:handleSignIn"
+    ],
+    "567": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:OtCalculatorModalProps"
+    ],
+    "568": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:ampm"
+    ],
+    "569": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:audit"
+    ],
+    "570": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:changed"
+    ],
+    "571": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:changedUpdates"
+    ],
+    "572": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:clock"
+    ],
+    "573": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:csvContent"
+    ],
+    "574": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:dayResults"
+    ],
+    "575": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:defaultIn"
+    ],
+    "576": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:defaultOut"
+    ],
+    "577": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:encodedUri"
+    ],
+    "578": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:entriesHash"
+    ],
+    "579": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:entriesWithOt"
+    ],
+    "580": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:estimatedPayout"
+    ],
+    "581": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:formatDuration"
+    ],
+    "582": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:formatTimeAMPM"
+    ],
+    "583": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:h"
+    ],
+    "584": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:handleClockChange"
+    ],
+    "585": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:handleExportCsv"
+    ],
+    "586": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:handleRemarkChange"
+    ],
+    "587": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:handleSaveClockTimes"
+    ],
+    "588": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:handleSaveSettings"
+    ],
+    "589": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:headers"
+    ],
+    "590": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:hrs"
+    ],
+    "591": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:initial"
+    ],
+    "592": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:isMobile"
+    ],
+    "593": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:ledger"
+    ],
+    "594": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:link"
+    ],
+    "595": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:m"
+    ],
+    "596": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:mins"
+    ],
+    "597": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:next"
+    ],
+    "598": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:otSettings"
+    ],
+    "599": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:parts"
+    ],
+    "600": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:remark"
+    ],
+    "601": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:result"
+    ],
+    "602": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:rows"
+    ],
+    "603": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:sched"
+    ],
+    "604": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:targetIn"
+    ],
+    "605": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:targetOut"
+    ],
+    "606": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:targetRemark"
+    ],
+    "607": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:time"
+    ],
+    "608": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:times"
+    ],
+    "609": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:totalBillableOtHours"
+    ],
+    "610": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:totalBillableOtMinutes"
+    ],
+    "611": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:totalRawOtHours"
+    ],
+    "612": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:totalRawOtMinutes"
+    ],
+    "613": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:updatedAppSettings"
+    ],
+    "614": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\OtCalculatorModal.tsx:updatedEntriesWithTimes"
+    ],
+    "615": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\PrintView.tsx:Changed ="
+    ],
+    "616": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\PrintView.tsx:PrintView"
+    ],
+    "617": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\PrintView.tsx:PrintViewProps"
+    ],
+    "618": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:RosterCalendarViewProps"
+    ],
+    "619": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:ampm"
+    ],
+    "620": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:cleaned"
+    ],
+    "621": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:dayNum"
+    ],
+    "622": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:entry"
+    ],
+    "623": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:entryMap"
+    ],
+    "624": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:firstDateObj"
+    ],
+    "625": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:firstDateStr"
+    ],
+    "626": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:formatTimeShort"
+    ],
+    "627": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:h12"
+    ],
+    "628": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:hours"
+    ],
+    "629": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:isAm"
+    ],
+    "630": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:isChanged"
+    ],
+    "631": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:isPm"
+    ],
+    "632": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:isToday"
+    ],
+    "633": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:leadingBlankCount"
+    ],
+    "634": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:leadingBlanks"
+    ],
+    "635": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:minutes"
+    ],
+    "636": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:monthDates"
+    ],
+    "637": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:parts"
+    ],
+    "638": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:raw"
+    ],
+    "639": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCalendarView.tsx:statusConfig"
+    ],
+    "640": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx:RosterCardListProps"
+    ],
+    "641": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx:isChanged"
+    ],
+    "642": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx:isSelected"
+    ],
+    "643": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx:isToday"
+    ],
+    "644": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx:todayStr"
+    ],
+    "645": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterCardList.tsx:totalOtHours"
+    ],
+    "646": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:RosterChangeModalProps"
+    ],
+    "647": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:activeStatuses"
+    ],
+    "648": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:ampm"
+    ],
+    "649": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:arrivalMinutes"
+    ],
+    "650": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:calculateMorningOT"
+    ],
+    "651": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:calculateNightOT"
+    ],
+    "652": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:calculated"
+    ],
+    "653": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:config"
+    ],
+    "654": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:currentCode"
+    ],
+    "655": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:departureMinutes"
+    ],
+    "656": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:diffHours"
+    ],
+    "657": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:displayH"
+    ],
+    "658": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:endTime"
+    ],
+    "659": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:expectedMinutes"
+    ],
+    "660": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:formatTimeLabel"
+    ],
+    "661": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:getExpectedTimes"
+    ],
+    "662": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:h"
+    ],
+    "663": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:handleStatusSelect"
+    ],
+    "664": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:handleSubmit"
+    ],
+    "665": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:isSelected"
+    ],
+    "666": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:selected"
+    ],
+    "667": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterChangeModal.tsx:startTime"
+    ],
+    "668": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx:RosterTableProps"
+    ],
+    "669": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx:isAllSelected"
+    ],
+    "670": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx:isChanged"
+    ],
+    "671": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx:isSelected"
+    ],
+    "672": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx:isToday"
+    ],
+    "673": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\RosterTable.tsx:totalOtHours"
+    ],
+    "674": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:SettingsModalProps"
+    ],
+    "675": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:activeEntries"
+    ],
+    "676": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:authRes"
+    ],
+    "677": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:calKey"
+    ],
+    "678": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:calSet"
+    ],
+    "679": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:cycleKey"
+    ],
+    "680": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:cycleSet"
+    ],
+    "681": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:d"
+    ],
+    "682": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:es = filterE"
+    ],
+    "683": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:executeClearData"
+    ],
+    "684": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:fetchSupabaseStatus"
+    ],
+    "685": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:filterEntriesByMonthKey"
+    ],
+    "686": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:handleConnectGoogle"
+    ],
+    "687": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:handleCopySqlInSettings"
+    ],
+    "688": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:handleDisconnectGoogle"
+    ],
+    "689": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:handleSave"
+    ],
+    "690": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:m"
+    ],
+    "691": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:monthOptions"
+    ],
+    "692": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:ntriesByMo"
+    ],
+    "693": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:prevM"
+    ],
+    "694": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:prevObj"
+    ],
+    "695": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:prevY"
+    ],
+    "696": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:res"
+    ],
+    "697": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:result"
+    ],
+    "698": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:rmatR"
+    ],
+    "699": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:saved"
+    ],
+    "700": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:savedSettings"
+    ],
+    "701": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:savedStatuses"
+    ],
+    "702": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:status"
+    ],
+    "703": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:successMsg"
+    ],
+    "704": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:targetEntries"
+    ],
+    "705": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:toLocaleS"
+    ],
+    "706": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:token"
+    ],
+    "707": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:trimmed"
+    ],
+    "708": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:umber(y"
+    ],
+    "709": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:updated"
+    ],
+    "710": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:updatedAll"
+    ],
+    "711": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SettingsModal.tsx:y"
+    ],
+    "712": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:StatusBadge"
+    ],
+    "713": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:StatusBadgeProps"
+    ],
+    "714": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:bg"
+    ],
+    "715": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:border"
+    ],
+    "716": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:codeDisplay"
+    ],
+    "717": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:config"
+    ],
+    "718": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:descriptionDisplay"
+    ],
+    "719": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:dotColor"
+    ],
+    "720": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:sizeClasses"
+    ],
+    "721": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\StatusBadge.tsx:text"
+    ],
+    "722": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:SummaryCardsProps"
+    ],
+    "723": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:changedCount"
+    ],
+    "724": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:config"
+    ],
+    "725": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:daysOff"
+    ],
+    "726": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:dosDays"
+    ],
+    "727": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:holDays"
+    ],
+    "728": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:leaveDays"
+    ],
+    "729": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:otDays"
+    ],
+    "730": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:otMorningHours"
+    ],
+    "731": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:otNightHours"
+    ],
+    "732": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:otTotalHours"
+    ],
+    "733": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:todayEntry"
+    ],
+    "734": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:todayStr"
+    ],
+    "735": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:totalDays"
+    ],
+    "736": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:wfhDays"
+    ],
+    "737": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\SummaryCards.tsx:workingDays"
+    ],
+    "738": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:TemplateGeneratorModal"
+    ],
+    "739": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:TemplateGeneratorModalProps"
+    ],
+    "740": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:cycleRange"
+    ],
+    "741": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:daysOfWeek"
+    ],
+    "742": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:handleDayStatusChange"
+    ],
+    "743": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:handleGenerate"
+    ],
+    "744": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\TemplateGeneratorModal.tsx:range"
+    ],
+    "745": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\Toast.tsx:Toast"
+    ],
+    "746": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\Toast.tsx:ToastItem"
+    ],
+    "747": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\Toast.tsx:ToastProps"
+    ],
+    "748": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\Toast.tsx:borderColors"
+    ],
+    "749": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\components\\Toast.tsx:icons"
+    ],
+    "750": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\data\\defaultStatuses.ts:DEFAULT_ROSTER_STATUSES"
+    ],
+    "751": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\hooks\\useIsMobile.ts:handler"
+    ],
+    "752": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\hooks\\useIsMobile.ts:mq"
+    ],
+    "753": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\hooks\\useIsMobile.ts:useIsMobile"
+    ],
+    "754": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:api"
+    ],
+    "755": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:authorizedFetch"
+    ],
+    "756": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:data"
+    ],
+    "757": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:headers"
+    ],
+    "758": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:query"
+    ],
+    "759": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:r ="
+    ],
+    "760": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:res"
+    ],
+    "761": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:s ="
+    ],
+    "762": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\api.ts:url"
+    ],
+    "763": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:OLD_SUMMARY_PREFIX"
+    ],
+    "764": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:STORAGE_KEY_TOKEN"
+    ],
+    "765": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:STORAGE_KEY_USER"
+    ],
+    "766": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:UserSession"
+    ],
+    "767": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:accessToken"
+    ],
+    "768": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:app"
+    ],
+    "769": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:assignmentLine"
+    ],
+    "770": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:auth"
+    ],
+    "771": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:body"
+    ],
+    "772": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:buildNewSummary"
+    ],
+    "773": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:code"
+    ],
+    "774": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:createOrUpdateCalendarEvent"
+    ],
+    "775": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:credential"
+    ],
+    "776": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:currentSession"
+    ],
+    "777": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:dashIdx"
+    ],
+    "778": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:data"
+    ],
+    "779": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:deleteCalendarEvent"
+    ],
+    "780": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:deleteCalendarEventsForEntries"
+    ],
+    "781": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:deletedCount"
+    ],
+    "782": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:endDate"
+    ],
+    "783": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:endDateObj"
+    ],
+    "784": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:eventPayload"
+    ],
+    "785": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:failedCount"
+    ],
+    "786": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:fbUser"
+    ],
+    "787": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:getAccessToken"
+    ],
+    "788": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:getSavedUserSession"
+    ],
+    "789": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:googleSignIn"
+    ],
+    "790": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:googleSignOut"
+    ],
+    "791": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:items"
+    ],
+    "792": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:match"
+    ],
+    "793": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:method"
+    ],
+    "794": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:migrateDutyRosterEventSummaries"
+    ],
+    "795": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:migratedCount"
+    ],
+    "796": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:mockId"
+    ],
+    "797": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:newSummary"
+    ],
+    "798": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:ok"
+    ],
+    "799": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:oldSummary"
+    ],
+    "800": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:pageToken"
+    ],
+    "801": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:patchRes"
+    ],
+    "802": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:provider"
+    ],
+    "803": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:res"
+    ],
+    "804": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:response"
+    ],
+    "805": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:rest"
+    ],
+    "806": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:result"
+    ],
+    "807": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:saved"
+    ],
+    "808": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:startDate"
+    ],
+    "809": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:statusConfig"
+    ],
+    "810": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:statusName"
+    ],
+    "811": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:successCount"
+    ],
+    "812": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:syncRosterEntriesToGoogleCalendar"
+    ],
+    "813": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:syncedResults"
+    ],
+    "814": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:token"
+    ],
+    "815": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:url"
+    ],
+    "816": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\services\\googleAuth.ts:userSession"
+    ],
+    "817": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:AppSettings"
+    ],
+    "818": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:DayClockRecord"
+    ],
+    "819": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:DosDofMatch"
+    ],
+    "820": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:GoogleCalendarInfo"
+    ],
+    "821": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:ImportHistoryRecord"
+    ],
+    "822": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:ImportOptions"
+    ],
+    "823": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:ImportPreviewItem"
+    ],
+    "824": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:LeaveBalanceResponse"
+    ],
+    "825": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:LeaveRow"
+    ],
+    "826": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:MonthSummary"
+    ],
+    "827": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:OtCalculationSettings"
+    ],
+    "828": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:OtDayResult"
+    ],
+    "829": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:RosterChangeHistory"
+    ],
+    "830": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:RosterEntry"
+    ],
+    "831": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:RosterFilterState"
+    ],
+    "832": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:RosterStatusCode"
+    ],
+    "833": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:RosterStatusConfig"
+    ],
+    "834": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts:RosterSummary"
+    ],
+    "835": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts: = d"
+    ],
+    "836": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts: = h"
+    ],
+    "837": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts: = n"
+    ],
+    "838": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts: = p"
+    ],
+    "839": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:1"
+    ],
+    "840": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:= S"
+    ],
+    "841": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:DAYS"
+    ],
+    "842": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:InMonth = n"
+    ],
+    "843": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:MONTHS"
+    ],
+    "844": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:Part = r"
+    ],
+    "845": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:S"
+    ],
+    "846": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:actTimeInTimezone(tim"
+    ],
+    "847": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:artMonthName ="
+    ],
+    "848": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:atMonthCycleDisplay(mon"
+    ],
+    "849": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:atMonthYearDisplay(mon"
+    ],
+    "850": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:atTimestamp(iso"
+    ],
+    "851": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:atesInMonth(mon"
+    ],
+    "852": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:atter = n"
+    ],
+    "853": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:c"
+    ],
+    "854": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:cleMonths ="
+    ],
+    "855": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:d"
+    ],
+    "856": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:dMonthName ="
+    ],
+    "857": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:dObj ="
+    ],
+    "858": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:dYear ="
+    ],
+    "859": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:day"
+    ],
+    "860": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:dayNum"
+    ],
+    "861": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:e = f"
+    ],
+    "862": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:ear = d"
+    ],
+    "863": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:endDate"
+    ],
+    "864": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:endMonthStr"
+    ],
+    "865": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:endObj"
+    ],
+    "866": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:endYear"
+    ],
+    "867": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:formatDateDisplay"
+    ],
+    "868": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:getDayOfWeekName"
+    ],
+    "869": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:getMonthYearString"
+    ],
+    "870": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:getRosterCycleRange"
+    ],
+    "871": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:getTodayDateString"
+    ],
+    "872": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:h = M"
+    ],
+    "873": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:h = d"
+    ],
+    "874": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:hStr = S"
+    ],
+    "875": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:label"
+    ],
+    "876": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:month"
+    ],
+    "877": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:monthName"
+    ],
+    "878": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:n"
+    ],
+    "879": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:now"
+    ],
+    "880": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:onth = S"
+    ],
+    "881": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:osterCycleForDate(dat"
+    ],
+    "882": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:parseLocalDate"
+    ],
+    "883": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:parts"
+    ],
+    "884": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:r = p"
+    ],
+    "885": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:r = y"
+    ],
+    "886": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:rmatRosterCycleTitle(m"
+    ],
+    "887": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:s = d"
+    ],
+    "888": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:s = f"
+    ],
+    "889": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:s: st"
+    ],
+    "890": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:startDate"
+    ],
+    "891": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:startMonthStr"
+    ],
+    "892": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:startYear"
+    ],
+    "893": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:tMonthYear(mon"
+    ],
+    "894": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:te = p"
+    ],
+    "895": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:tes = S"
+    ],
+    "896": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:th = S"
+    ],
+    "897": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:tr = S"
+    ],
+    "898": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts:year"
+    ],
+    "899": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:backupObj"
+    ],
+    "900": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:blob"
+    ],
+    "901": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:csv"
+    ],
+    "902": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:data"
+    ],
+    "903": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:exportBackupData"
+    ],
+    "904": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:exportToCSV"
+    ],
+    "905": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:exportToExcel"
+    ],
+    "906": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:isChanged"
+    ],
+    "907": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:jsonStr"
+    ],
+    "908": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:link"
+    ],
+    "909": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:prepareRosterExportData"
+    ],
+    "910": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:statusMap"
+    ],
+    "911": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:url"
+    ],
+    "912": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:workbook"
+    ],
+    "913": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\export.ts:worksheet"
+    ],
+    "914": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:= LEAVE_C"
+    ],
+    "915": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:ADY_PREFIXES = [\n  'LE"
+    ],
+    "916": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:AVE_CODE_TO_TYPE: "
+    ],
+    "917": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:AVE_ELIGIBLE_CODES ="
+    ],
+    "918": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:AVE_OPTIONS: "
+    ],
+    "919": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:AVE_WARN_CODES ="
+    ],
+    "920": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:Code(code: str"
+    ],
+    "921": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:ForCode(code: str"
+    ],
+    "922": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:IFT_CONTEXT: "
+    ],
+    "923": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:LEAVE_COD"
+    ],
+    "924": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:LF_DAY_POOL_OPTIONS ="
+    ],
+    "925": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:Result =\n  | { o"
+    ],
+    "926": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:aveApplication(\n  select"
+    ],
+    "927": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:aveOption {"
+    ],
+    "928": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:aveToCode(code: str"
+    ],
+    "929": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:eaveCode(code: str"
+    ],
+    "930": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leave.ts:tBa"
+    ],
+    "931": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\leaveColors.ts:leaveColors"
+    ],
+    "932": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts: (e.cu"
+    ],
+    "933": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts: build"
+    ],
+    "934": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:DEFAULT_OT_SETTINGS"
+    ],
+    "935": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:Dof ="
+    ],
+    "936": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:Dos ="
+    ],
+    "937": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:FullOt ="
+    ],
+    "938": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:HolidayOrBlank ="
+    ],
+    "939": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:Leave ="
+    ],
+    "940": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:['DOF"
+    ],
+    "941": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ace ="
+    ],
+    "942": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:aceDeductionMinutes ="
+    ],
+    "943": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ags: "
+    ],
+    "944": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ampm"
+    ],
+    "945": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:art ="
+    ],
+    "946": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:artMins ="
+    ],
+    "947": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:atus ="
+    ],
+    "948": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:atusType: "
+    ],
+    "949": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ceOnLeave = entri"
+    ],
+    "950": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:cleaned"
+    ],
+    "951": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:d ="
+    ],
+    "952": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:dHolidays = entri"
+    ],
+    "953": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:dMins ="
+    ],
+    "954": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:fCode ="
+    ],
+    "955": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:fEntries ="
+    ],
+    "956": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:fReferencedDate: "
+    ],
+    "957": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:fStr ="
+    ],
+    "958": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:format12hTo24hTime"
+    ],
+    "959": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:formatMinutesToTime"
+    ],
+    "960": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:formatTo12hDisplay"
+    ],
+    "961": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:getScheduledShiftWindow"
+    ],
+    "962": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ght ="
+    ],
+    "963": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:h"
+    ],
+    "964": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:h24"
+    ],
+    "965": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:hedEndMins ="
+    ],
+    "966": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:hedEndStr ="
+    ],
+    "967": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:hedStartMins ="
+    ],
+    "968": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:hedStartStr ="
+    ],
+    "969": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:heduledWindow ="
+    ],
+    "970": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:hours"
+    ],
+    "971": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ianceAudit(\n  entr"
+    ],
+    "972": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ildDosDofLedger(e"
+    ],
+    "973": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:isAm"
+    ],
+    "974": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:isPm"
+    ],
+    "975": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:lculateDayOt(\n"
+    ],
+    "976": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ledDoses: Rost"
+    ],
+    "977": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:llableOtHours ="
+    ],
+    "978": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:llableOtMinutes ="
+    ],
+    "979": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:m"
+    ],
+    "980": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:match"
+    ],
+    "981": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:mins"
+    ],
+    "982": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:minutes"
+    ],
+    "983": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:nThreshold ="
+    ],
+    "984": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ny[] "
+    ],
+    "985": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ockIn ="
+    ],
+    "986": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ockInMins ="
+    ],
+    "987": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ockOut ="
+    ],
+    "988": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ockOutMins ="
+    ],
+    "989": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ockSize ="
+    ],
+    "990": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ount = items"
+    ],
+    "991": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:parseTimeTo12hParts"
+    ],
+    "992": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:parseTimeToMinutes"
+    ],
+    "993": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:parts"
+    ],
+    "994": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:phanedDofs: "
+    ],
+    "995": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:raw"
+    ],
+    "996": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:rlyInAfterGrace ="
+    ],
+    "997": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:rlyInMinutes ="
+    ],
+    "998": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:rning ="
+    ],
+    "999": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:sClaimedSet ="
+    ],
+    "1000": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:sEntries ="
+    ],
+    "1001": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:sEntry ="
+    ],
+    "1002": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:sMap ="
+    ],
+    "1003": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:startTime"
+    ],
+    "1004": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:t = items"
+    ],
+    "1005": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:tOtBeforeRounding ="
+    ],
+    "1006": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:tch ="
+    ],
+    "1007": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:tchedDosDate: "
+    ],
+    "1008": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:tches: "
+    ],
+    "1009": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:te ="
+    ],
+    "1010": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:teOutAfterGrace ="
+    ],
+    "1011": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:teOutMinutes ="
+    ],
+    "1012": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:timeMatch"
+    ],
+    "1013": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:totalMins"
+    ],
+    "1014": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:ttlementDofEntries ="
+    ],
+    "1015": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:undedMins ="
+    ],
+    "1016": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:unding ="
+    ],
+    "1017": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:upper"
+    ],
+    "1018": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:wOtMinutes ="
+    ],
+    "1019": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:y = statu"
+    ],
+    "1020": [
+      "ast:D:\\Emkode\\Roster-Manager\\src\\utils\\otCalculator.ts:yName ="
+    ],
+    "1021": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\app_settings.json"
+    ],
+    "1022": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\clock_events.json"
+    ],
+    "1023": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\import_history.json"
+    ],
+    "1024": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\leave_entitlements.json"
+    ],
+    "1025": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\ot_calculations.json"
+    ],
+    "1026": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\roster_entries.json"
+    ],
+    "1027": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\roster_history.json"
+    ],
+    "1028": [
+      "file:D:\\Emkode\\Roster-Manager\\data\\roster_statuses.json"
+    ],
+    "1029": [
+      "file:D:\\Emkode\\Roster-Manager\\firebase-applet-config.json"
+    ],
+    "1030": [
+      "file:D:\\Emkode\\Roster-Manager\\firebase-blueprint.json"
+    ],
+    "1031": [
+      "file:D:\\Emkode\\Roster-Manager\\metadata.json"
+    ],
+    "1032": [
+      "file:D:\\Emkode\\Roster-Manager\\package.json"
+    ],
+    "1033": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\components\\Toast.tsx"
+    ],
+    "1034": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\hooks\\useIsMobile.ts"
+    ],
+    "1035": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\types\\roster.ts"
+    ],
+    "1036": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\utils\\date.ts"
+    ],
+    "1037": [
+      "file:D:\\Emkode\\Roster-Manager\\src\\utils\\leaveColors.ts"
+    ],
+    "1038": [
+      "file:D:\\Emkode\\Roster-Manager\\supabase_migration_leave_opening_utilized.sql"
+    ],
+    "1039": [
+      "file:D:\\Emkode\\Roster-Manager\\supabase_seed_leave_opening_utilized.sql"
+    ],
+    "1040": [
+      "file:D:\\Emkode\\Roster-Manager\\supabase_setup.sql"
+    ],
+    "1041": [
+      "file:D:\\Emkode\\Roster-Manager\\tsconfig.json"
+    ],
+    "1042": [
+      "file:D:\\Emkode\\Roster-Manager\\vercel.json"
+    ],
+    "1043": [
+      "file:D:\\Emkode\\Roster-Manager\\vite.config.ts"
+    ]
+  },
+  "cohesion": {
+    "0": 0.16666666666666666,
+    "1": 0.21818181818181817,
+    "2": 0.26666666666666666,
+    "3": 0.32142857142857145,
+    "4": 0.3333333333333333,
+    "5": 0.2857142857142857,
+    "6": 0.4,
+    "7": 1.0,
+    "8": 1.0,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0,
+    "96": 1.0,
+    "97": 1.0,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0,
+    "105": 1.0,
+    "106": 1.0,
+    "107": 1.0,
+    "108": 1.0,
+    "109": 1.0,
+    "110": 1.0,
+    "111": 1.0,
+    "112": 1.0,
+    "113": 1.0,
+    "114": 1.0,
+    "115": 1.0,
+    "116": 1.0,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0,
+    "136": 1.0,
+    "137": 1.0,
+    "138": 1.0,
+    "139": 1.0,
+    "140": 1.0,
+    "141": 1.0,
+    "142": 1.0,
+    "143": 1.0,
+    "144": 1.0,
+    "145": 1.0,
+    "146": 1.0,
+    "147": 1.0,
+    "148": 1.0,
+    "149": 1.0,
+    "150": 1.0,
+    "151": 1.0,
+    "152": 1.0,
+    "153": 1.0,
+    "154": 1.0,
+    "155": 1.0,
+    "156": 1.0,
+    "157": 1.0,
+    "158": 1.0,
+    "159": 1.0,
+    "160": 1.0,
+    "161": 1.0,
+    "162": 1.0,
+    "163": 1.0,
+    "164": 1.0,
+    "165": 1.0,
+    "166": 1.0,
+    "167": 1.0,
+    "168": 1.0,
+    "169": 1.0,
+    "170": 1.0,
+    "171": 1.0,
+    "172": 1.0,
+    "173": 1.0,
+    "174": 1.0,
+    "175": 1.0,
+    "176": 1.0,
+    "177": 1.0,
+    "178": 1.0,
+    "179": 1.0,
+    "180": 1.0,
+    "181": 1.0,
+    "182": 1.0,
+    "183": 1.0,
+    "184": 1.0,
+    "185": 1.0,
+    "186": 1.0,
+    "187": 1.0,
+    "188": 1.0,
+    "189": 1.0,
+    "190": 1.0,
+    "191": 1.0,
+    "192": 1.0,
+    "193": 1.0,
+    "194": 1.0,
+    "195": 1.0,
+    "196": 1.0,
+    "197": 1.0,
+    "198": 1.0,
+    "199": 1.0,
+    "200": 1.0,
+    "201": 1.0,
+    "202": 1.0,
+    "203": 1.0,
+    "204": 1.0,
+    "205": 1.0,
+    "206": 1.0,
+    "207": 1.0,
+    "208": 1.0,
+    "209": 1.0,
+    "210": 1.0,
+    "211": 1.0,
+    "212": 1.0,
+    "213": 1.0,
+    "214": 1.0,
+    "215": 1.0,
+    "216": 1.0,
+    "217": 1.0,
+    "218": 1.0,
+    "219": 1.0,
+    "220": 1.0,
+    "221": 1.0,
+    "222": 1.0,
+    "223": 1.0,
+    "224": 1.0,
+    "225": 1.0,
+    "226": 1.0,
+    "227": 1.0,
+    "228": 1.0,
+    "229": 1.0,
+    "230": 1.0,
+    "231": 1.0,
+    "232": 1.0,
+    "233": 1.0,
+    "234": 1.0,
+    "235": 1.0,
+    "236": 1.0,
+    "237": 1.0,
+    "238": 1.0,
+    "239": 1.0,
+    "240": 1.0,
+    "241": 1.0,
+    "242": 1.0,
+    "243": 1.0,
+    "244": 1.0,
+    "245": 1.0,
+    "246": 1.0,
+    "247": 1.0,
+    "248": 1.0,
+    "249": 1.0,
+    "250": 1.0,
+    "251": 1.0,
+    "252": 1.0,
+    "253": 1.0,
+    "254": 1.0,
+    "255": 1.0,
+    "256": 1.0,
+    "257": 1.0,
+    "258": 1.0,
+    "259": 1.0,
+    "260": 1.0,
+    "261": 1.0,
+    "262": 1.0,
+    "263": 1.0,
+    "264": 1.0,
+    "265": 1.0,
+    "266": 1.0,
+    "267": 1.0,
+    "268": 1.0,
+    "269": 1.0,
+    "270": 1.0,
+    "271": 1.0,
+    "272": 1.0,
+    "273": 1.0,
+    "274": 1.0,
+    "275": 1.0,
+    "276": 1.0,
+    "277": 1.0,
+    "278": 1.0,
+    "279": 1.0,
+    "280": 1.0,
+    "281": 1.0,
+    "282": 1.0,
+    "283": 1.0,
+    "284": 1.0,
+    "285": 1.0,
+    "286": 1.0,
+    "287": 1.0,
+    "288": 1.0,
+    "289": 1.0,
+    "290": 1.0,
+    "291": 1.0,
+    "292": 1.0,
+    "293": 1.0,
+    "294": 1.0,
+    "295": 1.0,
+    "296": 1.0,
+    "297": 1.0,
+    "298": 1.0,
+    "299": 1.0,
+    "300": 1.0,
+    "301": 1.0,
+    "302": 1.0,
+    "303": 1.0,
+    "304": 1.0,
+    "305": 1.0,
+    "306": 1.0,
+    "307": 1.0,
+    "308": 1.0,
+    "309": 1.0,
+    "310": 1.0,
+    "311": 1.0,
+    "312": 1.0,
+    "313": 1.0,
+    "314": 1.0,
+    "315": 1.0,
+    "316": 1.0,
+    "317": 1.0,
+    "318": 1.0,
+    "319": 1.0,
+    "320": 1.0,
+    "321": 1.0,
+    "322": 1.0,
+    "323": 1.0,
+    "324": 1.0,
+    "325": 1.0,
+    "326": 1.0,
+    "327": 1.0,
+    "328": 1.0,
+    "329": 1.0,
+    "330": 1.0,
+    "331": 1.0,
+    "332": 1.0,
+    "333": 1.0,
+    "334": 1.0,
+    "335": 1.0,
+    "336": 1.0,
+    "337": 1.0,
+    "338": 1.0,
+    "339": 1.0,
+    "340": 1.0,
+    "341": 1.0,
+    "342": 1.0,
+    "343": 1.0,
+    "344": 1.0,
+    "345": 1.0,
+    "346": 1.0,
+    "347": 1.0,
+    "348": 1.0,
+    "349": 1.0,
+    "350": 1.0,
+    "351": 1.0,
+    "352": 1.0,
+    "353": 1.0,
+    "354": 1.0,
+    "355": 1.0,
+    "356": 1.0,
+    "357": 1.0,
+    "358": 1.0,
+    "359": 1.0,
+    "360": 1.0,
+    "361": 1.0,
+    "362": 1.0,
+    "363": 1.0,
+    "364": 1.0,
+    "365": 1.0,
+    "366": 1.0,
+    "367": 1.0,
+    "368": 1.0,
+    "369": 1.0,
+    "370": 1.0,
+    "371": 1.0,
+    "372": 1.0,
+    "373": 1.0,
+    "374": 1.0,
+    "375": 1.0,
+    "376": 1.0,
+    "377": 1.0,
+    "378": 1.0,
+    "379": 1.0,
+    "380": 1.0,
+    "381": 1.0,
+    "382": 1.0,
+    "383": 1.0,
+    "384": 1.0,
+    "385": 1.0,
+    "386": 1.0,
+    "387": 1.0,
+    "388": 1.0,
+    "389": 1.0,
+    "390": 1.0,
+    "391": 1.0,
+    "392": 1.0,
+    "393": 1.0,
+    "394": 1.0,
+    "395": 1.0,
+    "396": 1.0,
+    "397": 1.0,
+    "398": 1.0,
+    "399": 1.0,
+    "400": 1.0,
+    "401": 1.0,
+    "402": 1.0,
+    "403": 1.0,
+    "404": 1.0,
+    "405": 1.0,
+    "406": 1.0,
+    "407": 1.0,
+    "408": 1.0,
+    "409": 1.0,
+    "410": 1.0,
+    "411": 1.0,
+    "412": 1.0,
+    "413": 1.0,
+    "414": 1.0,
+    "415": 1.0,
+    "416": 1.0,
+    "417": 1.0,
+    "418": 1.0,
+    "419": 1.0,
+    "420": 1.0,
+    "421": 1.0,
+    "422": 1.0,
+    "423": 1.0,
+    "424": 1.0,
+    "425": 1.0,
+    "426": 1.0,
+    "427": 1.0,
+    "428": 1.0,
+    "429": 1.0,
+    "430": 1.0,
+    "431": 1.0,
+    "432": 1.0,
+    "433": 1.0,
+    "434": 1.0,
+    "435": 1.0,
+    "436": 1.0,
+    "437": 1.0,
+    "438": 1.0,
+    "439": 1.0,
+    "440": 1.0,
+    "441": 1.0,
+    "442": 1.0,
+    "443": 1.0,
+    "444": 1.0,
+    "445": 1.0,
+    "446": 1.0,
+    "447": 1.0,
+    "448": 1.0,
+    "449": 1.0,
+    "450": 1.0,
+    "451": 1.0,
+    "452": 1.0,
+    "453": 1.0,
+    "454": 1.0,
+    "455": 1.0,
+    "456": 1.0,
+    "457": 1.0,
+    "458": 1.0,
+    "459": 1.0,
+    "460": 1.0,
+    "461": 1.0,
+    "462": 1.0,
+    "463": 1.0,
+    "464": 1.0,
+    "465": 1.0,
+    "466": 1.0,
+    "467": 1.0,
+    "468": 1.0,
+    "469": 1.0,
+    "470": 1.0,
+    "471": 1.0,
+    "472": 1.0,
+    "473": 1.0,
+    "474": 1.0,
+    "475": 1.0,
+    "476": 1.0,
+    "477": 1.0,
+    "478": 1.0,
+    "479": 1.0,
+    "480": 1.0,
+    "481": 1.0,
+    "482": 1.0,
+    "483": 1.0,
+    "484": 1.0,
+    "485": 1.0,
+    "486": 1.0,
+    "487": 1.0,
+    "488": 1.0,
+    "489": 1.0,
+    "490": 1.0,
+    "491": 1.0,
+    "492": 1.0,
+    "493": 1.0,
+    "494": 1.0,
+    "495": 1.0,
+    "496": 1.0,
+    "497": 1.0,
+    "498": 1.0,
+    "499": 1.0,
+    "500": 1.0,
+    "501": 1.0,
+    "502": 1.0,
+    "503": 1.0,
+    "504": 1.0,
+    "505": 1.0,
+    "506": 1.0,
+    "507": 1.0,
+    "508": 1.0,
+    "509": 1.0,
+    "510": 1.0,
+    "511": 1.0,
+    "512": 1.0,
+    "513": 1.0,
+    "514": 1.0,
+    "515": 1.0,
+    "516": 1.0,
+    "517": 1.0,
+    "518": 1.0,
+    "519": 1.0,
+    "520": 1.0,
+    "521": 1.0,
+    "522": 1.0,
+    "523": 1.0,
+    "524": 1.0,
+    "525": 1.0,
+    "526": 1.0,
+    "527": 1.0,
+    "528": 1.0,
+    "529": 1.0,
+    "530": 1.0,
+    "531": 1.0,
+    "532": 1.0,
+    "533": 1.0,
+    "534": 1.0,
+    "535": 1.0,
+    "536": 1.0,
+    "537": 1.0,
+    "538": 1.0,
+    "539": 1.0,
+    "540": 1.0,
+    "541": 1.0,
+    "542": 1.0,
+    "543": 1.0,
+    "544": 1.0,
+    "545": 1.0,
+    "546": 1.0,
+    "547": 1.0,
+    "548": 1.0,
+    "549": 1.0,
+    "550": 1.0,
+    "551": 1.0,
+    "552": 1.0,
+    "553": 1.0,
+    "554": 1.0,
+    "555": 1.0,
+    "556": 1.0,
+    "557": 1.0,
+    "558": 1.0,
+    "559": 1.0,
+    "560": 1.0,
+    "561": 1.0,
+    "562": 1.0,
+    "563": 1.0,
+    "564": 1.0,
+    "565": 1.0,
+    "566": 1.0,
+    "567": 1.0,
+    "568": 1.0,
+    "569": 1.0,
+    "570": 1.0,
+    "571": 1.0,
+    "572": 1.0,
+    "573": 1.0,
+    "574": 1.0,
+    "575": 1.0,
+    "576": 1.0,
+    "577": 1.0,
+    "578": 1.0,
+    "579": 1.0,
+    "580": 1.0,
+    "581": 1.0,
+    "582": 1.0,
+    "583": 1.0,
+    "584": 1.0,
+    "585": 1.0,
+    "586": 1.0,
+    "587": 1.0,
+    "588": 1.0,
+    "589": 1.0,
+    "590": 1.0,
+    "591": 1.0,
+    "592": 1.0,
+    "593": 1.0,
+    "594": 1.0,
+    "595": 1.0,
+    "596": 1.0,
+    "597": 1.0,
+    "598": 1.0,
+    "599": 1.0,
+    "600": 1.0,
+    "601": 1.0,
+    "602": 1.0,
+    "603": 1.0,
+    "604": 1.0,
+    "605": 1.0,
+    "606": 1.0,
+    "607": 1.0,
+    "608": 1.0,
+    "609": 1.0,
+    "610": 1.0,
+    "611": 1.0,
+    "612": 1.0,
+    "613": 1.0,
+    "614": 1.0,
+    "615": 1.0,
+    "616": 1.0,
+    "617": 1.0,
+    "618": 1.0,
+    "619": 1.0,
+    "620": 1.0,
+    "621": 1.0,
+    "622": 1.0,
+    "623": 1.0,
+    "624": 1.0,
+    "625": 1.0,
+    "626": 1.0,
+    "627": 1.0,
+    "628": 1.0,
+    "629": 1.0,
+    "630": 1.0,
+    "631": 1.0,
+    "632": 1.0,
+    "633": 1.0,
+    "634": 1.0,
+    "635": 1.0,
+    "636": 1.0,
+    "637": 1.0,
+    "638": 1.0,
+    "639": 1.0,
+    "640": 1.0,
+    "641": 1.0,
+    "642": 1.0,
+    "643": 1.0,
+    "644": 1.0,
+    "645": 1.0,
+    "646": 1.0,
+    "647": 1.0,
+    "648": 1.0,
+    "649": 1.0,
+    "650": 1.0,
+    "651": 1.0,
+    "652": 1.0,
+    "653": 1.0,
+    "654": 1.0,
+    "655": 1.0,
+    "656": 1.0,
+    "657": 1.0,
+    "658": 1.0,
+    "659": 1.0,
+    "660": 1.0,
+    "661": 1.0,
+    "662": 1.0,
+    "663": 1.0,
+    "664": 1.0,
+    "665": 1.0,
+    "666": 1.0,
+    "667": 1.0,
+    "668": 1.0,
+    "669": 1.0,
+    "670": 1.0,
+    "671": 1.0,
+    "672": 1.0,
+    "673": 1.0,
+    "674": 1.0,
+    "675": 1.0,
+    "676": 1.0,
+    "677": 1.0,
+    "678": 1.0,
+    "679": 1.0,
+    "680": 1.0,
+    "681": 1.0,
+    "682": 1.0,
+    "683": 1.0,
+    "684": 1.0,
+    "685": 1.0,
+    "686": 1.0,
+    "687": 1.0,
+    "688": 1.0,
+    "689": 1.0,
+    "690": 1.0,
+    "691": 1.0,
+    "692": 1.0,
+    "693": 1.0,
+    "694": 1.0,
+    "695": 1.0,
+    "696": 1.0,
+    "697": 1.0,
+    "698": 1.0,
+    "699": 1.0,
+    "700": 1.0,
+    "701": 1.0,
+    "702": 1.0,
+    "703": 1.0,
+    "704": 1.0,
+    "705": 1.0,
+    "706": 1.0,
+    "707": 1.0,
+    "708": 1.0,
+    "709": 1.0,
+    "710": 1.0,
+    "711": 1.0,
+    "712": 1.0,
+    "713": 1.0,
+    "714": 1.0,
+    "715": 1.0,
+    "716": 1.0,
+    "717": 1.0,
+    "718": 1.0,
+    "719": 1.0,
+    "720": 1.0,
+    "721": 1.0,
+    "722": 1.0,
+    "723": 1.0,
+    "724": 1.0,
+    "725": 1.0,
+    "726": 1.0,
+    "727": 1.0,
+    "728": 1.0,
+    "729": 1.0,
+    "730": 1.0,
+    "731": 1.0,
+    "732": 1.0,
+    "733": 1.0,
+    "734": 1.0,
+    "735": 1.0,
+    "736": 1.0,
+    "737": 1.0,
+    "738": 1.0,
+    "739": 1.0,
+    "740": 1.0,
+    "741": 1.0,
+    "742": 1.0,
+    "743": 1.0,
+    "744": 1.0,
+    "745": 1.0,
+    "746": 1.0,
+    "747": 1.0,
+    "748": 1.0,
+    "749": 1.0,
+    "750": 1.0,
+    "751": 1.0,
+    "752": 1.0,
+    "753": 1.0,
+    "754": 1.0,
+    "755": 1.0,
+    "756": 1.0,
+    "757": 1.0,
+    "758": 1.0,
+    "759": 1.0,
+    "760": 1.0,
+    "761": 1.0,
+    "762": 1.0,
+    "763": 1.0,
+    "764": 1.0,
+    "765": 1.0,
+    "766": 1.0,
+    "767": 1.0,
+    "768": 1.0,
+    "769": 1.0,
+    "770": 1.0,
+    "771": 1.0,
+    "772": 1.0,
+    "773": 1.0,
+    "774": 1.0,
+    "775": 1.0,
+    "776": 1.0,
+    "777": 1.0,
+    "778": 1.0,
+    "779": 1.0,
+    "780": 1.0,
+    "781": 1.0,
+    "782": 1.0,
+    "783": 1.0,
+    "784": 1.0,
+    "785": 1.0,
+    "786": 1.0,
+    "787": 1.0,
+    "788": 1.0,
+    "789": 1.0,
+    "790": 1.0,
+    "791": 1.0,
+    "792": 1.0,
+    "793": 1.0,
+    "794": 1.0,
+    "795": 1.0,
+    "796": 1.0,
+    "797": 1.0,
+    "798": 1.0,
+    "799": 1.0,
+    "800": 1.0,
+    "801": 1.0,
+    "802": 1.0,
+    "803": 1.0,
+    "804": 1.0,
+    "805": 1.0,
+    "806": 1.0,
+    "807": 1.0,
+    "808": 1.0,
+    "809": 1.0,
+    "810": 1.0,
+    "811": 1.0,
+    "812": 1.0,
+    "813": 1.0,
+    "814": 1.0,
+    "815": 1.0,
+    "816": 1.0,
+    "817": 1.0,
+    "818": 1.0,
+    "819": 1.0,
+    "820": 1.0,
+    "821": 1.0,
+    "822": 1.0,
+    "823": 1.0,
+    "824": 1.0,
+    "825": 1.0,
+    "826": 1.0,
+    "827": 1.0,
+    "828": 1.0,
+    "829": 1.0,
+    "830": 1.0,
+    "831": 1.0,
+    "832": 1.0,
+    "833": 1.0,
+    "834": 1.0,
+    "835": 1.0,
+    "836": 1.0,
+    "837": 1.0,
+    "838": 1.0,
+    "839": 1.0,
+    "840": 1.0,
+    "841": 1.0,
+    "842": 1.0,
+    "843": 1.0,
+    "844": 1.0,
+    "845": 1.0,
+    "846": 1.0,
+    "847": 1.0,
+    "848": 1.0,
+    "849": 1.0,
+    "850": 1.0,
+    "851": 1.0,
+    "852": 1.0,
+    "853": 1.0,
+    "854": 1.0,
+    "855": 1.0,
+    "856": 1.0,
+    "857": 1.0,
+    "858": 1.0,
+    "859": 1.0,
+    "860": 1.0,
+    "861": 1.0,
+    "862": 1.0,
+    "863": 1.0,
+    "864": 1.0,
+    "865": 1.0,
+    "866": 1.0,
+    "867": 1.0,
+    "868": 1.0,
+    "869": 1.0,
+    "870": 1.0,
+    "871": 1.0,
+    "872": 1.0,
+    "873": 1.0,
+    "874": 1.0,
+    "875": 1.0,
+    "876": 1.0,
+    "877": 1.0,
+    "878": 1.0,
+    "879": 1.0,
+    "880": 1.0,
+    "881": 1.0,
+    "882": 1.0,
+    "883": 1.0,
+    "884": 1.0,
+    "885": 1.0,
+    "886": 1.0,
+    "887": 1.0,
+    "888": 1.0,
+    "889": 1.0,
+    "890": 1.0,
+    "891": 1.0,
+    "892": 1.0,
+    "893": 1.0,
+    "894": 1.0,
+    "895": 1.0,
+    "896": 1.0,
+    "897": 1.0,
+    "898": 1.0,
+    "899": 1.0,
+    "900": 1.0,
+    "901": 1.0,
+    "902": 1.0,
+    "903": 1.0,
+    "904": 1.0,
+    "905": 1.0,
+    "906": 1.0,
+    "907": 1.0,
+    "908": 1.0,
+    "909": 1.0,
+    "910": 1.0,
+    "911": 1.0,
+    "912": 1.0,
+    "913": 1.0,
+    "914": 1.0,
+    "915": 1.0,
+    "916": 1.0,
+    "917": 1.0,
+    "918": 1.0,
+    "919": 1.0,
+    "920": 1.0,
+    "921": 1.0,
+    "922": 1.0,
+    "923": 1.0,
+    "924": 1.0,
+    "925": 1.0,
+    "926": 1.0,
+    "927": 1.0,
+    "928": 1.0,
+    "929": 1.0,
+    "930": 1.0,
+    "931": 1.0,
+    "932": 1.0,
+    "933": 1.0,
+    "934": 1.0,
+    "935": 1.0,
+    "936": 1.0,
+    "937": 1.0,
+    "938": 1.0,
+    "939": 1.0,
+    "940": 1.0,
+    "941": 1.0,
+    "942": 1.0,
+    "943": 1.0,
+    "944": 1.0,
+    "945": 1.0,
+    "946": 1.0,
+    "947": 1.0,
+    "948": 1.0,
+    "949": 1.0,
+    "950": 1.0,
+    "951": 1.0,
+    "952": 1.0,
+    "953": 1.0,
+    "954": 1.0,
+    "955": 1.0,
+    "956": 1.0,
+    "957": 1.0,
+    "958": 1.0,
+    "959": 1.0,
+    "960": 1.0,
+    "961": 1.0,
+    "962": 1.0,
+    "963": 1.0,
+    "964": 1.0,
+    "965": 1.0,
+    "966": 1.0,
+    "967": 1.0,
+    "968": 1.0,
+    "969": 1.0,
+    "970": 1.0,
+    "971": 1.0,
+    "972": 1.0,
+    "973": 1.0,
+    "974": 1.0,
+    "975": 1.0,
+    "976": 1.0,
+    "977": 1.0,
+    "978": 1.0,
+    "979": 1.0,
+    "980": 1.0,
+    "981": 1.0,
+    "982": 1.0,
+    "983": 1.0,
+    "984": 1.0,
+    "985": 1.0,
+    "986": 1.0,
+    "987": 1.0,
+    "988": 1.0,
+    "989": 1.0,
+    "990": 1.0,
+    "991": 1.0,
+    "992": 1.0,
+    "993": 1.0,
+    "994": 1.0,
+    "995": 1.0,
+    "996": 1.0,
+    "997": 1.0,
+    "998": 1.0,
+    "999": 1.0,
+    "1000": 1.0,
+    "1001": 1.0,
+    "1002": 1.0,
+    "1003": 1.0,
+    "1004": 1.0,
+    "1005": 1.0,
+    "1006": 1.0,
+    "1007": 1.0,
+    "1008": 1.0,
+    "1009": 1.0,
+    "1010": 1.0,
+    "1011": 1.0,
+    "1012": 1.0,
+    "1013": 1.0,
+    "1014": 1.0,
+    "1015": 1.0,
+    "1016": 1.0,
+    "1017": 1.0,
+    "1018": 1.0,
+    "1019": 1.0,
+    "1020": 1.0,
+    "1021": 1.0,
+    "1022": 1.0,
+    "1023": 1.0,
+    "1024": 1.0,
+    "1025": 1.0,
+    "1026": 1.0,
+    "1027": 1.0,
+    "1028": 1.0,
+    "1029": 1.0,
+    "1030": 1.0,
+    "1031": 1.0,
+    "1032": 1.0,
+    "1033": 1.0,
+    "1034": 1.0,
+    "1035": 1.0,
+    "1036": 1.0,
+    "1037": 1.0,
+    "1038": 1.0,
+    "1039": 1.0,
+    "1040": 1.0,
+    "1041": 1.0,
+    "1042": 1.0,
+    "1043": 1.0
+  },
+  "gods": [
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\api\\index.ts:appPromise",
+      "label": "appPromise",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\api\\index.ts:handler",
+      "label": "handler",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\api\\index.ts:app",
+      "label": "app",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:subDaysStr",
+      "label": "subDaysStr",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:d",
+      "label": "d",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:syncAndPersistOtForEntries",
+      "label": "syncAndPersistOtForEntries",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:settings",
+      "label": "settings",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:emp",
+      "label": "emp",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:otCalcs",
+      "label": "otCalcs",
+      "degree": 0
+    },
+    {
+      "id": "ast:D:\\Emkode\\Roster-Manager\\server.ts:res",
+      "label": "res",
+      "degree": 0
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `appPromise`, `handler`, `app` to the rest of the system?",
+      "why": "1012 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}
