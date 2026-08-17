@@ -302,7 +302,7 @@ export const AddRosterModal: React.FC<AddRosterModalProps> = ({
                 type="checkbox"
                 checked={ot}
                 onChange={(e) => setOt(e.target.checked)}
-                className="rounded border-slate-300 text-purple-600"
+                className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
               />
               Includes Overtime (OT)
             </label>

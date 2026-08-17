@@ -129,7 +129,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 type="checkbox"
                 checked={changedOnlyFilter}
                 onChange={(e) => setChangedOnlyFilter(e.target.checked)}
-                className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                className="rounded border-slate-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500"
               />
               Export only modified rosters (Original != Current)
             </label>

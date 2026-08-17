@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { RosterEntry, RosterStatusConfig } from '../types/roster';
 import { StatusBadge } from './StatusBadge';
 import { CurrentEffectiveTooltip } from './CurrentEffectiveTooltip';
@@ -49,35 +48,35 @@ export const RosterTable: React.FC<RosterTableProps> = ({
     <div className="w-full flex flex-col gap-3">
       {/* Bulk Action Top Header Bar when items are selected */}
       {selectedIds.length > 0 && (
-        <div className="bg-purple-500/10 dark:bg-purple-950/80 px-4 py-3 border border-purple-500/30 flex items-center justify-between text-xs animate-fadeIn rounded-2xl shadow-sm">
-          <div className="flex items-center gap-2.5 font-bold text-purple-900 dark:text-purple-200">
-            <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black shadow-xs">
+        <div className="bg-blue-50 dark:bg-blue-950/40 px-4 py-3 border border-blue-200 dark:border-blue-800/60 flex items-center justify-between text-xs animate-fadeIn rounded-xl">
+          <div className="flex items-center gap-2.5 font-semibold text-blue-900 dark:text-blue-200">
+            <span className="w-5 h-5 rounded-md bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
               {selectedIds.length}
             </span>
-            <span>Selected {selectedIds.length} roster entries</span>
+            <span>{selectedIds.length} roster entries selected</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={onBulkEditClick}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold transition-all flex items-center gap-1.5 shadow-md shadow-purple-600/30 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Edit3 className="w-3.5 h-3.5" />
-              Bulk Change Selected
+              Bulk Change
             </button>
           </div>
         </div>
       )}
 
       {/* Main Roster Schedule Table */}
-      <div className="w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/90 shadow-sm backdrop-blur-md">
+      <div className="w-full overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
         {entries.length === 0 ? (
           <div className="py-20 text-center text-slate-500 dark:text-zinc-400">
             <div className="flex flex-col items-center justify-center gap-4">
-              <div className="p-4 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800/80 dark:to-zinc-900/80 text-slate-400 shadow-inner">
-                <Calendar className="w-10 h-10" />
+              <div className="p-4 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-400">
+                <Calendar className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <p className="font-extrabold text-sm text-slate-800 dark:text-zinc-200">No roster entries found</p>
+                <p className="font-semibold text-sm text-slate-800 dark:text-zinc-200">No roster entries found</p>
                 <p className="text-xs text-slate-400 dark:text-zinc-500 max-w-sm leading-relaxed">
                   Try adjusting your search query, status filters, or import a new monthly roster file.
                 </p>
@@ -88,12 +87,12 @@ export const RosterTable: React.FC<RosterTableProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-100/80 dark:bg-zinc-950/80 border-b border-slate-200 dark:border-zinc-800/80 text-slate-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] font-black select-none">
+                <tr className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] font-semibold select-none">
                   <th className="py-3.5 pl-4 pr-2 w-10 text-center">
                     <button
                       type="button"
                       onClick={onToggleSelectAll}
-                      className="text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                      className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                       title={isAllSelected ? "Deselect All" : "Select All"}
                     >
                       {isAllSelected ? (
@@ -103,14 +102,14 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                       )}
                     </button>
                   </th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[130px]">Date & Day</th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[140px]">Effective Roster</th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[120px]">Original Status</th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[130px]">Clock Times</th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[120px]">OT & Shift</th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[160px]">Action & Notes</th>
-                  <th className="py-3.5 px-3 font-extrabold min-w-[110px]">Google Sync</th>
-                  <th className="py-3.5 pr-4 pl-2 font-extrabold text-right min-w-[120px]">Actions</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[130px]">Date & Day</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[140px]">Effective Roster</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[120px]">Original Status</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[130px]">Clock Times</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[120px]">OT & Shift</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[160px]">Action & Notes</th>
+                   <th className="py-3.5 px-3 font-semibold min-w-[120px]">Google Sync</th>
+                   <th className="py-3.5 pr-4 pl-2 font-semibold text-right min-w-[120px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium text-slate-800 dark:text-zinc-200">
@@ -123,14 +122,14 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                   return (
                     <tr
                       key={entry.id}
-                      className={`group transition-all duration-150 relative ${
+                      className={`group transition-colors duration-100 ${
                         isToday
-                          ? 'bg-purple-50/50 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/30'
+                          ? 'bg-blue-50/60 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/30'
                           : isChanged
                           ? 'bg-amber-50/40 dark:bg-amber-950/15 hover:bg-amber-50/70 dark:hover:bg-amber-950/25'
                           : isSelected
-                          ? 'bg-purple-50/30 dark:bg-purple-950/20 hover:bg-purple-50/50'
-                          : 'hover:bg-slate-50/80 dark:hover:bg-zinc-800/40'
+                          ? 'bg-blue-50/30 dark:bg-blue-950/15 hover:bg-blue-50/50'
+                          : 'hover:bg-slate-50 dark:hover:bg-zinc-800/40'
                       }`}
                     >
                       {/* Checkbox */}
@@ -138,10 +137,10 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                         <button
                           type="button"
                           onClick={() => onToggleSelect(entry.id)}
-                          className="text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                          className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                         >
                           {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                           ) : (
                             <Square className="w-4 h-4 opacity-50 group-hover:opacity-100" />
                           )}
@@ -153,11 +152,11 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                         <div className="flex items-center gap-2">
                           <div className="flex flex-col">
                             <div className="flex items-center gap-1.5">
-                              <span className="font-extrabold text-slate-900 dark:text-white tracking-tight text-xs">
+                              <span className="font-semibold text-slate-900 dark:text-white tracking-tight text-xs">
                                 {formatDateDisplay(entry.date)}
                               </span>
                               {isToday && (
-                                <span className="px-1.5 py-0.2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-[9px] rounded-lg tracking-wider uppercase shadow-sm">
+                                <span className="px-1.5 py-0.2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-[9px] rounded tracking-wide uppercase">
                                   TODAY
                                 </span>
                               )}
@@ -175,7 +174,7 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                           <CurrentEffectiveTooltip entry={entry} statuses={statuses} size="md" />
                           {isChanged && (
                             <span
-                              className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"
+                              className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse shrink-0"
                               title="Roster Modified from Original"
                             />
                           )}
@@ -191,7 +190,7 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                       <td className="py-3.5 px-3 align-middle">
                         {entry.clockIn || entry.clockOut ? (
                           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/80 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/80 text-[11px] font-mono font-bold text-slate-700 dark:text-zinc-300">
-                            <Clock className="w-3 h-3 text-purple-500 shrink-0" />
+                             <Clock className="w-3 h-3 text-slate-500 shrink-0" />
                             <span>{entry.clockIn || '--:--'}</span>
                             <span className="text-slate-400 dark:text-zinc-500">&rarr;</span>
                             <span>{entry.clockOut || '--:--'}</span>
@@ -229,7 +228,7 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                           )}
                           {entry.notes ? (
                             <span className="text-[11px] text-slate-500 dark:text-zinc-400 italic flex items-center gap-1 truncate" title={entry.notes}>
-                              <MessageSquare className="w-3 h-3 shrink-0 text-slate-400" />
+                              <MessageSquare className="w-3 h-3 shrink-0 text-slate-400 dark:text-zinc-500" />
                               <span className="truncate">{entry.notes}</span>
                             </span>
                           ) : !entry.action ? (
@@ -257,7 +256,7 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                         ) : (
                           <button
                             onClick={() => onSyncSingleClick(entry)}
-                            className="inline-flex items-center gap-1 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 text-[11px] font-semibold transition-colors cursor-pointer"
                             title="Sync to Google Calendar"
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
@@ -269,30 +268,27 @@ export const RosterTable: React.FC<RosterTableProps> = ({
                       {/* Row Actions */}
                       <td className="py-3.5 pr-4 pl-2 align-middle text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <motion.button
-                            whileTap={{ scale: 0.85 }}
+                          <button
                             onClick={() => onChangeRosterClick(entry)}
-                            className="p-1.5 rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors cursor-pointer"
                             title="Edit Roster Status"
                           >
                             <Edit3 className="w-4 h-4" />
-                          </motion.button>
-                          <motion.button
-                            whileTap={{ scale: 0.85 }}
+                          </button>
+                          <button
                             onClick={() => onHistoryClick(entry)}
-                            className="p-1.5 rounded-xl text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors cursor-pointer"
                             title="View Audit History"
                           >
                             <History className="w-4 h-4" />
-                          </motion.button>
-                          <motion.button
-                            whileTap={{ scale: 0.85 }}
+                          </button>
+                          <button
                             onClick={() => onDeleteClick(entry)}
-                            className="p-1.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all cursor-pointer"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
                             title="Delete Entry"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </motion.button>
+                           </button>
                         </div>
                       </td>
                     </tr>

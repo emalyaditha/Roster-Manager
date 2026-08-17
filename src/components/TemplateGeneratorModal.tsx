@@ -160,7 +160,7 @@ export const TemplateGeneratorModal: React.FC<TemplateGeneratorModalProps> = ({
               type="checkbox"
               checked={overwrite}
               onChange={(e) => setOverwrite(e.target.checked)}
-              className="rounded border-slate-300 text-purple-600"
+              className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
             />
             Overwrite existing roster entries in this date range
           </label>

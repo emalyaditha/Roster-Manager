@@ -39,7 +39,7 @@ import { OtCalculatorModal } from "./components/OtCalculatorModal";
 import { PrintView } from "./components/PrintView";
 import { LeavePickerModal } from "./components/LeavePickerModal";
 import { Toast, ToastItem } from "./components/Toast";
-import { LEAVE_CODE_TO_TYPE, getBalanceForCode } from "./utils/leave";
+import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode } from "./utils/leave";
 import {
   formatMonthYearDisplay,
   getRosterCycleRange,
@@ -681,6 +681,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 transition-colors font-sans pb-16">
+      {/* Top accent stripe */}
+      <div className="top-stripe" />
+
       {/* Navigation Header */}
       <HeaderNavbar
         currentMonthYear={currentMonthYear}
@@ -811,128 +814,89 @@ export default function App() {
 
         {/* Quick Month Stats Summary Banner */}
         {monthSummary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0 }}
-              className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs hover-lift"
-            >
-              <span className="text-[10px] font-extrabold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-5">
+            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
+              <span className="text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
                 Total Days
               </span>
-              <span className="text-xl font-extrabold text-slate-900 dark:text-white">
+              <span className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">
                 {monthSummary.totalDays}
               </span>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.03 }}
-              className="p-3.5 rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/20 dark:to-emerald-900/10 border border-emerald-200/80 dark:border-emerald-800/50 shadow-xs hover-lift"
-            >
-              <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">
+            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">
                 Duty / Working
               </span>
-              <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
+              <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
                 {monthSummary.workingDays}{" "}
-                <span className="text-xs font-normal text-emerald-400/60">
-                  days
-                </span>
+                <span className="text-xs font-normal text-slate-400">days</span>
               </span>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.06 }}
-              className="p-3.5 rounded-3xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 shadow-xs hover-lift"
-            >
-              <span className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
-                Days Off (DOF)
+            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
+              <span className="text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
+                Days Off
               </span>
-              <span className="text-xl font-extrabold text-slate-700 dark:text-zinc-300">
+              <span className="text-xl font-bold text-slate-700 dark:text-zinc-300 tabular-nums">
                 {monthSummary.offDays}{" "}
-                <span className="text-xs font-normal text-slate-400">
-                  days
-                </span>
+                <span className="text-xs font-normal text-slate-400">days</span>
               </span>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.09 }}
-              className="p-3.5 rounded-3xl bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 border border-amber-200/80 dark:border-amber-800/50 shadow-xs hover-lift"
-            >
-              <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                Holidays (HOL)
+            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
+              <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
+                Holidays
               </span>
-              <span className="text-xl font-extrabold text-amber-600 dark:text-amber-400">
+              <span className="text-xl font-bold text-amber-600 dark:text-amber-400 tabular-nums">
                 {monthSummary.holDays || 0}{" "}
-                <span className="text-xs font-normal text-amber-400/60">
-                  days
-                </span>
+                <span className="text-xs font-normal text-slate-400">days</span>
               </span>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 }}
-              className="p-3.5 rounded-3xl bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/20 dark:to-indigo-900/10 border border-indigo-200/80 dark:border-indigo-800/50 shadow-xs hover-lift"
-            >
-              <span className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block mb-1">
-                Leaves / Absence
+            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
+              <span className="text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
+                Leaves
               </span>
-              <span className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
+              <span className="text-xl font-bold text-slate-700 dark:text-zinc-300 tabular-nums">
                 {monthSummary.leaveDays}{" "}
-                <span className="text-xs font-normal text-indigo-400/60">
-                  days
-                </span>
+                <span className="text-xs font-normal text-slate-400">days</span>
               </span>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
+            <div
               onClick={() => setIsOtCalculatorModalOpen(true)}
-              className="p-3.5 rounded-3xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/10 border border-orange-200 dark:border-orange-800/50 shadow-xs cursor-pointer hover-lift transition-all group"
+              className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-extrabold text-orange-600 dark:text-orange-400 uppercase tracking-wider block mb-1">
-                  Overtime (OT)
+                <span className="text-[10px] font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider block mb-1">
+                  Overtime
                 </span>
-                <span className="text-[9px] font-bold text-orange-600 dark:text-orange-400 group-hover:underline">
-                  Engine &rarr;
+                <span className="text-[9px] font-medium text-orange-500 dark:text-orange-400">
+                  Engine
                 </span>
               </div>
-              <span className="text-xl font-extrabold text-orange-600 dark:text-orange-400">
+              <span className="text-xl font-bold text-orange-600 dark:text-orange-400 tabular-nums">
                 {monthSummary.otDays}{" "}
-                <span className="text-xs font-normal text-orange-400/60">
-                  shifts
-                </span>
+                <span className="text-xs font-normal text-slate-400">shifts</span>
               </span>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18 }}
-              className="p-3.5 rounded-3xl bg-gradient-to-br from-amber-50/80 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/10 border border-amber-200 dark:border-amber-800/50 shadow-xs hover-lift"
+            <div
+              onClick={() => {
+                setChangedOnlyFilter(true);
+                setActiveTab("table");
+              }}
+              className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs cursor-pointer hover:border-amber-300 dark:hover:border-amber-700 transition-colors"
             >
-              <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                Roster Changed
+              <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
+                Changed
               </span>
-              <span className="text-xl font-extrabold text-amber-700 dark:text-amber-400">
+              <span className="text-xl font-bold text-amber-600 dark:text-amber-400 tabular-nums">
                 {monthSummary.changedDays}{" "}
-                <span className="text-xs font-normal text-amber-400/60">
-                  modified
-                </span>
+                <span className="text-xs font-normal text-slate-400">modified</span>
               </span>
-            </motion.div>
+            </div>
           </div>
         )}
 
@@ -947,7 +911,7 @@ export default function App() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search date, day, status, action..."
-                className="w-full pl-9 pr-4 py-2 rounded-full border border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-950/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs font-medium"
+                className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-950/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 text-xs font-medium transition-all"
               />
             </div>
 
@@ -958,7 +922,7 @@ export default function App() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3.5 py-2 rounded-full border border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 font-bold focus:outline-none text-xs"
+                  className="px-3.5 py-2 rounded-lg border border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 font-semibold focus:outline-none text-xs"
                 >
                   <option value="ALL">All Statuses</option>
                   {statuses.map((s) => (
@@ -969,14 +933,14 @@ export default function App() {
                 </select>
               </div>
 
-              <label className="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700 dark:text-zinc-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+              <label className="flex items-center gap-1.5 cursor-pointer font-medium text-slate-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 <input
                   type="checkbox"
                   checked={changedOnlyFilter}
                   onChange={(e) => setChangedOnlyFilter(e.target.checked)}
-                  className="rounded-md border-slate-300 dark:border-zinc-700 text-purple-600 focus:ring-purple-500 bg-white dark:bg-zinc-950 cursor-pointer"
+                  className="rounded-md border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 bg-white dark:bg-zinc-950 cursor-pointer"
                 />
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse shrink-0" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                 <span>Show Changed Only</span>
               </label>
             </div>
@@ -985,20 +949,16 @@ export default function App() {
 
         {/* Bulk Selection Banner Bar */}
         {activeTab === "table" && selectedIds.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-between text-xs"
-          >
-            <span className="font-extrabold text-purple-900 dark:text-purple-200 flex items-center gap-2">
-              <CheckSquare className="w-4 h-4 text-purple-500" />
+          <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 flex items-center justify-between text-xs">
+            <span className="font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2">
+              <CheckSquare className="w-4 h-4 text-blue-500" />
               {selectedIds.length} entries selected
             </span>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsBulkEditModalOpen(true)}
-                className="px-3 py-1.5 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold flex items-center gap-1 shadow-md shadow-purple-600/20"
+                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-1"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 Bulk Change
@@ -1006,20 +966,19 @@ export default function App() {
 
               <button
                 onClick={() => setSelectedIds([])}
-                className="px-2.5 py-1.5 rounded-full text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 font-bold transition-colors"
+                className="px-2.5 py-1.5 rounded-lg text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition-colors"
               >
                 Clear
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Content Views */}
         {loading ? (
           <div className="py-20 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-4">
             <div className="relative">
-              <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
-              <div className="absolute inset-0 w-6 h-6 rounded-full bg-purple-600/10 animate-ping" />
+              <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
             </div>
             <span className="font-medium">
               Loading roster entries for{" "}
@@ -1086,12 +1045,12 @@ export default function App() {
       </div>
 
       {/* Floating Mobile Bottom Navigation Bar */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 md:hidden glass border border-slate-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/30 px-5 py-2.5 flex items-center gap-7">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 md:hidden glass border border-slate-200/80 dark:border-zinc-800/80 rounded-xl shadow-lg shadow-black/5 dark:shadow-black/30 px-5 py-2.5 flex items-center gap-7">
         <button
           onClick={() => setActiveTab("table")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold transition-colors ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
             activeTab === "table"
-              ? "text-purple-600 dark:text-purple-400"
+              ? "text-blue-600 dark:text-blue-400"
               : "text-slate-400 dark:text-zinc-500"
           }`}
         >
@@ -1100,9 +1059,9 @@ export default function App() {
         </button>
         <button
           onClick={() => setActiveTab("calendar")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold transition-colors ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
             activeTab === "calendar"
-              ? "text-purple-600 dark:text-purple-400"
+              ? "text-blue-600 dark:text-blue-400"
               : "text-slate-400 dark:text-zinc-500"
           }`}
         >
@@ -1111,9 +1070,9 @@ export default function App() {
         </button>
         <button
           onClick={() => setActiveTab("dashboard")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-extrabold transition-colors ${
+          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
             activeTab === "dashboard"
-              ? "text-purple-600 dark:text-purple-400"
+              ? "text-blue-600 dark:text-blue-400"
               : "text-slate-400 dark:text-zinc-500"
           }`}
         >
@@ -1184,10 +1143,11 @@ export default function App() {
           if (!leavePickerEntry) return;
           const balRow = getBalanceForCode(code, leaveRows);
           const leaveType = LEAVE_CODE_TO_TYPE[code] || code;
+          const displayCode = getDisplayCode(code);
           const previousCode = leavePickerEntry.currentStatusId || leavePickerEntry.originalStatusId || "";
           try {
             await api.updateRoster(leavePickerEntry.id, {
-              currentStatusId: code,
+              currentStatusId: displayCode,
               action: leaveType,
               reason: reason || `Leave applied (${leaveType})`,
               notes: reason || `Converted from ${previousCode} to ${leaveType}`,

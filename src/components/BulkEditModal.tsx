@@ -160,7 +160,7 @@ export const BulkEditModal: React.FC<BulkEditModalProps> = ({
               type="checkbox"
               checked={updateCalendar}
               onChange={(e) => setUpdateCalendar(e.target.checked)}
-              className="rounded border-slate-300 text-purple-600"
+              className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
             />
             Synchronize Google Calendar for all {selectedEntries.length} entries
           </label>

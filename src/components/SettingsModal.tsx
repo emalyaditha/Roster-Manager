@@ -303,7 +303,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 Application Settings
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Configure Google Calendar, Timezone, Statuses & Notifications
               </p>
             </div>
@@ -621,7 +621,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         },
                       })
                     }
-                    className="rounded border-slate-300 text-purple-600"
+                    className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
                   />
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
                     Automatically sync changes to Google Calendar upon save
@@ -675,7 +675,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               updated[idx].active = e.target.checked;
                               setStatusList(updated);
                             }}
-                            className="rounded border-slate-300 text-purple-600"
+                            className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
                           />
                           Active
                         </label>
@@ -775,7 +775,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         notifications: { ...formData.notifications, enabled: e.target.checked },
                       })
                     }
-                    className="rounded border-slate-300 text-purple-600"
+                    className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
                   />
                   <span className="font-bold text-slate-900 dark:text-white">
                     Enable System Notifications
@@ -796,7 +796,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           },
                         })
                       }
-                      className="rounded border-slate-300 text-purple-600"
+                      className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
                     />
                     <span>Notify on roster changes</span>
                   </label>
@@ -814,7 +814,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           },
                         })
                       }
-                      className="rounded border-slate-300 text-purple-600"
+                      className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
                     />
                     <span>Alert on Google Calendar sync errors</span>
                   </label>
@@ -829,7 +829,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <h4 className="font-bold text-slate-900 dark:text-white mb-1">
                     Allowed Google Accounts (Access Control)
                   </h4>
-                  <p className="text-xs text-slate-500 mb-3">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
                     Only the Gmail/Google accounts listed below will be allowed to log in and manage this roster. All other accounts will be blocked.
                   </p>
                 </div>
@@ -963,7 +963,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               setDeleteFromGoogleCalendar(e.target.checked);
                               setShowConfirmClear(false);
                             }}
-                            className="rounded border-rose-300 text-rose-600 focus:ring-rose-500"
+                            className="rounded border-rose-300 dark:border-zinc-600 text-rose-600 focus:ring-rose-500"
                           />
                           <span className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-rose-600" />

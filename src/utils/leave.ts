@@ -40,8 +40,8 @@ export const LEAVE_OPTIONS: LeaveOption[] = [
     code: 'Leave(Half)',
     label: 'Half Day Leave',
     colorDot: '#E60023',
-    unit: 1,
-    subtitle: 'Same pool as Short Leave',
+    unit: 0.5,
+    subtitle: 'Pick Annual or Casual pool',
   },
   {
     code: 'ML',
@@ -53,13 +53,21 @@ export const LEAVE_OPTIONS: LeaveOption[] = [
   },
 ];
 
+// Pool choices for half-day leave
+export const HALF_DAY_POOL_OPTIONS = [
+  { key: 'annual', code: 'LEAVE(Half)-Annual', label: 'Annual Leave', colorDot: '#1565c0' },
+  { key: 'casual', code: 'LEAVE(Half)-Casual', label: 'Casual Leave', colorDot: '#558b2f' },
+] as const;
+
 // Roster code -> leave type (as tracked in leave_entitlements / leave balance rows)
 export const LEAVE_CODE_TO_TYPE: Record<string, string> = {
   LEAVE: 'Annual Leave',
   'Medical LEAVE': 'Medical Leave',
   'Casual Leave': 'Casual Leave',
   'Short Leave': 'Short Leave',
-  'Leave(Half)': 'Short Leave', // same pool as Short Leave
+  'Leave(Half)': 'Short Leave', // legacy fallback
+  'LEAVE(Half)-Annual': 'Annual Leave',
+  'LEAVE(Half)-Casual': 'Casual Leave',
 };
 
 // Days on which the leave picker can be opened.
@@ -85,6 +93,12 @@ export const LEAVE_ALREADY_PREFIXES = [
   'ML',
   'DOF',
 ];
+
+// Map composite half-day codes back to the roster display code.
+export function getDisplayCode(code: string): string {
+  if (code === 'LEAVE(Half)-Annual' || code === 'LEAVE(Half)-Casual') return 'Leave(Half)';
+  return code;
+}
 
 export function canApplyLeaveToCode(code: string): boolean {
   return LEAVE_ELIGIBLE_CODES.includes(code) || LEAVE_WARN_CODES.includes(code);

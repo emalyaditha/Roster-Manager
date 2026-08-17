@@ -277,7 +277,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                   className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-red-300 hover:bg-red-50/60 dark:hover:bg-red-950/20 text-left transition-colors flex items-center justify-between"
                 >
                   <span className="flex items-center gap-2.5">
-                    <CalendarDays className="w-4 h-4 text-[#E60023]" />
+                    <CalendarDays className="w-4 h-4 text-[#E60023] dark:text-rose-400" />
                     <span>
                       <span className="block text-xs font-bold text-slate-800 dark:text-slate-100">
                         Apply Leave

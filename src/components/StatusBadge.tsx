@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { RosterStatusConfig } from '../types/roster';
 
 interface StatusBadgeProps {
@@ -21,9 +20,9 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const descriptionDisplay = config ? config.description : '';
 
   const sizeClasses = {
-    sm: 'px-2 py-0.5 text-xs font-semibold rounded-lg',
-    md: 'px-2.5 py-1 text-xs font-bold rounded-xl',
-    lg: 'px-3 py-1.5 text-sm font-bold rounded-xl',
+    sm: 'px-2 py-0.5 text-[11px] font-semibold rounded-md',
+    md: 'px-2 py-0.5 text-[11px] font-semibold rounded-lg',
+    lg: 'px-2.5 py-1 text-xs font-semibold rounded-lg',
   }[size];
 
   const bg = config?.badgeBg || 'bg-slate-100 dark:bg-slate-800';
@@ -33,25 +32,20 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const dotColor = config?.color || '#64748b';
 
   return (
-    <motion.span
-      whileHover={{ scale: 1.04 }}
-      whileTap={{ scale: 0.97 }}
-      className={`inline-flex items-center gap-1.5 border ${bg} ${text} ${border} ${sizeClasses} whitespace-nowrap shadow-xs transition-shadow hover:shadow-md cursor-default`}
-      style={{
-        boxShadow: `0 0 0 0 ${dotColor}00`,
-      }}
+    <span
+      className={`inline-flex items-center gap-1.5 border ${bg} ${text} ${border} ${sizeClasses} whitespace-nowrap cursor-default`}
       title={descriptionDisplay || codeDisplay}
     >
       <span
-        className="w-2 h-2 rounded-full flex-shrink-0 ring-1 ring-white/20 dark:ring-black/20"
+        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
         style={{ backgroundColor: dotColor }}
       />
       <span>{codeDisplay}</span>
       {showDescription && descriptionDisplay && (
-        <span className="opacity-75 font-normal border-l border-current/20 pl-1.5 hidden sm:inline">
+        <span className="opacity-60 font-normal border-l border-current/20 pl-1.5 hidden sm:inline">
           {descriptionDisplay}
         </span>
       )}
-    </motion.span>
+    </span>
   );
 };

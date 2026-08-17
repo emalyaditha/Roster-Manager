@@ -4,6 +4,7 @@ import { RosterEntry, LeaveRow } from '../types/roster';
 import { formatDateDisplay } from '../utils/date';
 import {
   LEAVE_OPTIONS,
+  HALF_DAY_POOL_OPTIONS,
   SHIFT_CONTEXT,
   getBalanceForCode,
   validateLeaveApplication,
@@ -32,12 +33,14 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
   onApply,
 }) => {
   const [selectedCode, setSelectedCode] = useState<string>('');
+  const [halfDayPool, setHalfDayPool] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const reset = () => {
     setSelectedCode('');
+    setHalfDayPool('');
     setReason('');
     setSubmitting(false);
     setError(null);
@@ -49,12 +52,31 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
     onClose();
   };
 
-  const selectedOption = LEAVE_OPTIONS.find((o) => o.code === selectedCode);
+  const handleSelectOption = (code: string) => {
+    setSelectedCode(code);
+    if (code !== 'Leave(Half)') {
+      setHalfDayPool('');
+    }
+  };
+
+  const handleSelectPool = (poolCode: string) => {
+    setHalfDayPool(poolCode);
+  };
+
+  const isHalfDay = selectedCode === 'Leave(Half)';
+  const effectiveCode = isHalfDay ? halfDayPool : selectedCode;
+
+  const selectedOption = useMemo(() => {
+    if (effectiveCode) {
+      return LEAVE_OPTIONS.find((o) => o.code === selectedCode) || HALF_DAY_POOL_OPTIONS.find((o) => o.code === effectiveCode);
+    }
+    return undefined;
+  }, [effectiveCode, selectedCode]);
 
   const validation: ValidationResult | null = useMemo(() => {
-    if (!selectedOption) return null;
-    return validateLeaveApplication(selectedOption.code, leaveRows);
-  }, [selectedOption, leaveRows]);
+    if (!effectiveCode) return null;
+    return validateLeaveApplication(effectiveCode, leaveRows);
+  }, [effectiveCode, leaveRows]);
 
   if (!isOpen || !entry) return null;
 
@@ -66,17 +88,17 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
 
   const confirmDisabled =
     submitting ||
-    !selectedCode ||
+    !effectiveCode ||
     !validation ||
     validation.ok === false ||
     (validation.ok === true && validation.warn === false && validation.after !== undefined && validation.after < 0);
 
   const handleConfirm = async () => {
-    if (!selectedCode || !validation || !validation.ok) return;
+    if (!effectiveCode || !validation || !validation.ok) return;
     setSubmitting(true);
     setError(null);
     try {
-      await onApply(selectedCode, reason);
+      await onApply(effectiveCode, reason);
       reset();
       onClose();
     } catch (err: any) {
@@ -84,6 +106,14 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const getPreviewLabel = (): string => {
+    if (isHalfDay && halfDayPool) {
+      const pool = HALF_DAY_POOL_OPTIONS.find((p) => p.code === halfDayPool);
+      return pool ? `Half Day ${pool.label}` : 'Half Day Leave';
+    }
+    return selectedOption?.label || '';
   };
 
   const modal = (
@@ -125,39 +155,71 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
 
           <div className="space-y-1.5">
             {LEAVE_OPTIONS.map((opt) => {
-              const balRow = getBalanceForCode(opt.code, leaveRows);
-              const balance = opt.noBalanceCheck ? null : (balRow?.balance ?? 0);
               const isSelected = selectedCode === opt.code;
-              const zeroBalance = !opt.noBalanceCheck && balance !== null && balance <= 0;
+              const showPool = isHalfDay && opt.code === 'Leave(Half)';
               return (
-                <button
-                  key={opt.code}
-                  type="button"
-                  onClick={() => setSelectedCode(opt.code)}
-                  className={`leave-option ${isSelected ? 'selected' : ''} ${zeroBalance ? 'zero-balance' : ''}`}
-                >
-                  <span
-                    className="leave-option-dot"
-                    style={{ background: opt.colorDot }}
-                  />
-                  <span className="flex-1 text-left">
-                    <span className="block leave-option-label">{opt.label}</span>
-                    {opt.subtitle && <span className="block leave-option-sub">{opt.subtitle}</span>}
-                  </span>
-                  {opt.noBalanceCheck ? (
-                    <span className="leave-option-bal bal-ok">no cap</span>
-                  ) : (
-                    <span className={`leave-option-bal ${zeroBalance ? 'bal-warn' : 'bal-ok'}`}>
-                      {formatBalance(balance)} left{zeroBalance ? ' ⚠' : ''}
+                <div key={opt.code}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectOption(opt.code)}
+                    className={`leave-option ${isSelected ? 'selected' : ''}`}
+                  >
+                    <span
+                      className="leave-option-dot"
+                      style={{ background: opt.colorDot }}
+                    />
+                    <span className="flex-1 text-left">
+                      <span className="block leave-option-label">{opt.label}</span>
+                      {opt.subtitle && <span className="block leave-option-sub">{opt.subtitle}</span>}
                     </span>
+                    {opt.noBalanceCheck ? (
+                      <span className="leave-option-bal bal-ok">no cap</span>
+                    ) : (
+                      <span className="leave-option-bal bal-ok">
+                        {opt.unit === 0.5 ? '½ day' : `${opt.unit} day`}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Half-day pool sub-picker */}
+                  {showPool && (
+                    <div className="ml-6 mt-1.5 mb-1 space-y-1">
+                      <div className="leave-picker-label">Select balance pool</div>
+                      {HALF_DAY_POOL_OPTIONS.map((pool) => {
+                        const poolBalRow = getBalanceForCode(pool.code, leaveRows);
+                        const poolBalance = poolBalRow?.balance ?? 0;
+                        const poolSelected = halfDayPool === pool.code;
+                        const poolZero = poolBalance <= 0;
+                        return (
+                          <button
+                            key={pool.code}
+                            type="button"
+                            onClick={() => handleSelectPool(pool.code)}
+                            className={`leave-option ${poolSelected ? 'selected' : ''} ${poolZero ? 'zero-balance' : ''}`}
+                          >
+                            <span
+                              className="leave-option-dot"
+                              style={{ background: pool.colorDot }}
+                            />
+                            <span className="flex-1 text-left">
+                              <span className="block leave-option-label">{pool.label}</span>
+                              <span className="block leave-option-sub">Half day deduction</span>
+                            </span>
+                            <span className={`leave-option-bal ${poolZero ? 'bal-warn' : 'bal-ok'}`}>
+                              {formatBalance(poolBalance)} left{poolZero ? ' ⚠' : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
 
           {/* After-applying preview */}
-          {selectedOption && validation && (
+          {effectiveCode && selectedOption && validation && (
             <div
               className={`after-apply-box ${
                 validation.ok === false
@@ -170,7 +232,7 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
               {validation.ok === false ? (
                 validation.reason === 'no_balance' ? (
                   <>
-                    No {selectedOption.label} balance remaining (
+                    No {getPreviewLabel()} balance remaining (
                     {formatBalance(validation.current)} days left).
                   </>
                 ) : (
@@ -178,14 +240,12 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
                 )
               ) : validation.warn ? (
                 <>
-                  No {selectedOption.label} balance remaining. Applying anyway (leave it to HR to
+                  No {getPreviewLabel()} balance remaining. Applying anyway (leave it to HR to
                   resolve). After applying: {formatBalance(validation.after)} days remaining.
                 </>
-              ) : selectedOption.noBalanceCheck ? (
-                <>Maternity Leave applied (no balance cap).</>
               ) : (
                 <>
-                  After applying: {selectedOption.label} — {formatBalance(validation.after)} days
+                  After applying: {getPreviewLabel()} — {formatBalance(validation.after)} days
                   remaining
                 </>
               )}
