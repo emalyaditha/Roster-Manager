@@ -1,7 +1,6 @@
-import fs from 'fs';
-import path from 'path';
 import type { Request, Response, NextFunction } from 'express';
 import { store } from './store.js';
+import firebaseConfig from '../firebase-applet-config.json';
 
 /**
  * Firebase ID token verification for the API.
@@ -14,19 +13,10 @@ import { store } from './store.js';
  * The allow-list (settings.allowedEmails) is enforced server-side.
  */
 
-let webApiKey: string | undefined = process.env.FIREBASE_API_KEY;
-
-if (!webApiKey) {
-  try {
-    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
-    if (fs.existsSync(configPath)) {
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      webApiKey = config.apiKey;
-    }
-  } catch {
-    // handled below — auth fails closed when the API key is unavailable
-  }
-}
+// Imported (not fs-read) so the config is inlined into the serverless bundle —
+// runtime fs paths are not traced into lambdas.
+const webApiKey: string | undefined =
+  process.env.FIREBASE_API_KEY?.trim() || firebaseConfig.apiKey;
 
 export interface AuthedRequest extends Request {
   user?: { email?: string; user_id?: string };

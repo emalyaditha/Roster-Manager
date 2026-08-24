@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "{firebase-applet-config.json,supabase_setup.sql,supabase_tasks.sql}"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
