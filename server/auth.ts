@@ -1,4 +1,3 @@
-import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
 import fs from 'fs';
 import path from 'path';
 import type { Request, Response, NextFunction } from 'express';
@@ -7,42 +6,86 @@ import { store } from './store.js';
 /**
  * Firebase ID token verification for the API.
  *
- * Verifies Firebase Auth ID tokens locally against Google's public JWKS
- * (no Firebase Admin SDK / service account needed) and enforces the
- * settings.allowedEmails allowlist server-side.
+ * Uses Google's Identity Toolkit `accounts:lookup` endpoint, which only
+ * returns account data for cryptographically valid, unexpired Firebase ID
+ * tokens — no Firebase Admin SDK / service account / extra dependency
+ * required (works in every serverless runtime).
+ *
+ * The allow-list (settings.allowedEmails) is enforced server-side.
  */
 
-let firebaseProjectId: string | undefined = process.env.FIREBASE_PROJECT_ID;
+let webApiKey: string | undefined = process.env.FIREBASE_API_KEY;
 
-if (!firebaseProjectId) {
+if (!webApiKey) {
   try {
     const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
     if (fs.existsSync(configPath)) {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      firebaseProjectId = config.projectId;
+      webApiKey = config.apiKey;
     }
   } catch {
-    // handled below — auth fails closed when the project id is unavailable
+    // handled below — auth fails closed when the API key is unavailable
   }
 }
-
-const FIREBASE_JWKS = createRemoteJWKSet(
-  new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com')
-);
 
 export interface AuthedRequest extends Request {
-  user?: JWTPayload & { email?: string; user_id?: string };
+  user?: { email?: string; user_id?: string };
 }
 
-export async function verifyFirebaseIdToken(token: string): Promise<JWTPayload> {
-  if (!firebaseProjectId) {
-    throw new Error('Firebase project id unavailable — cannot verify tokens');
+interface LookupUser {
+  email?: string;
+  localId?: string;
+}
+
+/** Short-lived cache so repeated requests with the same token skip the lookup. */
+const verificationCache = new Map<string, { user: LookupUser; expiresAt: number }>();
+const CACHE_TTL_MS = 4 * 60 * 1000; // ID tokens live ~1h; re-verify well before expiry
+const CACHE_MAX = 100;
+
+function pruneCache(now: number) {
+  for (const [k, v] of verificationCache) {
+    if (v.expiresAt <= now) verificationCache.delete(k);
   }
-  const { payload } = await jwtVerify(token, FIREBASE_JWKS, {
-    issuer: `https://securetoken.google.com/${firebaseProjectId}`,
-    audience: firebaseProjectId,
-  });
-  return payload;
+  while (verificationCache.size > CACHE_MAX) {
+    const first = verificationCache.keys().next().value;
+    if (first === undefined) break;
+    verificationCache.delete(first);
+  }
+}
+
+export async function verifyFirebaseIdToken(token: string): Promise<LookupUser> {
+  if (!webApiKey) {
+    throw new Error('Firebase web API key unavailable — cannot verify tokens');
+  }
+
+  const now = Date.now();
+  pruneCache(now);
+  const cached = verificationCache.get(token);
+  if (cached && cached.expiresAt > now) {
+    return cached.user;
+  }
+
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(webApiKey)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken: token }),
+      signal: AbortSignal.timeout(10_000),
+    }
+  );
+  if (!res.ok) {
+    // 400 INVALID_ID_TOKEN / EXPIRED_ID_TOKEN etc. — invalid token.
+    throw new Error(`Token verification rejected (${res.status})`);
+  }
+  const data: any = await res.json();
+  const user: LookupUser | undefined = data?.users?.[0];
+  if (!user) {
+    throw new Error('Token verification returned no user');
+  }
+
+  verificationCache.set(token, { user, expiresAt: now + CACHE_TTL_MS });
+  return user;
 }
 
 function extractBearerToken(req: Request): string | null {
@@ -59,8 +102,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    const payload = (await verifyFirebaseIdToken(token)) as AuthedRequest['user'];
-    const email = (payload.email || '').toLowerCase();
+    const user = await verifyFirebaseIdToken(token);
+    const email = (user.email || '').toLowerCase();
     if (!email) {
       res.status(403).json({ error: 'Forbidden' });
       return;
@@ -71,7 +114,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       res.status(403).json({ error: 'Forbidden' });
       return;
     }
-    (req as AuthedRequest).user = payload;
+    (req as AuthedRequest).user = { email: user.email, user_id: user.localId };
     next();
   } catch {
     res.status(401).json({ error: 'Unauthorized' });

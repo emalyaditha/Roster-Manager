@@ -145,9 +145,14 @@ const isPlaceholder = (val?: string) => {
   );
 };
 
-// Initialize Supabase Client if credentials are provided in the environment
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+// Initialize Supabase Client if credentials are provided in the environment.
+// Env values are trimmed of stray quotes/whitespace (a quoted value pasted
+// into a hosting dashboard would otherwise crash createClient and take the
+// whole lambda down).
+const cleanEnv = (val: string | undefined) => val?.trim().replace(/^["']+|["']+$/g, '');
+
+const supabaseUrl = cleanEnv(process.env.SUPABASE_URL);
+const supabaseKey = cleanEnv(process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
 
 const isSupabaseEnabled = Boolean(
   supabaseUrl &&
@@ -159,8 +164,14 @@ const isSupabaseEnabled = Boolean(
 let supabaseClient: any = null;
 
 if (isSupabaseEnabled) {
-  console.log('🔌 Supabase configuration detected. Utilizing Supabase cloud database!');
-  supabaseClient = createClient(supabaseUrl!, supabaseKey!);
+  try {
+    supabaseClient = createClient(supabaseUrl!, supabaseKey!);
+    console.log('🔌 Supabase configuration detected. Utilizing Supabase cloud database!');
+  } catch (err) {
+    // Never let a bad URL/key crash the module — degrade to local persistence.
+    supabaseClient = null;
+    console.log('[Supabase Sync] Note: client initialization failed; using local storage fallback. (Detail:', (err as Error)?.message || err, ')');
+  }
 } else {
   console.log('📂 No valid Supabase configuration found or placeholders detected. Falling back to local JSON file persistence.');
 }
