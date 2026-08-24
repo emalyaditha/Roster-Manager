@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 interface CalendarLoaderProps {
   label?: string;
+  /** Optional list of messages cycled while loading (overrides label). */
+  messages?: string[];
   /** compact = inline fallback for lazy views; default is a full-page loader */
   compact?: boolean;
 }
@@ -12,20 +14,32 @@ interface CalendarLoaderProps {
  */
 export const CalendarLoader: React.FC<CalendarLoaderProps> = ({
   label = 'Loading your roster days',
+  messages,
   compact = false,
 }) => {
+  const [msgIndex, setMsgIndex] = useState(0);
+
+  useEffect(() => {
+    if (!messages || messages.length <= 1) return;
+    const timer = setInterval(() => {
+      setMsgIndex((i) => (i + 1) % messages.length);
+    }, 1600);
+    return () => clearInterval(timer);
+  }, [messages]);
+
+  const text = messages && messages.length > 0 ? messages[msgIndex % messages.length] : label;
   const now = useMemo(() => new Date(), []);
   const days = useMemo(() => Array.from({ length: 31 }, (_, i) => i + 1), []);
   const monthLabel = now.toLocaleString('en-US', { month: 'short' }).toUpperCase();
   const today = now.getDate();
 
   return (
-    <div
-      className={`cal-loader ${compact ? 'cal-loader-compact' : ''}`}
-      role="status"
-      aria-live="polite"
-      aria-label={label}
-    >
+      <div
+        className={`cal-loader ${compact ? 'cal-loader-compact' : ''}`}
+        role="status"
+        aria-live="polite"
+        aria-label={text}
+      >
       <div className="cal-loader-card" aria-hidden>
         <span className="cal-ring cal-ring-l" />
         <span className="cal-ring cal-ring-r" />
@@ -51,7 +65,7 @@ export const CalendarLoader: React.FC<CalendarLoaderProps> = ({
         </div>
       </div>
       <div className="cal-loader-text">
-        {label}
+        {text}
         <span className="cal-loader-dots" aria-hidden>
           <span>.</span>
           <span>.</span>

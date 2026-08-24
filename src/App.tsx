@@ -538,16 +538,22 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f0f2f8] dark:bg-[#0a0e1a] transition-colors relative">
+      <div className="min-h-screen flex items-center justify-center bg-page transition-colors relative">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="aurora-blob aurora-blob-1" />
           <div className="aurora-blob aurora-blob-2" />
         </div>
-        <div className="flex flex-col items-center gap-4 relative z-10">
-          <div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-            Verifying access permissions...
-          </p>
+        <div className="relative z-10">
+          <CalendarLoader
+            compact
+            messages={[
+              'Checking your access pass',
+              'Counting the days',
+              'Syncing the calendar',
+              'Unlocking your roster',
+              'Almost on duty',
+            ]}
+          />
         </div>
       </div>
     );
