@@ -27,6 +27,7 @@ import { RosterCardList } from "./components/RosterCardList";
 import { RosterCalendarView } from "./components/RosterCalendarView";
 import { SummaryCards } from "./components/SummaryCards";
 import { CalendarLoader } from "./components/CalendarLoader";
+import { AccessBadgeLoader } from "./components/AccessBadgeLoader";
 import { Toast, ToastItem } from "./components/Toast";
 import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode, isPartialLeaveCode, getShortLeaveCutoff } from "./utils/leave";
 
@@ -544,12 +545,11 @@ export default function App() {
           <div className="aurora-blob aurora-blob-2" />
         </div>
         <div className="relative z-10">
-          <CalendarLoader
-            compact
+          <AccessBadgeLoader
             messages={[
               'Checking your access pass',
-              'Counting the days',
-              'Syncing the calendar',
+              'Scanning credentials',
+              'Verifying clearance',
               'Unlocking your roster',
               'Almost on duty',
             ]}
