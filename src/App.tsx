@@ -26,6 +26,7 @@ import { RosterTable } from "./components/RosterTable";
 import { RosterCardList } from "./components/RosterCardList";
 import { RosterCalendarView } from "./components/RosterCalendarView";
 import { SummaryCards } from "./components/SummaryCards";
+import { CalendarLoader } from "./components/CalendarLoader";
 import { Toast, ToastItem } from "./components/Toast";
 import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode, isPartialLeaveCode, getShortLeaveCutoff } from "./utils/leave";
 
@@ -86,8 +87,8 @@ import {
 } from "lucide-react";
 
 const ViewLoading = () => (
-  <div className="py-20 text-center text-xs text-muted">
-    <RefreshCw className="w-5 h-5 animate-spin mx-auto" style={{ color: "var(--color-primary)" }} />
+  <div className="py-16 flex justify-center">
+    <CalendarLoader compact label="Loading view" />
   </div>
 );
 
@@ -767,12 +768,8 @@ export default function App() {
         )}
         {/* Content Views */}
         {loading ? (
-          <div className="py-20 text-center text-xs text-muted flex flex-col items-center justify-center gap-4">
-            <RefreshCw className="w-5 h-5 animate-spin" style={{ color: "var(--color-primary)" }} />
-            <span className="font-medium">
-              Loading roster entries for{" "}
-              {formatMonthYearDisplay(currentMonthYear)}...
-            </span>
+          <div className="pt-14 pb-24 flex justify-center">
+            <CalendarLoader label={`Loading ${formatMonthYearDisplay(currentMonthYear)} roster days`} />
           </div>
         ) : (
           <>

@@ -703,6 +703,133 @@
 .toast-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
 }
 
+/* --- Calendar loading screen --- */
+@keyframes calCellWave {
+  0%, 100% { opacity: 0.3; transform: scale(0.86); background: transparent; color: var(--color-text-faint); }
+  30% { opacity: 1; transform: scale(1.12); background: var(--accent-soft); color: var(--color-primary); font-weight: 700; }
+}
+@keyframes calTodayPop {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+}
+@keyframes calDotsBlink {
+  0%, 20% { opacity: 0.15; }
+  50% { opacity: 1; }
+  80%, 100% { opacity: 0.15; }
+}
+@keyframes calCardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@layer components {
+  .cal-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .cal-loader-card {
+    position: relative;
+    background: var(--color-panel);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 14px 14px 12px;
+    box-shadow: var(--shadow-md);
+    animation: calCardFloat 2.6s ease-in-out infinite;
+  }
+  .cal-ring {
+    position: absolute;
+    top: -7px;
+    width: 8px;
+    height: 16px;
+    border-radius: 9999px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+  }
+  .cal-ring-l { left: 22%; }
+  .cal-ring-r { right: 22%; }
+  .cal-loader-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 2px 8px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 8px;
+  }
+  .cal-loader-month {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--color-primary);
+  }
+  .cal-loader-year {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .cal-loader-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+  .cal-loader-weekday {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    text-align: center;
+    padding-bottom: 2px;
+  }
+  .cal-loader-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 22px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    animation: calCellWave 1.9s ease-in-out infinite;
+  }
+  .cal-loader-cell.is-today {
+    background: var(--color-primary);
+    color: var(--on-accent);
+    font-weight: 800;
+    animation: calTodayPop 1.9s ease-in-out infinite;
+  }
+  .cal-loader-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .cal-loader-dots span {
+    display: inline-block;
+    animation: calDotsBlink 1.4s ease-in-out infinite;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+  .cal-loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .cal-loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* Compact variant for lazy-view fallbacks */
+  .cal-loader-compact { gap: 10px; }
+  .cal-loader-compact .cal-loader-card {
+    padding: 10px 10px 8px;
+    border-radius: 12px;
+  }
+  .cal-loader-compact .cal-loader-cell { width: 18px; height: 15px; font-size: 6.5px; border-radius: 4px; }
+  .cal-loader-compact .cal-loader-grid { gap: 2px; }
+  .cal-loader-compact .cal-loader-month { font-size: 10px; }
+  .cal-loader-compact .cal-loader-year { font-size: 8px; }
+  .cal-loader-compact .cal-loader-weekday { font-size: 6px; }
+  .cal-loader-compact .cal-loader-text { font-size: 12px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
