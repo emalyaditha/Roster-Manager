@@ -48,9 +48,9 @@ export const RosterTable = React.memo<RosterTableProps>(({
     <div className="w-full flex flex-col gap-3">
       {/* Bulk Action Top Header Bar when items are selected */}
       {selectedIds.length > 0 && (
-        <div className="bg-blue-50 dark:bg-blue-950/40 px-4 py-3 border border-blue-200 dark:border-blue-800/60 flex items-center justify-between text-xs animate-fadeIn rounded-xl">
-          <div className="flex items-center gap-2.5 font-semibold text-blue-900 dark:text-blue-200">
-            <span className="w-5 h-5 rounded-md bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+        <div className="bg-[var(--accent-soft)] px-4 py-3 border border-line flex items-center justify-between text-xs animate-fadeIn rounded-lg">
+          <div className="flex items-center gap-2.5 font-semibold text-fg">
+            <span className="w-5 h-5 rounded-md bg-accent text-on-accent flex items-center justify-center text-[10px] font-bold">
               {selectedIds.length}
             </span>
             <span>{selectedIds.length} roster entries selected</span>
@@ -58,7 +58,7 @@ export const RosterTable = React.memo<RosterTableProps>(({
           <div className="flex items-center gap-2">
             <button
               onClick={onBulkEditClick}
-              className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="btn-min btn-primary"
             >
               <Edit3 className="w-3.5 h-3.5" />
               Bulk Change
@@ -68,16 +68,16 @@ export const RosterTable = React.memo<RosterTableProps>(({
       )}
 
       {/* Main Roster Schedule Table */}
-      <div className="w-full overflow-hidden rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+      <div className="card overflow-hidden w-full relative">
         {entries.length === 0 ? (
-          <div className="py-20 text-center text-slate-500 dark:text-zinc-400">
+          <div className="py-20 text-center text-muted">
             <div className="flex flex-col items-center justify-center gap-4">
-              <div className="p-4 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-400">
+              <div className="p-4 rounded-lg bg-well text-faint">
                 <Calendar className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <p className="font-semibold text-sm text-slate-800 dark:text-zinc-200">No roster entries found</p>
-                <p className="text-xs text-slate-400 dark:text-zinc-500 max-w-sm leading-relaxed">
+                <p className="font-semibold text-sm text-fg">No roster entries found</p>
+                <p className="text-xs text-muted max-w-sm leading-relaxed">
                   Try adjusting your search query, status filters, or import a new monthly roster file.
                 </p>
               </div>
@@ -85,34 +85,34 @@ export const RosterTable = React.memo<RosterTableProps>(({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="bg-slate-50 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] font-semibold select-none">
-                  <th className="py-3.5 pl-4 pr-2 w-10 text-center">
+                <tr>
+                  <th className="py-2.5 pl-4 pr-2 w-10 text-center text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 select-none">
                     <button
                       type="button"
                       onClick={onToggleSelectAll}
-                      className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                      className="text-faint hover:text-accent transition-colors cursor-pointer"
                       title={isAllSelected ? "Deselect All" : "Select All"}
                     >
                       {isAllSelected ? (
-                        <CheckSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <CheckSquare className="w-4 h-4 text-accent" />
                       ) : (
                         <Square className="w-4 h-4" />
                       )}
                     </button>
                   </th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[130px]">Date & Day</th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[140px]">Effective Roster</th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[120px]">Original Status</th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[130px]">Clock Times</th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[120px]">OT & Shift</th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[160px]">Action & Notes</th>
-                   <th className="py-3.5 px-3 font-semibold min-w-[120px]">Google Sync</th>
-                   <th className="py-3.5 pr-4 pl-2 font-semibold text-right min-w-[120px]">Actions</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[130px]">Date &amp; Day</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[140px]">Effective Roster</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[120px]">Original Status</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[130px]">Clock Times</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[120px]">OT &amp; Shift</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[160px]">Action &amp; Notes</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[120px]">Google Sync</th>
+                   <th className="py-2.5 pr-4 pl-2 text-right text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[120px]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 font-medium text-slate-800 dark:text-zinc-200">
+              <tbody>
                 {entries.map((entry) => {
                   const isChanged = !!entry.changedStatusId;
                   const isSelected = selectedIds.includes(entry.id);
@@ -122,25 +122,23 @@ export const RosterTable = React.memo<RosterTableProps>(({
                   return (
                     <tr
                       key={entry.id}
-                      className={`group transition-colors duration-100 ${
+                      className={`group border-b border-line hover:bg-well/60 transition-colors ${
                         isToday
-                          ? 'bg-blue-50/60 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/30'
-                          : isChanged
-                          ? 'bg-amber-50/40 dark:bg-amber-950/15 hover:bg-amber-50/70 dark:hover:bg-amber-950/25'
+                          ? 'bg-[var(--accent-soft)]'
                           : isSelected
-                          ? 'bg-blue-50/30 dark:bg-blue-950/15 hover:bg-blue-50/50'
-                          : 'hover:bg-slate-50 dark:hover:bg-zinc-800/40'
+                          ? 'bg-[var(--accent-soft)]'
+                          : ''
                       }`}
                     >
                       {/* Checkbox */}
-                      <td className="py-3.5 pl-4 pr-2 text-center align-middle">
+                      <td className="py-2.5 pl-4 pr-2 text-center align-middle text-sm text-fg">
                         <button
                           type="button"
                           onClick={() => onToggleSelect(entry.id)}
-                          className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                          className="text-faint hover:text-accent transition-colors cursor-pointer"
                         >
                           {isSelected ? (
-                        <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <CheckSquare className="w-4 h-4 text-accent" />
                           ) : (
                             <Square className="w-4 h-4 opacity-50 group-hover:opacity-100" />
                           )}
@@ -148,20 +146,20 @@ export const RosterTable = React.memo<RosterTableProps>(({
                       </td>
 
                       {/* Date & Day */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         <div className="flex items-center gap-2">
                           <div className="flex flex-col">
                             <div className="flex items-center gap-1.5">
-                              <span className="font-semibold text-slate-900 dark:text-white tracking-tight text-xs">
+                              <span className="font-semibold text-fg tracking-tight text-xs">
                                 {formatDateDisplay(entry.date)}
                               </span>
                               {isToday && (
-                                <span className="px-1.5 py-0.2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-[9px] rounded tracking-wide uppercase">
+                                <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-fg text-page tracking-wide uppercase">
                                   TODAY
                                 </span>
                               )}
                             </div>
-                            <span className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400">
+                            <span className="text-[11px] font-medium text-muted">
                               {entry.day}
                             </span>
                           </div>
@@ -169,12 +167,13 @@ export const RosterTable = React.memo<RosterTableProps>(({
                       </td>
 
                       {/* Effective Roster Badge */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         <div className="flex items-center gap-1.5">
                           <CurrentEffectiveTooltip entry={entry} statuses={statuses} size="md" />
                           {isChanged && (
                             <span
-                              className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse shrink-0"
+                              className="w-2 h-2 rounded-full animate-pulse shrink-0"
+                              style={{ background: 'var(--warning)' }}
                               title="Roster Modified from Original"
                             />
                           )}
@@ -182,109 +181,112 @@ export const RosterTable = React.memo<RosterTableProps>(({
                       </td>
 
                       {/* Original Status */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         <StatusBadge statusId={entry.originalStatusId} statuses={statuses} size="sm" />
                       </td>
 
                       {/* Clock In / Out Times */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         {entry.clockIn || entry.clockOut ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/80 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700/80 text-[11px] font-mono font-bold text-slate-700 dark:text-zinc-300">
-                             <Clock className="w-3 h-3 text-slate-500 shrink-0" />
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-well border border-line text-[11px] font-mono font-semibold text-fg">
+                             <Clock className="w-3 h-3 text-muted shrink-0" />
                             <span>{entry.clockIn || '--:--'}</span>
-                            <span className="text-slate-400 dark:text-zinc-500">&rarr;</span>
+                            <span className="text-faint">&rarr;</span>
                             <span>{entry.clockOut || '--:--'}</span>
                           </div>
                         ) : (
-                          <span className="text-slate-400 dark:text-zinc-500 text-[11px] italic">--</span>
+                          <span className="text-faint text-[11px] italic">--</span>
                         )}
                       </td>
 
                       {/* OT & Shift Details */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         {entry.ot || totalOtHours > 0 ? (
                           <div className="inline-flex flex-col gap-0.5">
-                            <span className="px-2 py-0.5 rounded-lg bg-orange-500/10 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 font-extrabold text-[10px] border border-orange-500/30 w-fit">
+                            <span
+                              className="px-2 py-0.5 rounded-md font-bold text-[10px] w-fit"
+                              style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}
+                            >
                               + OT {totalOtHours > 0 ? `${totalOtHours.toFixed(1)}h` : 'Shift'}
                             </span>
                             {totalOtHours > 0 && (
-                              <span className="text-[9px] font-medium text-slate-500 dark:text-zinc-400">
+                              <span className="text-[9px] font-medium text-muted">
                                 M:{entry.otMorningHours || 0}h | N:{entry.otNightHours || 0}h
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-slate-400 dark:text-zinc-500 text-[11px]">Standard</span>
+                          <span className="text-faint text-[11px]">Standard</span>
                         )}
                       </td>
 
                       {/* Action & Notes */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         <div className="flex flex-col gap-0.5 max-w-[200px]">
                           {entry.action && (
-                            <span className="font-semibold text-slate-800 dark:text-zinc-200 text-xs truncate">
+                            <span className="font-medium text-fg text-xs truncate">
                               {entry.action}
                             </span>
                           )}
                           {entry.notes ? (
-                            <span className="text-[11px] text-slate-500 dark:text-zinc-400 italic flex items-center gap-1 truncate" title={entry.notes}>
-                              <MessageSquare className="w-3 h-3 shrink-0 text-slate-400 dark:text-zinc-500" />
+                            <span className="text-[11px] text-muted italic flex items-center gap-1 truncate" title={entry.notes}>
+                              <MessageSquare className="w-3 h-3 shrink-0 text-faint" />
                               <span className="truncate">{entry.notes}</span>
                             </span>
                           ) : !entry.action ? (
-                            <span className="text-slate-400 dark:text-zinc-500 text-[11px] italic">No notes</span>
+                            <span className="text-faint text-[11px] italic">No notes</span>
                           ) : null}
                         </div>
                       </td>
 
                       {/* Google Calendar Sync */}
-                      <td className="py-3.5 px-3 align-middle">
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         {entry.googleCalendarSyncStatus === 'Synced' ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] border border-emerald-500/20">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span className="chip chip-success">
+                            <CheckCircle2 className="w-3 h-3" />
                             Synced
                           </span>
                         ) : entry.googleCalendarSyncStatus === 'Sync Failed' ? (
                           <button
                             onClick={() => onSyncSingleClick(entry)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 font-extrabold text-[10px] border border-red-500/20 hover:bg-red-500/20 transition-all cursor-pointer"
+                            className="chip chip-danger cursor-pointer"
                             title="Click to retry calendar sync"
                           >
-                            <AlertTriangle className="w-3.5 h-3.5" />
+                            <AlertTriangle className="w-3 h-3" />
                             Retry
                           </button>
                         ) : (
                           <button
                             onClick={() => onSyncSingleClick(entry)}
-                            className="inline-flex items-center gap-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="chip chip-neutral cursor-pointer"
                             title="Sync to Google Calendar"
                           >
-                            <RefreshCw className="w-3.5 h-3.5" />
+                            <RefreshCw className="w-3 h-3" />
                             Sync
                           </button>
                         )}
                       </td>
 
                       {/* Row Actions */}
-                      <td className="py-3.5 pr-4 pl-2 align-middle text-right">
+                      <td className="py-2.5 pr-4 pl-2 align-middle text-right text-sm text-fg">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => onChangeRosterClick(entry)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors cursor-pointer"
+                            className="btn-icon w-7 h-7"
                             title="Edit Roster Status"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => onHistoryClick(entry)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors cursor-pointer"
+                            className="btn-icon w-7 h-7"
                             title="View Audit History"
                           >
                             <History className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => onDeleteClick(entry)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                            className="btn-icon w-7 h-7"
                             title="Delete Entry"
                           >
                             <Trash2 className="w-4 h-4" />

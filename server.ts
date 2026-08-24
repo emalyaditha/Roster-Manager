@@ -1,10 +1,99 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import { randomUUID } from 'crypto';
 import { store } from './server/store.js';
-import { RosterEntry, RosterChangeHistory } from './src/types/roster.js';
+import { requireAuth, type AuthedRequest } from './server/auth.js';
+import * as taskStore from './server/taskStore.js';
+import * as taskGroupStore from './server/taskGroupStore.js';
+import * as taskTemplateStore from './server/taskTemplateStore.js';
+import { Task, TaskGroup, TaskTemplate } from './src/types/tasks.js';
+import { RosterEntry, RosterChangeHistory, AppSettings } from './src/types/roster.js';
 import { getDayOfWeekName, extractTimeInTimezone } from './src/utils/date.js';
 import { calculateDayOt, DEFAULT_OT_SETTINGS } from './src/utils/otCalculator.js';
+
+// TMS definition -> runtime transition: substitute {{variables}} and fan out
+// a template into concrete tasks (single task or sequenced group with deps).
+const VALID_TASK_STATUSES = ['todo', 'in_progress', 'blocked', 'done'];
+const VALID_TASK_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
+const VALID_TASK_CATEGORIES = ['work', 'personal', 'projects'];
+
+function substituteVariables(text: string, values: Record<string, string>, variables: TaskTemplate['variables']): string {
+  return String(text || '').replace(/\{\{([\w-]+)\}\}/g, (match, key: string) => {
+    const provided = values?.[key];
+    if (provided !== undefined && String(provided).trim()) return String(provided).trim();
+    const fallback = variables.find((v) => v.key === key)?.defaultValue;
+    return fallback !== undefined ? String(fallback) : '';
+  });
+}
+
+function addDaysStr(dateStr: string, days: number): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+async function instantiateFromTemplate(body: {
+  templateId?: string;
+  variableValues?: Record<string, string>;
+  dueDate?: string | null;
+  user?: string;
+}): Promise<{ group: TaskGroup | null; tasks: Task[] }> {
+  const templates = await taskTemplateStore.getTaskTemplates();
+  const template = templates.find((t) => t.id === body.templateId);
+  if (!template) {
+    throw new taskStore.TaskRouteError(404, 'Task template not found');
+  }
+  const values = body.variableValues || {};
+  const baseDue = body.dueDate || null;
+
+  // Single-task template.
+  if (!template.children || template.children.length === 0) {
+    const task = await taskStore.createTask({
+      title: substituteVariables(template.titleTemplate, values, template.variables),
+      notes: substituteVariables(template.notesTemplate || '', values, template.variables),
+      priority: template.priority,
+      tags: template.tags,
+      dueDate: baseDue,
+      user: body.user || 'User',
+      category: (template as { category?: Task['category'] }).category ?? 'work',
+    });
+    return { group: null, tasks: [task] };
+  }
+
+  // Group template: create the container first (TMS runtime container object).
+  const group = await taskGroupStore.createTaskGroup({ name: substituteVariables(template.name, values, template.variables), description: template.description });
+
+  // Pre-allocate sibling ids so dependsOnIndexes resolve to real tasks in one write.
+  const ids = template.children.map(() => randomUUID());
+  const today = new Date().toISOString().slice(0, 10);
+
+  const createdTasks = await taskStore.mutateTasks((tasks) => {
+    let next = [...tasks];
+    const children: Task[] = template.children!.map((child, i) => {
+      const offset = child.dueOffsetDays ?? 0;
+      const spec = {
+        id: ids[i],
+        title: substituteVariables(child.titleTemplate, values, template.variables),
+        notes: substituteVariables(child.notesTemplate || '', values, template.variables),
+        priority: child.priority ?? template.priority,
+        tags: [...template.tags, group.name],
+        dueDate: baseDue ? addDaysStr(baseDue, offset) : addDaysStr(today, offset),
+        user: body.user || 'User',
+        groupId: group.id,
+        sequence: i + 1,
+        dependsOn: (child.dependsOnIndexes ?? []).map((di) => ids[di]).filter(Boolean),
+        category: (template as { category?: Task['category'] }).category ?? 'work',
+      };
+      return taskStore.createTaskFromSpec(spec, next);
+    });
+    next = [...next, ...children];
+    return { next, value: children };
+  });
+
+  return { group, tasks: createdTasks };
+}
 
 // Date calculation helper for rolling backfill
 function subDaysStr(dateStr: string, days: number): string {
@@ -55,10 +144,69 @@ async function createServer() {
 
   app.use(express.json({ limit: '10mb' }));
 
-  // Middleware
-  app.use(async (req, res, next) => {
+  // Security headers (minimal helmet-equivalent; no extra dependency)
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('X-DNS-Prefetch-Control', 'off');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     next();
   });
+
+  // Simple in-memory rate limiter (per-IP, fixed window). On serverless this
+  // is per-instance; pair with edge/WAF rules for cross-instance enforcement.
+  const rateBuckets = new Map<string, { count: number; resetAt: number }>();
+  function rateLimit(max: number, windowMs: number) {
+    return (req: any, res: any, next: any) => {
+      const key = req.ip || req.socket?.remoteAddress || 'unknown';
+      const now = Date.now();
+      const bucket = rateBuckets.get(key);
+      if (!bucket || now > bucket.resetAt) {
+        rateBuckets.set(key, { count: 1, resetAt: now + windowMs });
+        next();
+        return;
+      }
+      bucket.count += 1;
+      if (bucket.count > max) {
+        res.status(429).json({ error: 'Too many requests' });
+        return;
+      }
+      next();
+    };
+  }
+  // Periodically drop expired buckets so the map cannot grow unbounded.
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, bucket] of rateBuckets) {
+      if (now > bucket.resetAt) rateBuckets.delete(key);
+    }
+  }, 60_000).unref();
+
+  app.use('/api', rateLimit(300, 60_000));
+
+  // Authentication: every /api route requires a valid Firebase ID token from
+  // an allow-listed email, except the health probe.
+  app.use('/api', (req, res, next) => {
+    if (req.path === '/health') return next();
+    requireAuth(req, res, next);
+  });
+
+  // Serializes whole-table roster read-modify-write cycles within this
+  // process, so two concurrent requests can never interleave read and write
+  // phases. (Cross-process safety comes from Supabase being authoritative
+  // plus upsert-before-delete ordering.)
+  let rosterWriteQueue: Promise<unknown> = Promise.resolve();
+  function withRosterLock(handler: (req: any, res: any) => Promise<any>): (req: any, res: any) => Promise<any> {
+    return async (req: any, res: any) => {
+      const run = rosterWriteQueue.then(() => handler(req, res));
+      rosterWriteQueue = run.then(
+        () => undefined,
+        () => undefined
+      );
+      return run;
+    };
+  }
 
   // Helper to get 16th-to-15th roster cycle date range
   function getCycleDateRange(monthYearStr: string) {
@@ -70,9 +218,15 @@ async function createServer() {
   }
 
   // API Routes
-  // 1. Health check
+  // 1. Health check (unauthenticated, for uptime probes)
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Identity of the authenticated user (auth middleware already enforced allow-list)
+  app.get('/api/auth/me', (req, res) => {
+    const user = (req as AuthedRequest).user;
+    res.json({ email: user?.email || null, uid: user?.user_id || null });
   });
 
   // Supabase status check
@@ -81,7 +235,7 @@ async function createServer() {
       const status = await store.checkSupabaseStatus();
       res.json(status);
     } catch (error: any) {
-      res.status(500).json({ error: error?.message || String(error) });
+      res.status(500).json({ error: 'Internal server error' });
     }
   });
 
@@ -96,7 +250,7 @@ async function createServer() {
         res.status(404).json({ error: 'SQL setup file not found' });
       }
     } catch (error: any) {
-      res.status(500).json({ error: error?.message || String(error) });
+      res.status(500).json({ error: 'Internal server error' });
     }
   });
 
@@ -148,7 +302,7 @@ async function createServer() {
             e.day.toLowerCase().includes(query) ||
             e.originalStatusId.toLowerCase().includes(query) ||
             e.currentStatusId.toLowerCase().includes(query) ||
-            e.action.toLowerCase().includes(query) ||
+            (e.action || '').toLowerCase().includes(query) ||
             (e.notes && e.notes.toLowerCase().includes(query))
         );
       }
@@ -239,7 +393,7 @@ async function createServer() {
   });
 
   // 3b. Update clock times and remark for single entry
-  app.put('/api/roster/:id/clock-times', async (req, res) => {
+  app.put('/api/roster/:id/clock-times', withRosterLock(async (req, res) => {
     try {
       const { clockIn, clockOut, remark, notes } = req.body;
       const entries = await store.getRosters();
@@ -280,12 +434,12 @@ async function createServer() {
       res.json(entries[idx]);
     } catch (error: any) {
       console.error('Failed to update clock times:', error);
-      res.status(500).json({ error: error?.message || 'Failed to update clock times and remark' });
+      res.status(500).json({ error: 'Failed to update clock times and remark' });
     }
-  });
+  }));
 
   // 3c. Batch Update clock times and remarks for multiple entries
-  app.post('/api/roster/clock-times/batch', async (req, res) => {
+  app.post('/api/roster/clock-times/batch', withRosterLock(async (req, res) => {
     try {
       const { updates } = req.body; // Array of { id, clockIn, clockOut, remark, notes }
       if (!Array.isArray(updates) || updates.length === 0) {
@@ -347,12 +501,12 @@ async function createServer() {
       });
     } catch (error: any) {
       console.error('Failed to batch update clock times:', error);
-      res.status(500).json({ error: error?.message || 'Failed to batch update clock times' });
+      res.status(500).json({ error: 'Failed to batch update clock times' });
     }
-  });
+  }));
 
   // 4. Create new Roster Entry
-  app.post('/api/roster', async (req, res) => {
+  app.post('/api/roster', withRosterLock(async (req, res) => {
     try {
       const { date, originalStatusId, changedStatusId, action, notes, clockIn, clockOut, ot, otMorningHours, otNightHours, updateCalendar } = req.body;
 
@@ -414,7 +568,7 @@ async function createServer() {
           notes: notes || '',
           clockIn: clockIn || '',
           clockOut: clockOut || '',
-          ot: Boolean(ot),
+          ot: ot === true || ot === 'true',
           otMorningHours: otMorningHours !== undefined ? Number(otMorningHours) : undefined,
           otNightHours: otNightHours !== undefined ? Number(otNightHours) : undefined,
           googleCalendarSyncStatus: updateCalendar ? 'Synced' : 'Not Synced',
@@ -434,10 +588,10 @@ async function createServer() {
       console.error('Error creating roster entry:', error);
       res.status(500).json({ error: 'Failed to save roster entry' });
     }
-  });
+  }));
 
   // 5. Change Roster Entry Workflow (Preserving Original Roster)
-  app.put('/api/roster/:id/change', async (req, res) => {
+  app.put('/api/roster/:id/change', withRosterLock(async (req, res) => {
     try {
       const { newStatusId, action, reason, notes, clockIn, clockOut, ot, otMorningHours, otNightHours, user, updateCalendar } = req.body;
 
@@ -494,7 +648,7 @@ async function createServer() {
 
       // Record Audit History Record!
       const auditRecord: RosterChangeHistory = {
-        id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        id: randomUUID(),
         rosterEntryId: existing.id,
         date: existing.date,
         previousStatusId: previousStatus,
@@ -516,13 +670,13 @@ async function createServer() {
       console.error('Error changing roster:', error);
       res.status(500).json({ 
         error: 'Failed to change roster entry',
-        details: error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error))
+        details: undefined
       });
     }
-  });
+  }));
 
   // 6. Bulk Change Roster Workflow
-  app.post('/api/roster/bulk-change', async (req, res) => {
+  app.post('/api/roster/bulk-change', withRosterLock(async (req, res) => {
     try {
       const { ids, newStatusId, action, reason, user, updateCalendar } = req.body;
 
@@ -532,6 +686,7 @@ async function createServer() {
 
       const entries = await store.getRosters();
       const updatedEntries: RosterEntry[] = [];
+      const historyRecords: RosterChangeHistory[] = [];
       const now = new Date().toISOString();
 
       for (const id of ids) {
@@ -562,9 +717,10 @@ async function createServer() {
           entries[idx] = updated;
           updatedEntries.push(updated);
 
-          // Individual audit history record for every affected entry!
-          await store.addHistoryRecord({
-            id: `hist-bulk-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+          // Individual audit history record for every affected entry —
+          // recorded only AFTER the entries persist successfully.
+          historyRecords.push({
+            id: randomUUID(),
             rosterEntryId: existing.id,
             date: existing.date,
             previousStatusId: previousStatus,
@@ -581,13 +737,16 @@ async function createServer() {
       }
 
       await store.saveRosters(entries);
+      for (const record of historyRecords) {
+        await store.addHistoryRecord(record);
+      }
 
       res.json({ updatedCount: updatedEntries.length, entries: updatedEntries });
     } catch (error) {
       console.error('Error performing bulk change:', error);
       res.status(500).json({ error: 'Failed to apply bulk change' });
     }
-  });
+  }));
 
   // 7. Delete Roster Entries (by month or clear all)
   const clearHandler = async (req: express.Request, res: express.Response) => {
@@ -642,10 +801,10 @@ async function createServer() {
     }
   };
 
-  app.delete('/api/roster/clear', clearHandler);
-  app.delete('/api/roster/all/clear', clearHandler);
+  app.delete('/api/roster/clear', withRosterLock(clearHandler));
+  app.delete('/api/roster/all/clear', withRosterLock(clearHandler));
 
-  app.delete('/api/roster/:id', async (req, res) => {
+  app.delete('/api/roster/:id', withRosterLock(async (req, res) => {
     try {
       let entries = await store.getRosters();
       const target = entries.find((e) => e.id === req.params.id);
@@ -657,6 +816,17 @@ async function createServer() {
       entries = entries.filter((e) => e.id !== req.params.id);
       await store.saveRosters(entries);
 
+      // Purge the entry's audit records so history cannot reference a ghost row.
+      try {
+        const history = await store.getHistory();
+        const remaining = history.filter((h) => h.rosterEntryId !== req.params.id);
+        if (remaining.length !== history.length) {
+          await store.saveHistory(remaining);
+        }
+      } catch (histErr) {
+        console.warn('Could not purge audit history for deleted entry:', histErr);
+      }
+
       res.json({
         message: 'Roster entry and associated calendar event deleted successfully',
         deletedId: req.params.id,
@@ -666,7 +836,7 @@ async function createServer() {
       console.error('Error deleting roster:', error);
       res.status(500).json({ error: 'Failed to delete roster entry' });
     }
-  });
+  }));
 
   // 8. Audit Change History endpoint
   app.get('/api/history', async (req, res) => {
@@ -710,6 +880,289 @@ async function createServer() {
     }
   });
 
+  // 9b. Tasks API (TMS-style: templates, groups, sequencing, dependency flow)
+  app.get('/api/tasks', async (req, res) => {
+    try {
+      res.json(await taskStore.getTasks());
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch tasks' });
+    }
+  });
+
+  app.post('/api/tasks', async (req, res) => {
+    try {
+      const input = req.body || {};
+      if (!input.title || !String(input.title).trim()) {
+        return res.status(400).json({ error: 'Title is required' });
+      }
+      if (input.status !== undefined && !VALID_TASK_STATUSES.includes(input.status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+      }
+      if (input.priority !== undefined && !VALID_TASK_PRIORITIES.includes(input.priority)) {
+        return res.status(400).json({ error: 'Invalid priority' });
+      }
+      if (input.dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
+        return res.status(400).json({ error: 'Invalid due date' });
+      }
+      if (input.category !== undefined && !VALID_TASK_CATEGORIES.includes(input.category)) {
+        return res.status(400).json({ error: 'Invalid category' });
+      }
+      const groups = await taskGroupStore.getTaskGroups();
+      const task = await taskStore.createTask((tasks) => {
+        // Group membership is validated inside the write queue against a
+        // pre-fetched snapshot (races with concurrent deletions are tolerated).
+        if (input.groupId && !groups.some((g) => g.id === input.groupId)) {
+          throw new taskStore.TaskRouteError(400, 'Group not found');
+        }
+        return input;
+      });
+      res.status(201).json(task);
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to create task' });
+    }
+  });
+
+  app.put('/api/tasks/:id', async (req, res) => {
+    try {
+      const input = req.body || {};
+      if (input.status !== undefined && !VALID_TASK_STATUSES.includes(input.status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+      }
+      if (input.priority !== undefined && !VALID_TASK_PRIORITIES.includes(input.priority)) {
+        return res.status(400).json({ error: 'Invalid priority' });
+      }
+      if (input.dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) {
+        return res.status(400).json({ error: 'Invalid due date' });
+      }
+      if (input.category !== undefined && !VALID_TASK_CATEGORIES.includes(input.category)) {
+        return res.status(400).json({ error: 'Invalid category' });
+      }
+      const groups = await taskGroupStore.getTaskGroups();
+      const updated = await taskStore.mutateTasks((tasks) => {
+        const idx = tasks.findIndex((t) => t.id === req.params.id);
+        if (idx === -1) throw new taskStore.TaskRouteError(404, 'Task not found');
+        const current = tasks[idx];
+
+        // Group membership validated against a pre-fetched snapshot.
+        if (input.groupId && !groups.some((g) => g.id === input.groupId)) {
+          throw new taskStore.TaskRouteError(400, 'Group not found');
+        }
+
+        // Completion guard: block done-transition while dependencies are unmet.
+        if (input.status === 'done' && current.status !== 'done' && !input.force) {
+          const blockers = taskStore.getUnmetDependencies(current, tasks);
+          if (blockers.length > 0) {
+            throw new taskStore.TaskRouteError(
+              409,
+              JSON.stringify({
+                message: 'Blocked by unfinished dependencies',
+                blockers: blockers.map((b) => ({ id: b.id, title: b.title })),
+              })
+            );
+          }
+        }
+
+        // Flow mechanism integrity: no self-deps, no cycles.
+        if (input.dependsOn !== undefined) {
+          const nextDeps = taskStore.normalizeDependsOn(input.dependsOn);
+          if (nextDeps.includes(current.id)) {
+            throw new taskStore.TaskRouteError(400, 'A task cannot depend on itself');
+          }
+          if (taskStore.wouldCreateCycle(tasks, current.id, nextDeps)) {
+            throw new taskStore.TaskRouteError(400, 'Dependency cycle detected');
+          }
+        }
+
+        let applied = taskStore.applyTaskInput(current, input);
+        // Switching groups invalidates the old sequence — append at the end of the new one.
+        if (
+          input.sequence === undefined &&
+          input.groupId !== undefined &&
+          input.groupId &&
+          input.groupId !== current.groupId
+        ) {
+          const siblings = tasks.filter((t) => t.id !== current.id && t.groupId === input.groupId);
+          applied = { ...applied, sequence: siblings.reduce((m, t) => Math.max(m, t.sequence ?? 0), 0) + 1 };
+        }
+
+        const next = [...tasks];
+        next[idx] = applied;
+        return { next, value: applied };
+      });
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to update task' });
+    }
+  });
+
+  app.delete('/api/tasks/:id', async (req, res) => {
+    try {
+      await taskStore.mutateTasks((tasks) => {
+        const remaining = tasks
+          .filter((t) => t.id !== req.params.id)
+          .map((t) =>
+            t.dependsOn?.includes(req.params.id)
+              ? { ...t, dependsOn: t.dependsOn.filter((d) => d !== req.params.id), updatedAt: new Date().toISOString() }
+              : t
+          );
+        if (remaining.length === tasks.length) {
+          throw new taskStore.TaskRouteError(404, 'Task not found');
+        }
+        return { next: remaining, value: { message: 'Task deleted' } };
+      });
+      res.json({ message: 'Task deleted' });
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to delete task' });
+    }
+  });
+
+  // --- Task groups (runtime container objects) ---
+  app.get('/api/task-groups', async (req, res) => {
+    try {
+      res.json(await taskGroupStore.getTaskGroups());
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch task groups' });
+    }
+  });
+
+  app.post('/api/task-groups', async (req, res) => {
+    try {
+      const group = await taskGroupStore.createTaskGroup(req.body || {});
+      res.status(201).json(group);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to create task group' });
+    }
+  });
+
+  app.put('/api/task-groups/:id', async (req, res) => {
+    try {
+      const updated = await taskGroupStore.mutateTaskGroups((groups) => {
+        const idx = groups.findIndex((g) => g.id === req.params.id);
+        if (idx === -1) throw new taskStore.TaskRouteError(404, 'Task group not found');
+        const payload = req.body || {};
+        const next = [...groups];
+        next[idx] = {
+          ...next[idx],
+          name: payload.name !== undefined ? String(payload.name).trim() || next[idx].name : next[idx].name,
+          description: payload.description !== undefined ? String(payload.description) : next[idx].description,
+          color: payload.color !== undefined ? String(payload.color) : next[idx].color,
+        };
+        return { next, value: next[idx] };
+      });
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to update task group' });
+    }
+  });
+
+  // Deleting a group UNASSIGNS its children (work outlives containers).
+  app.delete('/api/task-groups/:id', async (req, res) => {
+    try {
+      let existed = true;
+      await taskGroupStore.mutateTaskGroups((groups) => {
+        const next = groups.filter((g) => g.id !== req.params.id);
+        existed = next.length < groups.length;
+        if (!existed) throw new taskStore.TaskRouteError(404, 'Task group not found');
+        return { next, value: null };
+      });
+      await taskStore.mutateTasks((tasks) => ({
+        next: tasks.map((t) =>
+          t.groupId === req.params.id
+            ? { ...t, groupId: null, sequence: null, updatedAt: new Date().toISOString() }
+            : t
+        ),
+        value: null,
+      }));
+      res.json({ message: existed ? 'Task group deleted' : 'Task group not found' });
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to delete task group' });
+    }
+  });
+
+  // --- Task templates (definition stage) ---
+  app.get('/api/task-templates', async (req, res) => {
+    try {
+      res.json(await taskTemplateStore.getTaskTemplates());
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch task templates' });
+    }
+  });
+
+  app.post('/api/task-templates', async (req, res) => {
+    try {
+      const template = await taskTemplateStore.mutateTaskTemplates((templates) => {
+        const built = taskTemplateStore.buildTemplate(null, req.body || {});
+        return { next: [...templates, built], value: built };
+      });
+      res.status(201).json(template);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to create task template' });
+    }
+  });
+
+  app.put('/api/task-templates/:id', async (req, res) => {
+    try {
+      const updated = await taskTemplateStore.mutateTaskTemplates((templates) => {
+        const existing = templates.find((t) => t.id === req.params.id);
+        if (!existing) throw new taskStore.TaskRouteError(404, 'Task template not found');
+        const built = taskTemplateStore.buildTemplate(null, req.body || {}, existing);
+        const next = templates.map((t) => (t.id === built.id ? built : t));
+        return { next, value: built };
+      });
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to update task template' });
+    }
+  });
+
+  app.delete('/api/task-templates/:id', async (req, res) => {
+    try {
+      await taskTemplateStore.mutateTaskTemplates((templates) => {
+        const next = templates.filter((t) => t.id !== req.params.id);
+        if (next.length === templates.length) throw new taskStore.TaskRouteError(404, 'Task template not found');
+        return { next, value: null };
+      });
+      res.json({ message: 'Task template deleted' });
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to delete task template' });
+    }
+  });
+
+  // Instantiate from template (definition -> runtime transition).
+  app.post('/api/tasks/from-template', async (req, res) => {
+    try {
+      const body = req.body || {};
+      const result = await instantiateFromTemplate(body);
+      res.status(201).json(result);
+    } catch (error) {
+      if (error instanceof taskStore.TaskRouteError) {
+        return res.status(error.status).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Failed to instantiate template' });
+    }
+  });
+
   // 10. App Settings API
   app.get('/api/settings', async (req, res) => {
     try {
@@ -721,9 +1174,63 @@ async function createServer() {
 
   app.put('/api/settings', async (req, res) => {
     try {
-      const newSettings = req.body;
+      const incoming = req.body;
+      if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) {
+        return res.status(400).json({ error: 'Settings object required' });
+      }
       const current = await store.getSettings();
-      const merged = { ...current, ...newSettings };
+
+      // Allow-list merge: only known sections/keys are applied, so unknown or
+      // hostile keys in the payload can never be persisted.
+      const str = (v: unknown, fallback: string) => (typeof v === 'string' ? v : fallback);
+      const num = (v: unknown, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? v : fallback);
+      const bool = (v: unknown, fallback: boolean) => (typeof v === 'boolean' ? v : fallback);
+
+      const merged: AppSettings = {
+        ...current,
+        userName: str(incoming.userName, current.userName),
+        timezone: str(incoming.timezone, current.timezone),
+        workingHours: {
+          start: str(incoming.workingHours?.start, current.workingHours.start),
+          end: str(incoming.workingHours?.end, current.workingHours.end),
+        },
+        otCalculationSettings: {
+          gracePeriodMinutes: num(incoming.otCalculationSettings?.gracePeriodMinutes, current.otCalculationSettings.gracePeriodMinutes),
+          minimumOtThresholdMinutes: num(incoming.otCalculationSettings?.minimumOtThresholdMinutes, current.otCalculationSettings.minimumOtThresholdMinutes),
+          roundingRule: ['down', 'nearest', 'up'].includes(incoming.otCalculationSettings?.roundingRule)
+            ? incoming.otCalculationSettings.roundingRule
+            : current.otCalculationSettings.roundingRule,
+          roundingBlockMinutes: [15, 30].includes(incoming.otCalculationSettings?.roundingBlockMinutes)
+            ? incoming.otCalculationSettings.roundingBlockMinutes
+            : current.otCalculationSettings.roundingBlockMinutes,
+          wfhEligibleForOt: bool(incoming.otCalculationSettings?.wfhEligibleForOt, current.otCalculationSettings.wfhEligibleForOt),
+          trainingEligibleForOt: bool(incoming.otCalculationSettings?.trainingEligibleForOt, current.otCalculationSettings.trainingEligibleForOt),
+          hourlyOtRate: num(incoming.otCalculationSettings?.hourlyOtRate, current.otCalculationSettings.hourlyOtRate ?? 0),
+        },
+        googleCalendar: {
+          ...current.googleCalendar,
+          connected: bool(incoming.googleCalendar?.connected, current.googleCalendar.connected),
+          accountEmail: incoming.googleCalendar?.accountEmail !== undefined ? str(incoming.googleCalendar.accountEmail, '') : current.googleCalendar.accountEmail,
+          selectedCalendarId: incoming.googleCalendar?.selectedCalendarId !== undefined ? str(incoming.googleCalendar.selectedCalendarId, '') : current.googleCalendar.selectedCalendarId,
+          selectedCalendarName: incoming.googleCalendar?.selectedCalendarName !== undefined ? str(incoming.googleCalendar.selectedCalendarName, '') : current.googleCalendar.selectedCalendarName,
+          autoSync: bool(incoming.googleCalendar?.autoSync, current.googleCalendar.autoSync),
+        },
+        notifications: {
+          enabled: bool(incoming.notifications?.enabled, current.notifications.enabled),
+          rosterChanges: bool(incoming.notifications?.rosterChanges, current.notifications.rosterChanges),
+          syncErrors: bool(incoming.notifications?.syncErrors, current.notifications.syncErrors),
+          upcomingLeave: bool(incoming.notifications?.upcomingLeave, current.notifications.upcomingLeave),
+        },
+        theme: ['light', 'dark', 'system'].includes(incoming.theme) ? incoming.theme : current.theme,
+        allowedEmails: Array.isArray(incoming.allowedEmails)
+          ? [...new Set(
+              (incoming.allowedEmails as unknown[])
+                .filter((e): e is string => typeof e === 'string' && e.includes('@'))
+                .map((e) => e.trim().toLowerCase())
+            )]
+          : current.allowedEmails,
+      };
+
       await store.saveSettings(merged);
       res.json(merged);
     } catch (error) {
@@ -741,7 +1248,7 @@ async function createServer() {
     ]);
   });
 
-  app.post('/api/calendar/sync/:id', async (req, res) => {
+  app.post('/api/calendar/sync/:id', withRosterLock(async (req, res) => {
     try {
       const entries = await store.getRosters();
       const index = entries.findIndex((e) => e.id === req.params.id);
@@ -753,25 +1260,23 @@ async function createServer() {
       const item = entries[index];
       const { googleCalendarEventId, syncStatus } = req.body || {};
 
-      item.googleCalendarSyncStatus = syncStatus || 'Synced';
-      if (googleCalendarEventId) {
-        item.googleCalendarEventId = googleCalendarEventId;
-      } else if (!item.googleCalendarEventId) {
-        item.googleCalendarEventId = `gcal-evt-${item.date}-${Date.now()}`;
-      }
-      item.calendarSyncError = undefined;
-      item.updatedAt = new Date().toISOString();
-
-      entries[index] = item;
+      const updatedItem: RosterEntry = {
+        ...item,
+        googleCalendarSyncStatus: syncStatus || 'Synced',
+        googleCalendarEventId: googleCalendarEventId || item.googleCalendarEventId || `gcal-evt-${item.date}-${Date.now()}`,
+        calendarSyncError: undefined,
+        updatedAt: new Date().toISOString(),
+      };
+      entries[index] = updatedItem;
       await store.saveRosters(entries);
 
-      res.json({ message: 'Synced successfully', entry: item });
+      res.json({ message: 'Synced successfully', entry: updatedItem });
     } catch (error) {
       res.status(500).json({ error: 'Calendar sync failed' });
     }
-  });
+  }));
 
-  app.post('/api/calendar/sync-all', async (req, res) => {
+  app.post('/api/calendar/sync-all', withRosterLock(async (req, res) => {
     try {
       const { syncedEntries } = req.body || {};
       const entries = await store.getRosters();
@@ -808,7 +1313,7 @@ async function createServer() {
     } catch (error) {
       res.status(500).json({ error: 'Failed to sync calendar entries' });
     }
-  });
+  }));
 
   // 11b. OT Calculations Persistence Endpoints
   app.post('/api/ot/save', async (req, res) => {
@@ -828,7 +1333,7 @@ async function createServer() {
       });
     } catch (err: any) {
       console.error('Error saving OT calculations:', err);
-      res.status(500).json({ error: err?.message || 'Failed to save OT calculations' });
+      res.status(500).json({ error: 'Failed to save OT calculations' });
     }
   });
 
@@ -842,12 +1347,12 @@ async function createServer() {
       );
       res.json(calcs);
     } catch (err: any) {
-      res.status(500).json({ error: err?.message || 'Failed to fetch OT calculations' });
+      res.status(500).json({ error: 'Failed to fetch OT calculations' });
     }
   });
 
   // 11c. Clock Sync Endpoint with 3-Day Rolling Backfill & Non-Null Merging
-  app.post('/api/clock/sync', async (req, res) => {
+  app.post('/api/clock/sync', withRosterLock(async (req, res) => {
     try {
       const { startDate: reqStart, endDate: reqEnd, events: incomingEvents } = req.body || {};
       const allEntries = await store.getRosters();
@@ -946,9 +1451,9 @@ async function createServer() {
       });
     } catch (err: any) {
       console.error('Error in clock sync:', err);
-      res.status(500).json({ error: err?.message || 'Failed to sync clock events' });
+      res.status(500).json({ error: 'Failed to sync clock events' });
     }
-  });
+  }));
 
   app.get('/api/clock/events', async (req, res) => {
     try {
@@ -960,7 +1465,7 @@ async function createServer() {
       );
       res.json(events);
     } catch (err: any) {
-      res.status(500).json({ error: err?.message || 'Failed to fetch clock events' });
+      res.status(500).json({ error: 'Failed to fetch clock events' });
     }
   });
 
@@ -977,7 +1482,7 @@ async function createServer() {
       res.json({ year: yearNum, rows });
     } catch (err: any) {
       console.error('Error fetching leave balance:', err);
-      res.status(500).json({ error: err?.message || 'Failed to fetch leave balance' });
+      res.status(500).json({ error: 'Failed to fetch leave balance' });
     }
   });
 
@@ -997,7 +1502,7 @@ async function createServer() {
       res.json({ success: true, balance });
     } catch (err: any) {
       console.error('Error saving leave entitlements:', err);
-      res.status(500).json({ error: err?.message || 'Failed to save leave entitlements' });
+      res.status(500).json({ error: 'Failed to save leave entitlements' });
     }
   });
 
@@ -1030,11 +1535,41 @@ async function createServer() {
   });
 
   app.get(['/auth/callback', '/auth/callback/'], async (req, res) => {
-    // Save connected state
-    const settings = await store.getSettings();
-    settings.googleCalendar.connected = true;
-    settings.googleCalendar.accountEmail = 'emalyaditha@gmail.com';
-    await store.saveSettings(settings);
+    try {
+      // Only treat the flow as connected when Google actually redirected back
+      // with an authorization code. (Token exchange is handled by the client
+      // Google integration; this route only records the connection state.)
+      const code = typeof req.query.code === 'string' ? req.query.code : '';
+      if (!code) {
+        res.status(400).send(`
+          <!DOCTYPE html>
+          <html>
+            <head><title>Connection Failed</title></head>
+            <body style="font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f8fafc; color: #0f172a;">
+              <p>Missing authorization code. Close this window and try again.</p>
+            </body>
+          </html>
+        `);
+        return;
+      }
+
+      // Save connected state (no account email is claimed without a real token exchange)
+      const settings = await store.getSettings();
+      settings.googleCalendar.connected = true;
+      await store.saveSettings(settings);
+    } catch (err) {
+      console.error('OAuth callback failed:', err);
+      res.status(500).send(`
+        <!DOCTYPE html>
+        <html>
+          <head><title>Connection Failed</title></head>
+          <body style="font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f8fafc; color: #0f172a;">
+            <p>Could not save the connection state. Close this window and try again.</p>
+          </body>
+        </html>
+      `);
+      return;
+    }
 
     res.send(`
       <!DOCTYPE html>
@@ -1048,7 +1583,7 @@ async function createServer() {
           </div>
           <script>
             if (window.opener) {
-              window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
+              window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, window.location.origin);
               setTimeout(() => { window.close(); }, 1200);
             } else {
               window.location.href = '/';
@@ -1086,16 +1621,28 @@ async function createServer() {
     }
   });
 
-  app.post('/api/import', async (req, res) => {
+  app.post('/api/import', withRosterLock(async (req, res) => {
     try {
       const { rows, options } = req.body;
 
       if (!Array.isArray(rows)) {
         return res.status(400).json({ error: 'Rows array required' });
       }
+      if (rows.length > 5000) {
+        return res.status(400).json({ error: 'Too many rows (max 5000 per import)' });
+      }
 
       const existingEntries = await store.getRosters();
       const validStatuses = (await store.getStatuses()).map((s) => s.code);
+
+      // Server-side duplicate detection (the client-side check is advisory only).
+      const { fileHash } = options || {};
+      if (fileHash && typeof fileHash === 'string') {
+        const history = await store.getImportHistory();
+        if (history.some((h) => h.fileHash === fileHash && h.status === 'Successful')) {
+          return res.status(409).json({ error: 'This file has already been imported' });
+        }
+      }
 
       // Pre-process rows: check date gap sequence & auto-fill missing dates as HOL
       const normalizedRows = [...rows];
@@ -1105,6 +1652,11 @@ async function createServer() {
         const dateSet = new Set(validDateRows.map((r) => r.date));
         const minDateStr = validDateRows[0].date;
         const maxDateStr = validDateRows[validDateRows.length - 1].date;
+
+        // Cap the synthesized gap-fill range to prevent resource exhaustion.
+        if (countDaysBetween(minDateStr, maxDateStr) > MAX_RANGE_DAYS) {
+          return res.status(400).json({ error: `Imported date range too large (max ${MAX_RANGE_DAYS} days)` });
+        }
 
         const start = new Date(minDateStr + 'T00:00:00');
         const end = new Date(maxDateStr + 'T00:00:00');
@@ -1194,7 +1746,7 @@ async function createServer() {
               changedStatusId: newChangedStatus,
               currentStatusId: newCurrentStatus,
               action: row.action || existing.action,
-              ot: row.ot !== undefined ? Boolean(row.ot) : existing.ot,
+              ot: row.ot !== undefined ? (row.ot === true || row.ot === 'true') : existing.ot,
               updatedAt: now,
             };
           } else {
@@ -1211,7 +1763,7 @@ async function createServer() {
               currentStatusId: newCurrent,
               action: row.action || (original === 'RTD' ? 'Work on Roster 10.15 - 7.30' : original === 'NWD' ? 'Normal Working Day' : original === 'DOF' ? 'Day Off' : original),
               notes: row.notes || '',
-              ot: Boolean(row.ot),
+              ot: row.ot === true || row.ot === 'true',
               googleCalendarSyncStatus: 'Not Synced',
               createdAt: now,
               updatedAt: now,
@@ -1230,7 +1782,7 @@ async function createServer() {
       const dateRange = minDate === maxDate ? minDate : `${minDate} - ${maxDate}`;
 
       const historyRecord = {
-        id: `imp-${Date.now()}`,
+        id: randomUUID(),
         filename: options?.filename || 'Official_Roster_Import.xlsx',
         uploadTimestamp: new Date().toISOString(),
         user: options?.employeeName || 'EM Staff',
@@ -1260,23 +1812,43 @@ async function createServer() {
       console.error('Import error:', error);
       res.status(500).json({ error: 'Failed to process import' });
     }
-  });
+  }));
 
   // 14. Weekly Template Generator
-  app.post('/api/templates/generate', async (req, res) => {
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const MAX_RANGE_DAYS = 400;
+  function countDaysBetween(startStr: string, endStr: string): number {
+    const start = new Date(startStr + 'T00:00:00');
+    const end = new Date(endStr + 'T00:00:00');
+    return Math.round((end.getTime() - start.getTime()) / 86_400_000);
+  }
+
+  app.post('/api/templates/generate', withRosterLock(async (req, res) => {
     try {
       const { startDate, endDate, template, overwrite } = req.body;
 
-      if (!startDate || !endDate || !template) {
+      if (!startDate || !endDate || !template || typeof template !== 'object') {
         return res.status(400).json({ error: 'Start date, end date, and weekly template mapping required' });
+      }
+      if (typeof startDate !== 'string' || !DATE_RE.test(startDate) || typeof endDate !== 'string' || !DATE_RE.test(endDate)) {
+        return res.status(400).json({ error: 'Dates must be valid YYYY-MM-DD strings' });
+      }
+      const span = countDaysBetween(startDate, endDate);
+      if (span < 0) {
+        return res.status(400).json({ error: 'End date must be on or after start date' });
+      }
+      if (span > MAX_RANGE_DAYS) {
+        return res.status(400).json({ error: `Date range too large (max ${MAX_RANGE_DAYS} days)` });
       }
 
       const entries = await store.getRosters();
       const generated: RosterEntry[] = [];
       const now = new Date().toISOString();
 
-      let curr = new Date(startDate);
-      const end = new Date(endDate);
+      // Local-midnight parse: a bare new Date(startDate) reads as UTC and
+      // shifts the calendar day on servers west of UTC.
+      let curr = new Date(startDate + 'T00:00:00');
+      const end = new Date(endDate + 'T00:00:00');
 
       while (curr <= end) {
         const year = curr.getFullYear();
@@ -1329,7 +1901,7 @@ async function createServer() {
     } catch (error) {
       res.status(500).json({ error: 'Failed to generate template rosters' });
     }
-  });
+  }));
 
   // Serve Vite in development mode
   if (process.env.NODE_ENV !== 'production') {

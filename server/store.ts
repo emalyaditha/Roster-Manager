@@ -40,7 +40,7 @@ function getWriteFilePath(filename: string) {
   return path.join(LOCAL_DATA_DIR, filename);
 }
 
-function readJsonFile<T>(filename: string, defaultValue: T): T {
+export function readJsonFile<T>(filename: string, defaultValue: T): T {
   try {
     const filePath = getReadFilePath(filename);
     if (!fs.existsSync(filePath)) {
@@ -61,10 +61,40 @@ function readJsonFile<T>(filename: string, defaultValue: T): T {
   }
 }
 
-function writeJsonFile<T>(filename: string, data: T): void {
+/**
+ * Strict variant for data stores: a MISSING file returns the default (and seeds it),
+ * but a CORRUPT file throws so callers can abort instead of wiping data.
+ * Writes are atomic (temp file + rename) and throw on failure.
+ */
+export function readDataFileStrict<T>(filename: string, defaultValue: T): T {
+  const filePath = getReadFilePath(filename);
+  if (!fs.existsSync(filePath)) {
+    try {
+      const writePath = getWriteFilePath(filename);
+      fs.writeFileSync(writePath, JSON.stringify(defaultValue, null, 2), 'utf-8');
+    } catch (writeErr) {
+      // Read-only setups: still serve the in-memory default
+    }
+    return defaultValue;
+  }
+  const content = fs.readFileSync(filePath, 'utf-8');
   try {
-    const filePath = getWriteFilePath(filename);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    return JSON.parse(content) as T;
+  } catch (error) {
+    throw new Error(`Corrupt data file ${filename}: ${(error as Error).message}`);
+  }
+}
+
+export function writeDataFileStrict<T>(filename: string, data: T): void {
+  const filePath = getWriteFilePath(filename);
+  const tmpPath = `${filePath}.tmp`;
+  fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+  fs.renameSync(tmpPath, filePath);
+}
+
+export function writeJsonFile<T>(filename: string, data: T): void {
+  try {
+    writeDataFileStrict(filename, data);
   } catch (error) {
     console.warn(`Warning writing ${filename}:`, error);
   }
@@ -172,7 +202,7 @@ initSupabaseCheck();
 function handleSupabaseError(context: string, err: any) {
   const errorMessage = err?.message || err?.error_description || (typeof err === 'object' ? JSON.stringify(err) : String(err));
   const errorCode = err?.code || err?.status || '';
-  
+
   // Clean up any "Error" words to prevent false alerting in automated environment log catchers
   const safeContext = context.replace(/error/gi, 'Issue').replace(/Error/gi, 'Issue');
   const safeMessage = errorMessage.replace(/error/gi, 'Issue').replace(/Error/gi, 'Issue');
@@ -185,6 +215,52 @@ function handleSupabaseError(context: string, err: any) {
   } else {
     console.log(`[Supabase Sync] Note: ${safeContext} is using local/firebase storage fallback. (Detail: ${safeMessage} | Code: ${errorCode})`);
   }
+}
+
+/** True when the select succeeded (table exists, query valid). */
+function isMissingTableError(err: any): boolean {
+  const code = err?.code || '';
+  const msg = err?.message || '';
+  return code === '42P01' || code === 'PGRST205' || msg.includes('relation') || msg.includes('does not exist');
+}
+
+/**
+ * Sync a full row list to Supabase.
+ * Ordering matters: upsert FIRST, then delete rows absent from the payload.
+ * Upsert is idempotent, so a partial failure leaves stale extra rows (safe)
+ * instead of deleting rows whose replacement failed to write (data loss).
+ */
+async function syncFullTable(
+  table: string,
+  idColumn: string,
+  rows: any[],
+): Promise<void> {
+  if (!supabaseClient) throw new Error('Supabase client unavailable');
+  const ids = rows.map((r) => r[idColumn]);
+  if (ids.length > 0) {
+    const { error: upsertError } = await supabaseClient.from(table).upsert(rows);
+    if (upsertError) throw upsertError;
+
+    const escaped = ids.map((id) => `"${String(id).replace(/"/g, '""')}"`).join(',');
+    const { error: deleteError } = await supabaseClient
+      .from(table)
+      .delete()
+      .not(idColumn, 'in', `(${escaped})`);
+    if (deleteError) throw deleteError;
+  } else {
+    const { error: clearError } = await supabaseClient.from(table).delete().neq(idColumn, '');
+    if (clearError) throw clearError;
+  }
+}
+
+/** Shared Supabase client for auxiliary stores (tasks, groups, templates). Null when unconfigured. */
+export function getSupabaseClient(): any {
+  return isSupabaseEnabled ? supabaseClient : null;
+}
+
+/** Log a Supabase issue with the standard fallback message. */
+export function reportSupabaseIssue(context: string, err: any): void {
+  handleSupabaseError(context, err);
 }
 
 // Data Store Accessors
@@ -223,6 +299,7 @@ export const store = {
 
   async getRosters(): Promise<RosterEntry[]> {
     let entries: RosterEntry[] = [];
+    let fetchFailed = false;
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
         const { data, error } = await supabaseClient
@@ -236,19 +313,31 @@ export const store = {
           notes: row.notes !== undefined ? row.notes : (row.remark !== undefined ? row.remark : ''),
         })).sort((a: any, b: any) => a.date.localeCompare(b.date));
       } catch (err) {
+        fetchFailed = true;
         handleSupabaseError('Error fetching rosters from Supabase', err);
       }
-    } else if (isFirebaseEnabled && firestoreDb) {
+    } else {
+      fetchFailed = true;
+    }
+    if (isFirebaseEnabled && firestoreDb) {
       try {
         const docs = await getFirestoreDocs<RosterEntry>('roster_entries');
         entries = docs.sort((a, b) => a.date.localeCompare(b.date));
+        fetchFailed = false;
       } catch (err) {
         console.warn('Firebase getRosters failed:', err);
       }
     }
 
-    if (entries.length === 0) {
-      entries = readJsonFile<RosterEntry[]>('roster_entries.json', []);
+    // Fall back to the local JSON mirror ONLY when the cloud read actually
+    // failed — an empty cloud table is authoritative and must not be
+    // shadowed by stale committed JSON (which would resurrect deleted rows).
+    if (entries.length === 0 && fetchFailed) {
+      try {
+        entries = readDataFileStrict<RosterEntry[]>('roster_entries.json', []);
+      } catch {
+        entries = [];
+      }
     }
 
     // Hydrate clockIn & clockOut from clock_events table / store ONLY if entry does not already have them
@@ -297,42 +386,8 @@ export const store = {
   async saveRosters(entries: RosterEntry[]): Promise<void> {
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
-        const ids = entries.map(e => e.id);
-        if (ids.length > 0) {
-          // Delete rows that are not in the new list to maintain alignment with local array sync
-          const { error: deleteError } = await supabaseClient
-            .from('roster_entries')
-            .delete()
-            .not('id', 'in', `(${ids.map(id => `"${id}"`).join(',')})`);
-          if (deleteError) throw deleteError;
-
-          // Upsert current entries with retry safety for missing columns (e.g. otMorningHours, otNightHours)
-          let { error: upsertError } = await supabaseClient
-            .from('roster_entries')
-            .upsert(entries);
-          
-          if (upsertError) {
-            const errCode = upsertError.code || '';
-            const errMsg = upsertError.message || '';
-            if (errCode === '42703' || errMsg.includes('otMorningHours') || errMsg.includes('otNightHours') || errMsg.includes('column')) {
-              console.warn('[Supabase Sync] Warning: otMorningHours or otNightHours columns do not exist on Supabase. Retrying without those columns...');
-              const sanitizedEntries = entries.map(({ otMorningHours, otNightHours, ...rest }: any) => rest);
-              const retryRes = await supabaseClient
-                .from('roster_entries')
-                .upsert(sanitizedEntries);
-              upsertError = retryRes.error;
-            }
-          }
-          if (upsertError) throw upsertError;
-          this.syncRosterDays(entries).catch((e) => console.warn('Failed to sync roster_days:', e));
-        } else {
-          // Clear all
-          const { error: clearError } = await supabaseClient
-            .from('roster_entries')
-            .delete()
-            .neq('id', '');
-          if (clearError) throw clearError;
-        }
+        await syncFullTable('roster_entries', 'id', entries);
+        this.syncRosterDays(entries).catch((e) => console.warn('Failed to sync roster_days:', e));
         writeJsonFile('roster_entries.json', entries);
         return;
       } catch (err) {
@@ -377,25 +432,7 @@ export const store = {
   async saveHistory(history: RosterChangeHistory[]): Promise<void> {
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
-        const ids = history.map(h => h.id);
-        if (ids.length > 0) {
-          const { error: deleteError } = await supabaseClient
-            .from('roster_history')
-            .delete()
-            .not('id', 'in', `(${ids.map(id => `"${id}"`).join(',')})`);
-          if (deleteError) throw deleteError;
-
-          const { error: upsertError } = await supabaseClient
-            .from('roster_history')
-            .upsert(history);
-          if (upsertError) throw upsertError;
-        } else {
-          const { error: clearError } = await supabaseClient
-            .from('roster_history')
-            .delete()
-            .neq('id', '');
-          if (clearError) throw clearError;
-        }
+        await syncFullTable('roster_history', 'id', history);
         writeJsonFile('roster_history.json', history);
         return;
       } catch (err) {
@@ -479,25 +516,7 @@ export const store = {
   async saveStatuses(statuses: RosterStatusConfig[]): Promise<void> {
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
-        const codes = statuses.map(s => s.code);
-        if (codes.length > 0) {
-          const { error: deleteError } = await supabaseClient
-            .from('roster_statuses')
-            .delete()
-            .not('code', 'in', `(${codes.map(c => `"${c}"`).join(',')})`);
-          if (deleteError) throw deleteError;
-
-          const { error: upsertError } = await supabaseClient
-            .from('roster_statuses')
-            .upsert(statuses);
-          if (upsertError) throw upsertError;
-        } else {
-          const { error: clearError } = await supabaseClient
-            .from('roster_statuses')
-            .delete()
-            .neq('code', '');
-          if (clearError) throw clearError;
-        }
+        await syncFullTable('roster_statuses', 'code', statuses);
         writeJsonFile('roster_statuses.json', statuses);
         return;
       } catch (err) {
@@ -517,6 +536,20 @@ export const store = {
   },
 
   async getSettings(): Promise<AppSettings> {
+    const normalize = (s: any): AppSettings => {
+      const merged: AppSettings = { ...DEFAULT_SETTINGS, ...s };
+      // Legacy settings rows may predate the allow-list — an absent or empty
+      // list falls back to the default owner so the operator is never locked
+      // out by fail-closed auth.
+      if (!Array.isArray(merged.allowedEmails) || merged.allowedEmails.length === 0) {
+        merged.allowedEmails = DEFAULT_SETTINGS.allowedEmails;
+      }
+      if (!merged.otCalculationSettings) merged.otCalculationSettings = DEFAULT_SETTINGS.otCalculationSettings;
+      if (!merged.googleCalendar) merged.googleCalendar = DEFAULT_SETTINGS.googleCalendar;
+      if (!merged.notifications) merged.notifications = DEFAULT_SETTINGS.notifications;
+      return merged;
+    };
+
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
         const { data, error } = await supabaseClient
@@ -526,7 +559,7 @@ export const store = {
           .maybeSingle();
         if (error) throw error;
         if (data && data.settings) {
-          return data.settings;
+          return normalize(data.settings);
         } else {
           // Initialize default settings in db
           const { error: initError } = await supabaseClient
@@ -545,7 +578,7 @@ export const store = {
         const snap = await getDoc(docRef);
         if (snap.exists()) {
           const data = snap.data();
-          if (data && data.settings) return data.settings as AppSettings;
+          if (data && data.settings) return normalize(data.settings);
         } else {
           await setDoc(docRef, { id: 'default', settings: DEFAULT_SETTINGS });
           return DEFAULT_SETTINGS;
@@ -554,7 +587,7 @@ export const store = {
         console.warn('Firebase getSettings failed:', err);
       }
     }
-    return readJsonFile<AppSettings>('app_settings.json', DEFAULT_SETTINGS);
+    return normalize(readJsonFile<AppSettings>('app_settings.json', DEFAULT_SETTINGS));
   },
 
   async saveSettings(settings: AppSettings): Promise<void> {
@@ -608,25 +641,7 @@ export const store = {
   async saveImportHistory(history: ImportHistoryRecord[]): Promise<void> {
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
-        const ids = history.map(h => h.id);
-        if (ids.length > 0) {
-          const { error: deleteError } = await supabaseClient
-            .from('import_history')
-            .delete()
-            .not('id', 'in', `(${ids.map(id => `"${id}"`).join(',')})`);
-          if (deleteError) throw deleteError;
-
-          const { error: upsertError } = await supabaseClient
-            .from('import_history')
-            .upsert(history);
-          if (upsertError) throw upsertError;
-        } else {
-          const { error: clearError } = await supabaseClient
-            .from('import_history')
-            .delete()
-            .neq('id', '');
-          if (clearError) throw clearError;
-        }
+        await syncFullTable('import_history', 'id', history);
         writeJsonFile('import_history.json', history);
         return;
       } catch (err) {
@@ -930,6 +945,7 @@ export const store = {
     const entitlementsFile = 'leave_entitlements.json';
 
     let entitlements: any[] = [];
+    let fetchFailed = false;
     if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
       try {
         const { data, error } = await supabaseClient
@@ -940,11 +956,16 @@ export const store = {
         if (error) throw error;
         entitlements = data || [];
       } catch (err) {
+        fetchFailed = true;
         handleSupabaseError('Error fetching leave entitlements from Supabase', err);
       }
+    } else {
+      fetchFailed = true;
     }
 
-    if (entitlements.length === 0) {
+    // Fall back to the local mirror only on fetch failure — an empty cloud
+    // result is authoritative (prevents stale JSON from resurrecting rows).
+    if (entitlements.length === 0 && fetchFailed) {
       const local = readJsonFile<any[]>(entitlementsFile, []);
       entitlements = local.filter((e: any) => e.employee_id === empId && e.year === year);
     }
@@ -1052,43 +1073,42 @@ export const store = {
       'Medical LEAVE': 'Medical Leave',
       'Casual Leave': 'Casual Leave',
       'Short Leave': 'Short Leave',
-      'Leave(Half)': 'Short Leave',
     };
+    // Half-day leave codes consume 0.5 day from their ledger (matches the
+    // client-side pricing in src/utils/leave.ts).
+    const halfDayCodes = new Set(['Leave(Half)']);
+    // 'ML' (maternity) is intentionally unmapped — the app treats it as uncapped.
 
     const utilizedMap: Record<string, number> = {};
     let lieuUtilized = 0;
-    let rosterUsed = false;
 
-    if (isSupabaseEnabled && supabaseClient && !supabaseTablesMissing) {
-      try {
-        const { data: rosterRows, error } = await supabaseClient
-          .from('roster_days')
-          .select('code')
-          .eq('employee_id', empId)
-          .gte('roster_date', yearStart)
-          .lte('roster_date', yearEnd);
-        if (!error && Array.isArray(rosterRows) && rosterRows.length > 0) {
-          for (const row of rosterRows) {
-            const leaveType = rosterCodeMap[row.code];
-            if (leaveType) utilizedMap[leaveType] = (utilizedMap[leaveType] ?? 0) + 1;
-            if (typeof row.code === 'string' && row.code.startsWith('DOF')) lieuUtilized++;
-          }
-          rosterUsed = true;
-        }
-      } catch (err) {
-        handleSupabaseError('Error fetching roster_days for leave balance', err);
-      }
-    }
+    // Partial leaves keep the base work status (NWD/RTD) and are recorded via the
+    // action text instead — count them from there so balances still decrement.
+    const countPartialFromAction = (rawAction: string, map: Record<string, number>) => {
+      const a = (rawAction || '').trim();
+      if (!a) return;
+      if (/^short leave/i.test(a)) map['Short Leave'] = (map['Short Leave'] ?? 0) + 1;
+      else if (/^half day \(annual\)/i.test(a)) map['Annual Leave'] = (map['Annual Leave'] ?? 0) + 0.5;
+      else if (/^half day \(casual\)/i.test(a)) map['Casual Leave'] = (map['Casual Leave'] ?? 0) + 0.5;
+    };
 
-    if (!rosterUsed) {
-      const entries = await this.getRosters();
-      for (const e of entries) {
-        if (e.date >= yearStart && e.date <= yearEnd) {
-          const code = e.currentStatusId || e.originalStatusId || '';
-          const leaveType = rosterCodeMap[code];
-          if (leaveType) utilizedMap[leaveType] = (utilizedMap[leaveType] ?? 0) + 1;
-          if (code.startsWith('DOF')) lieuUtilized++;
+    // Compute utilization from roster entries directly. (The roster_days
+    // projection has no action column and no partial-leave info, so querying
+    // it here silently failed and was dropped.)
+    const entries = await this.getRosters();
+    for (const e of entries) {
+      if (e.date >= yearStart && e.date <= yearEnd) {
+        const code = e.currentStatusId || e.originalStatusId || '';
+        const leaveType = rosterCodeMap[code];
+        if (leaveType) {
+          utilizedMap[leaveType] = (utilizedMap[leaveType] ?? 0) + 1;
+        } else if (halfDayCodes.has(code)) {
+          const base = code === 'Leave(Half)' ? 'Short Leave' : code;
+          utilizedMap[base] = (utilizedMap[base] ?? 0) + 0.5;
+        } else {
+          countPartialFromAction(e.action || '', utilizedMap);
         }
+        if (code.startsWith('DOF')) lieuUtilized++;
       }
     }
 
@@ -1107,3 +1127,4 @@ export const store = {
     });
   },
 };
+

@@ -38,6 +38,7 @@ export function exportToCSV(entries: RosterEntry[], statuses: RosterStatusConfig
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 export function exportToExcel(entries: RosterEntry[], statuses: RosterStatusConfig[], filename = 'roster-export.xlsx') {
@@ -73,4 +74,5 @@ export function exportBackupData(
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, Suspense } from "react";
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from "react";
 import { motion } from "motion/react";
 import {
   RosterEntry,
@@ -8,6 +8,7 @@ import {
   LeaveRow,
 } from "./types/roster";
 import { api } from "./services/api";
+import { DEFAULT_ROSTER_STATUSES } from "./data/defaultStatuses";
 import {
   googleSignIn,
   getAccessToken,
@@ -15,20 +16,21 @@ import {
   syncRosterEntriesToGoogleCalendar,
   migrateDutyRosterEventSummaries,
   deleteCalendarEvent,
-  getSavedUserSession,
   googleSignOut,
   auth,
   onAuthStateChanged,
 } from "./services/googleAuth";
-import { HeaderNavbar } from "./components/HeaderNavbar";
+import { AppShell, type ViewTab } from "./components/AppShell";
 import { LoginScreen } from "./components/LoginScreen";
 import { RosterTable } from "./components/RosterTable";
 import { RosterCardList } from "./components/RosterCardList";
 import { RosterCalendarView } from "./components/RosterCalendarView";
+import { SummaryCards } from "./components/SummaryCards";
 import { Toast, ToastItem } from "./components/Toast";
-import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode } from "./utils/leave";
+import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode, isPartialLeaveCode, getShortLeaveCutoff } from "./utils/leave";
 
 const LazyDashboardOverview = React.lazy(() => import("./components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
+const LazyTasksView = React.lazy(() => import("./components/tasks/TasksView").then(m => ({ default: m.TasksView })));
 const LazyRosterChangeModal = React.lazy(() => import("./components/RosterChangeModal").then(m => ({ default: m.RosterChangeModal })));
 const LazyAuditHistoryModal = React.lazy(() => import("./components/AuditHistoryModal").then(m => ({ default: m.AuditHistoryModal })));
 const LazyImportWizardModal = React.lazy(() => import("./components/ImportWizardModal").then(m => ({ default: m.ImportWizardModal })));
@@ -80,7 +82,14 @@ import {
   Check,
   LogOut,
   Calculator,
+  KanbanSquare,
 } from "lucide-react";
+
+const ViewLoading = () => (
+  <div className="py-20 text-center text-xs text-muted">
+    <RefreshCw className="w-5 h-5 animate-spin mx-auto" style={{ color: "var(--color-primary)" }} />
+  </div>
+);
 
 export default function App() {
   // Theme State - Respect system preference, then localStorage
@@ -159,6 +168,14 @@ export default function App() {
       setAuthLoading(true);
       if (fbUser) {
         try {
+          const me = await api.getMe();
+          if (!me.email) {
+            await googleSignOut();
+            setCurrentUser(null);
+            setAuthError("Access is restricted to staff members configured in system settings.");
+            setAuthLoading(false);
+            return;
+          }
           const userSession = {
             uid: fbUser.uid,
             email: fbUser.email || "",
@@ -174,7 +191,13 @@ export default function App() {
           setAuthError(null);
         } catch (err: any) {
           console.error("Authorization check failed:", err);
-          setAuthError("Failed to verify user settings.");
+          if (err?.status === 403) {
+            await googleSignOut();
+            setCurrentUser(null);
+            setAuthError("Access is restricted to staff members configured in system settings.");
+          } else {
+            setAuthError(err?.status === 401 ? "Session expired. Please sign in again." : "Failed to verify user settings.");
+          }
         } finally {
           setAuthLoading(false);
         }
@@ -199,10 +222,11 @@ export default function App() {
     }
   }, []);
 
-  // Active View Tab ('table' | 'calendar' | 'dashboard')
-  const [activeTab, setActiveTab] = useState<
-    "table" | "calendar" | "dashboard"
-  >("table");
+  // Active View Tab ('table' | 'calendar' | 'dashboard' | 'tasks') — Dashboard is always the landing view
+  const [activeTab, setActiveTab] = useState<ViewTab>(() => "dashboard");
+  const handleTabChange = (tab: ViewTab) => {
+    setActiveTab(tab);
+  };
 
   // Ongoing Roster Cycle strictly based on today's live date
   const ongoingCycle = useMemo(() => getRosterCycleForDate(new Date()), []);
@@ -222,8 +246,15 @@ export default function App() {
     return Array.from(cyclesSet).sort();
   }, [ongoingCycle, currentMonthYear]);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [statusFilterCodes, setStatusFilterCodes] = useState<string[]>([]);
+  const [statusFilterLabel, setStatusFilterLabel] = useState<string>("All Statuses");
   const [changedOnlyFilter, setChangedOnlyFilter] = useState<boolean>(false);
+
+  const handleCardFilterChangedOnly = useCallback(() => setChangedOnlyFilter(true), []);
+  const handleCardFilterStatus = useCallback((codes: string[], label: string) => {
+    setStatusFilterCodes(codes);
+    setStatusFilterLabel(label);
+  }, []);
 
   // Bulk Selection
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -259,13 +290,17 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Initial Load & Load on Month Change
+  // Initial Load & Load on Month Change (sequence guard: only the latest
+  // request may commit state, so rapid month/tab changes can't race)
+  const loadDataSeqRef = useRef(0);
   const loadData = async () => {
     if (!currentUser) return;
+    const seq = ++loadDataSeqRef.current;
     setLoading(true);
     try {
       try {
         const sStatus = await api.getSupabaseStatus();
+        if (seq !== loadDataSeqRef.current) return;
         setSupabaseStatus(sStatus);
       } catch (sErr) {
         console.warn("Could not retrieve Supabase status:", sErr);
@@ -279,28 +314,27 @@ export default function App() {
           api.getSummary(currentMonthYear),
         ]);
 
+      if (seq !== loadDataSeqRef.current) return;
+
       setEntries(fetchedEntries);
-      setStatuses(fetchedStatuses);
+      const mergedStatuses = [...fetchedStatuses];
+      DEFAULT_ROSTER_STATUSES.forEach((d) => {
+        if (!mergedStatuses.some((s) => s.code === d.code)) mergedStatuses.push(d);
+      });
+      setStatuses(mergedStatuses);
       setSettings(fetchedSettings);
       setMonthSummary(fetchedSummary);
       setSelectedIds([]);
       setAuthError(null);
     } catch (err: any) {
       console.error("Error loading data:", err);
-      if (
-        err.message?.includes("403") ||
-        err.message?.includes("Forbidden") ||
-        err.message?.includes("authorized")
-      ) {
+      if (err?.status === 403) {
         setAuthError(
           "Your account is not authorized to access this roster. Access restricted to whitelisted accounts.",
         );
         setCurrentUser(null);
         await googleSignOut();
-      } else if (
-        err.message?.includes("401") ||
-        err.message?.includes("Unauthorized")
-      ) {
+      } else if (err?.status === 401) {
         setAuthError("Session expired. Please try logging in again.");
         setCurrentUser(null);
         await googleSignOut();
@@ -437,159 +471,6 @@ export default function App() {
     }
   }, [statuses]);
 
-  // Save Roster Change (Single)
-  const handleSaveRosterChange = async (data: {
-    newStatusId: string;
-    action: string;
-    reason: string;
-    notes: string;
-    ot: boolean;
-    otMorningHours?: number;
-    otNightHours?: number;
-    updateCalendar: boolean;
-  }) => {
-    if (!changeModalEntry) return;
-
-    const res = await api.updateRoster(changeModalEntry.id, {
-      currentStatusId: data.newStatusId,
-      action: data.action,
-      notes: data.notes,
-      ot: data.ot,
-      otMorningHours: data.otMorningHours,
-      otNightHours: data.otNightHours,
-      reason: data.reason,
-      updateCalendar: data.updateCalendar,
-    });
-
-    if (
-      (data.updateCalendar || settings?.googleCalendar.autoSync) &&
-      res.entry
-    ) {
-      try {
-        const token = await getAccessToken();
-        if (token) {
-          const gcalRes = await createOrUpdateCalendarEvent(
-            res.entry,
-            statuses,
-            token,
-          );
-          await api.syncSingleCalendar(res.entry.id, gcalRes.eventId);
-          setSyncNotice(`Updated Google Calendar event for ${res.entry.date}`);
-          setTimeout(() => setSyncNotice(null), 3000);
-        }
-      } catch (err) {
-        console.warn("Google Calendar update error on single edit:", err);
-      }
-    }
-
-    await loadData();
-  };
-
-  // Apply Bulk Change
-  const handleApplyBulkChange = async (data: {
-    ids: string[];
-    newStatusId: string;
-    action: string;
-    reason: string;
-    updateCalendar: boolean;
-  }) => {
-    const res = await api.bulkUpdate(data.ids, {
-      currentStatusId: data.newStatusId,
-      action: data.action,
-      reason: data.reason,
-      updateCalendar: data.updateCalendar,
-    });
-
-    if (
-      (data.updateCalendar || settings?.googleCalendar.autoSync) &&
-      res.entries
-    ) {
-      try {
-        const token = await getAccessToken();
-        if (token) {
-          const syncRes = await syncRosterEntriesToGoogleCalendar(
-            res.entries,
-            statuses,
-            token,
-          );
-          const syncedEntries = syncRes.syncedResults.map((r) => ({
-            id: r.id,
-            googleCalendarEventId: r.googleCalendarEventId,
-            syncStatus: "Synced",
-          }));
-          await api.syncAllCalendar(undefined, syncedEntries);
-          setSyncNotice(
-            `Updated ${res.entries.length} Google Calendar event(s)`,
-          );
-          setTimeout(() => setSyncNotice(null), 3000);
-        }
-      } catch (err) {
-        console.warn("Bulk calendar update error:", err);
-      }
-    }
-
-    await loadData();
-  };
-
-  // Add Manual Entry
-  const handleAddRoster = async (data: {
-    date: string;
-    day: string;
-    originalStatusId: string;
-    changedStatusId: string;
-    action: string;
-    notes: string;
-    ot: boolean;
-    otMorningHours?: number;
-    otNightHours?: number;
-  }) => {
-    const newEntry = await api.addRoster(data);
-    if (settings?.googleCalendar.autoSync && newEntry) {
-      try {
-        const token = await getAccessToken();
-        if (token) {
-          const gcalRes = await createOrUpdateCalendarEvent(
-            newEntry,
-            statuses,
-            token,
-          );
-          await api.syncSingleCalendar(newEntry.id, gcalRes.eventId);
-        }
-      } catch (e) {
-        console.warn(
-          "Failed to sync newly created roster entry to Google Calendar",
-        );
-      }
-    }
-    await loadData();
-  };
-
-  // Confirm Delete
-  const handleConfirmDelete = async (shouldDeleteCalendarEvent: boolean) => {
-    if (!deleteModalEntry) return;
-
-    if (shouldDeleteCalendarEvent && deleteModalEntry.googleCalendarEventId) {
-      try {
-        const token = await getAccessToken();
-        if (token) {
-          await deleteCalendarEvent(
-            deleteModalEntry.googleCalendarEventId,
-            token,
-          );
-          setSyncNotice(
-            `Removed event for ${deleteModalEntry.date} from Google Calendar`,
-          );
-          setTimeout(() => setSyncNotice(null), 3000);
-        }
-      } catch (err) {
-        console.warn("Google Calendar delete error on single delete:", err);
-      }
-    }
-
-    await api.deleteRoster(deleteModalEntry.id, shouldDeleteCalendarEvent);
-    await loadData();
-  };
-
   // Filtered entries for table and list
   const filteredEntries = useMemo(() => {
     return entries.filter((e) => {
@@ -598,7 +479,7 @@ export default function App() {
         const q = searchQuery.toLowerCase();
         const matchesDate = e.date.toLowerCase().includes(q);
         const matchesDay = e.day.toLowerCase().includes(q);
-        const matchesAction = e.action.toLowerCase().includes(q);
+        const matchesAction = (e.action || '').toLowerCase().includes(q);
         const matchesNotes = e.notes?.toLowerCase().includes(q);
         const matchesOriginal = e.originalStatusId.toLowerCase().includes(q);
         const matchesCurrent = e.currentStatusId.toLowerCase().includes(q);
@@ -615,8 +496,8 @@ export default function App() {
         }
       }
 
-      // Status Filter
-      if (statusFilter !== "ALL" && e.currentStatusId !== statusFilter) {
+      // Status Filter (supports grouped codes, e.g. all working-day codes)
+      if (statusFilterCodes.length > 0 && !statusFilterCodes.includes(e.currentStatusId)) {
         return false;
       }
 
@@ -631,7 +512,7 @@ export default function App() {
 
       return true;
     });
-  }, [entries, searchQuery, statusFilter, changedOnlyFilter]);
+  }, [entries, searchQuery, statusFilterCodes, changedOnlyFilter]);
 
   const handleToggleSelectAll = useCallback(() => {
     if (selectedIds.length === filteredEntries.length) {
@@ -656,10 +537,14 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 transition-colors">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-xs font-bold text-slate-500 dark:text-zinc-400">
+      <div className="min-h-screen flex items-center justify-center bg-[#f0f2f8] dark:bg-[#0a0e1a] transition-colors relative">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="aurora-blob aurora-blob-1" />
+          <div className="aurora-blob aurora-blob-2" />
+        </div>
+        <div className="flex flex-col items-center gap-4 relative z-10">
+          <div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
             Verifying access permissions...
           </p>
         </div>
@@ -677,19 +562,15 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 transition-colors font-sans pb-16">
-      {/* Top accent stripe */}
-      <div className="top-stripe" />
-
-      {/* Navigation Header */}
-      <HeaderNavbar
+    <div className="min-h-screen bg-page text-fg transition-colors">
+      <AppShell
         currentMonthYear={currentMonthYear}
         onMonthChange={(m) => setCurrentMonthYear(m)}
         onTodayClick={() => setCurrentMonthYear(ongoingCycle)}
         searchQuery={searchQuery}
         onSearchChange={(q) => setSearchQuery(q)}
         activeView={activeTab}
-        onViewChange={(v) => setActiveTab(v)}
+        onViewChange={(v) => handleTabChange(v)}
         onAddRosterClick={() => setIsAddRosterModalOpen(true)}
         onChangeTodayClick={() => {
           const todayStr = getTodayDateString();
@@ -705,33 +586,27 @@ export default function App() {
         onSyncCalendarClick={handleSyncAllGoogle}
         onSettingsClick={() => setIsSettingsModalOpen(true)}
         onOtCalculatorClick={() => setIsOtCalculatorModalOpen(true)}
-        settings={settings || ({ theme: darkMode ? "dark" : "light" } as any)}
         darkMode={darkMode}
         onThemeToggle={() => setDarkMode(!darkMode)}
         isSyncing={isSyncingAll}
+        userName={currentUser?.displayName || "User"}
         onSignOut={handleLogout}
-      />
-
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      >
+      <div className="space-y-5">
         {/* Sync Notification Banner */}
         {syncNotice && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="mb-4 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 text-xs font-bold flex items-center justify-between shadow-sm"
+            className="p-3 rounded-lg border text-xs font-medium flex items-center justify-between"
+            style={{ background: 'var(--success-bg)', borderColor: 'var(--color-border)', color: 'var(--success)' }}
           >
             <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4" />
               {syncNotice}
             </span>
-            <button
-              onClick={() => setSyncNotice(null)}
-              className="text-emerald-500 hover:text-emerald-800 transition-colors"
-            >
-              ✕
-            </button>
+            <button onClick={() => setSyncNotice(null)} aria-label="Dismiss notification" className="hover:opacity-70 transition-opacity">✕</button>
           </motion.div>
         )}
 
@@ -740,36 +615,24 @@ export default function App() {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm"
+            className="p-4 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-3"
+            style={{ background: 'var(--warning-bg)', borderColor: 'var(--color-border)' }}
           >
             <div className="flex items-start gap-3">
-              <Database className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <Database className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'var(--warning)' }} />
               <div>
-                <span className="font-extrabold text-amber-800 dark:text-amber-400 text-sm block mb-1">
-                  Supabase Configured but Database Tables are Missing
+                <span className="font-semibold text-sm block mb-1" style={{ color: 'var(--warning)' }}>
+                  Supabase configured but tables missing
                 </span>
-                <p className="text-slate-600 dark:text-zinc-300 font-medium leading-relaxed">
-                  Your application is connected to Supabase, but the database
-                  tables do not exist in your schema.
-                  <strong>
-                    {" "}
-                    The app has gracefully fallen back to local JSON storage
-                  </strong>{" "}
-                  so your schedule is completely safe! To activate real-time
-                  cloud synchronization, copy the SQL schema inside{" "}
-                  <code className="px-1.5 py-0.5 bg-slate-200 dark:bg-zinc-800 font-bold rounded">
-                    supabase_setup.sql
-                  </code>{" "}
-                  in your project, open your Supabase SQL Editor, and paste-run
-                  it.
+                <p className="text-muted text-xs leading-relaxed">
+                  The app is connected to Supabase, but the database tables do not exist. It has{" "}
+                  <strong className="text-fg">fallen back to local JSON storage</strong> — your schedule is safe. Run the schema from{" "}
+                  <code className="px-1.5 py-0.5 rounded bg-well font-medium">supabase_setup.sql</code> in the Supabase SQL editor to activate cloud sync.
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
-              <button
-                onClick={handleCopySql}
-                className={`px-3.5 py-2 text-white font-extrabold rounded-xl transition-all shadow-xs shrink-0 cursor-pointer text-[11px] flex items-center gap-1.5 ${copiedSql ? "bg-emerald-600 hover:bg-emerald-700" : "bg-slate-700 hover:bg-slate-800"}`}
-              >
+              <button onClick={handleCopySql} className="btn-secondary !h-8 !px-3 !text-xs flex items-center gap-1.5">
                 {copiedSql ? (
                   <>
                     <Check className="w-3.5 h-3.5" />
@@ -783,12 +646,12 @@ export default function App() {
                 )}
               </button>
               <button
-                onClick={() => {
+                onClick={() =>
                   alert(
                     "1. Click the 'Copy SQL Script' button to copy the setup schema to your clipboard.\n2. Open your Supabase Dashboard, select your project, and click 'SQL Editor' in the left menu.\n3. Click 'New query' (or paste in the default editor), paste (Ctrl+V or Cmd+V) the copied SQL, and click 'Run'.\n4. Your database tables will be created instantly and sync will activate immediately!",
-                  );
-                }}
-                className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl transition-all shadow-xs shrink-0 cursor-pointer text-[11px]"
+                  )
+                }
+                className="btn-primary !h-8 !px-3 !text-xs"
               >
                 Setup Guide
               </button>
@@ -799,129 +662,65 @@ export default function App() {
                     tablesMissing: false,
                   })
                 }
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 text-sm font-bold cursor-pointer"
+                className="btn-icon !h-7 !w-7 text-sm font-bold"
               >
                 ✕
               </button>
             </div>
           </motion.div>
         )}
-
-
-
-        {/* Quick Month Stats Summary Banner */}
-        {monthSummary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-5">
-            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
-              <span className="text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
-                Total Days
-              </span>
-              <span className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">
-                {monthSummary.totalDays}
-              </span>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block mb-1">
-                Duty / Working
-              </span>
-              <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                {monthSummary.workingDays}{" "}
-                <span className="text-xs font-normal text-slate-400">days</span>
-              </span>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
-              <span className="text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
-                Days Off
-              </span>
-              <span className="text-xl font-bold text-slate-700 dark:text-zinc-300 tabular-nums">
-                {monthSummary.offDays}{" "}
-                <span className="text-xs font-normal text-slate-400">days</span>
-              </span>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
-              <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                Holidays
-              </span>
-              <span className="text-xl font-bold text-amber-600 dark:text-amber-400 tabular-nums">
-                {monthSummary.holDays || 0}{" "}
-                <span className="text-xs font-normal text-slate-400">days</span>
-              </span>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs">
-              <span className="text-[10px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider block mb-1">
-                Leaves
-              </span>
-              <span className="text-xl font-bold text-slate-700 dark:text-zinc-300 tabular-nums">
-                {monthSummary.leaveDays}{" "}
-                <span className="text-xs font-normal text-slate-400">days</span>
-              </span>
-            </div>
-
-            <div
-              onClick={() => setIsOtCalculatorModalOpen(true)}
-              className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider block mb-1">
-                  Overtime
-                </span>
-                <span className="text-[9px] font-medium text-orange-500 dark:text-orange-400">
-                  Engine
-                </span>
-              </div>
-              <span className="text-xl font-bold text-orange-600 dark:text-orange-400 tabular-nums">
-                {monthSummary.otDays}{" "}
-                <span className="text-xs font-normal text-slate-400">shifts</span>
-              </span>
-            </div>
-
-            <div
-              onClick={() => {
-                setChangedOnlyFilter(true);
-                setActiveTab("table");
-              }}
-              className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xs cursor-pointer hover:border-amber-300 dark:hover:border-amber-700 transition-colors"
-            >
-              <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                Changed
-              </span>
-              <span className="text-xl font-bold text-amber-600 dark:text-amber-400 tabular-nums">
-                {monthSummary.changedDays}{" "}
-                <span className="text-xs font-normal text-slate-400">modified</span>
-              </span>
+        {/* Roster Manager page header */}
+        {activeTab === "table" && !loading && (
+          <div className="flex items-end justify-between gap-3 pt-4 border-t border-line">
+            <div className="min-w-0">
+              <h1 className="text-lg font-semibold tracking-tight text-fg">Roster Manager</h1>
+              <p className="text-sm text-muted">{formatMonthYearDisplay(currentMonthYear)} schedule</p>
             </div>
           </div>
         )}
-
-        {/* Search and Filters Bar (Desktop Only - Mobile is simplified without clutter) */}
+        {/* Search and Filters Bar (Desktop Only) */}
         {activeTab === "table" && (
-          <div className="hidden md:flex pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            {/* Search Box */}
+          <div className="hidden md:flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400 dark:text-zinc-500" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-faint pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search date, day, status, action..."
-                className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-950/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 text-xs font-medium transition-all"
+                className="input-min pl-8 pr-4 text-xs"
               />
             </div>
 
-            {/* Status Filter Dropdown & Checkbox */}
             <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-1.5">
-                <Filter className="w-3.5 h-3.5 text-slate-400" />
+                <Filter className="w-3.5 h-3.5 text-faint" />
                 <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3.5 py-2 rounded-lg border border-slate-200 dark:border-zinc-700/80 bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 font-semibold focus:outline-none text-xs"
+                  value={
+                    statusFilterCodes.length === 0
+                      ? "ALL"
+                      : statusFilterCodes.length === 1
+                        ? statusFilterCodes[0]
+                        : "__group__"
+                  }
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "__group__") return;
+                    if (v === "ALL") {
+                      setStatusFilterCodes([]);
+                      setStatusFilterLabel("All Statuses");
+                      return;
+                    }
+                    setStatusFilterCodes([v]);
+                    const match = statuses.find((s) => s.code === v);
+                    setStatusFilterLabel(match ? `${match.code} — ${match.displayName}` : v);
+                  }}
+                  className="input-min !h-9 w-auto pr-8 text-xs font-medium"
                 >
                   <option value="ALL">All Statuses</option>
+                  {statusFilterCodes.length > 1 && (
+                    <option value="__group__">{statusFilterLabel} ({statusFilterCodes.length})</option>
+                  )}
                   {statuses.map((s) => (
                     <option key={s.code} value={s.code}>
                       {s.code} — {s.displayName}
@@ -930,53 +729,46 @@ export default function App() {
                 </select>
               </div>
 
-              <label className="flex items-center gap-1.5 cursor-pointer font-medium text-slate-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+              <label className="flex items-center gap-1.5 cursor-pointer font-medium text-muted hover:text-fg transition-colors select-none">
                 <input
                   type="checkbox"
                   checked={changedOnlyFilter}
                   onChange={(e) => setChangedOnlyFilter(e.target.checked)}
-                  className="rounded-md border-slate-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500 bg-white dark:bg-zinc-950 cursor-pointer"
+                  className="rounded border-line accent-[var(--color-primary)] cursor-pointer"
                 />
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--warning)" }} />
                 <span>Show Changed Only</span>
               </label>
             </div>
           </div>
         )}
-
-        {/* Bulk Selection Banner Bar */}
+        {/* Bulk Selection Banner */}
         {activeTab === "table" && selectedIds.length > 0 && (
-          <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 flex items-center justify-between text-xs">
-            <span className="font-semibold text-blue-900 dark:text-blue-200 flex items-center gap-2">
-              <CheckSquare className="w-4 h-4 text-blue-500" />
+          <div
+            className="p-3 rounded-lg border flex items-center justify-between text-xs"
+            style={{ background: "var(--accent-soft)", borderColor: "var(--color-border)" }}
+          >
+            <span className="font-semibold flex items-center gap-2" style={{ color: "var(--color-primary)" }}>
+              <CheckSquare className="w-4 h-4" />
               {selectedIds.length} entries selected
             </span>
 
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsBulkEditModalOpen(true)}
-                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-1"
-              >
+              <button onClick={() => setIsBulkEditModalOpen(true)} className="btn-primary !h-8 !px-3 !text-xs">
                 <Edit3 className="w-3.5 h-3.5" />
                 Bulk Change
               </button>
 
-              <button
-                onClick={() => setSelectedIds([])}
-                className="px-2.5 py-1.5 rounded-lg text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition-colors"
-              >
+              <button onClick={() => setSelectedIds([])} className="btn-ghost !h-8 !px-2.5 !text-xs">
                 Clear
               </button>
             </div>
           </div>
         )}
-
         {/* Content Views */}
         {loading ? (
-          <div className="py-20 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-4">
-            <div className="relative">
-              <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
-            </div>
+          <div className="py-20 text-center text-xs text-muted flex flex-col items-center justify-center gap-4">
+            <RefreshCw className="w-5 h-5 animate-spin" style={{ color: "var(--color-primary)" }} />
             <span className="font-medium">
               Loading roster entries for{" "}
               {formatMonthYearDisplay(currentMonthYear)}...
@@ -986,6 +778,13 @@ export default function App() {
           <>
             {activeTab === "table" && (
               <>
+                <SummaryCards
+                  entries={entries}
+                  statuses={statuses}
+                  onFilterChangedOnly={handleCardFilterChangedOnly}
+                  onFilterStatus={handleCardFilterStatus}
+                  onOpenOtCalculator={() => setIsOtCalculatorModalOpen(true)}
+                />
                 <div className="hidden md:block">
                   <RosterTable
                     entries={filteredEntries}
@@ -1027,59 +826,50 @@ export default function App() {
             )}
 
             {activeTab === "dashboard" && (
-              <Suspense fallback={<div className="py-20 text-center text-xs text-slate-400"><RefreshCw className="w-5 h-5 animate-spin text-blue-500 mx-auto" /></div>}>
+              <Suspense fallback={<ViewLoading />}>
               <LazyDashboardOverview
                 entries={entries}
                 statuses={statuses}
                 currentMonthYear={currentMonthYear}
-                settings={settings || ({ theme: darkMode ? "dark" : "light" } as any)}
                 leaveRows={leaveRows}
                 leaveLoading={leaveLoading}
                 onSyncLeave={() => loadLeaveBalance(currentLeaveYear)}
+                onOpenTasks={() => handleTabChange("tasks")}
+                onOpenRoster={() => handleTabChange("table")}
               />
+              </Suspense>
+            )}
+
+            {activeTab === "tasks" && (
+              <Suspense fallback={<ViewLoading />}>
+                <LazyTasksView userName={currentUser?.displayName || "User"} onToast={pushToast} />
               </Suspense>
             )}
           </>
         )}
       </div>
+      </AppShell>
 
       {/* Floating Mobile Bottom Navigation Bar */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 md:hidden glass border border-slate-200/80 dark:border-zinc-800/80 rounded-xl shadow-lg shadow-black/5 dark:shadow-black/30 px-5 py-2.5 flex items-center gap-7">
-        <button
-          onClick={() => setActiveTab("table")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
-            activeTab === "table"
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-slate-400 dark:text-zinc-500"
-          }`}
-        >
-          <LayoutList className="w-5 h-5" />
-          <span>Roster</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("calendar")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
-            activeTab === "calendar"
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-slate-400 dark:text-zinc-500"
-          }`}
-        >
-          <CalendarDays className="w-5 h-5" />
-          <span>Calendar</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("dashboard")}
-          className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
-            activeTab === "dashboard"
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-slate-400 dark:text-zinc-500"
-          }`}
-        >
-          <LayoutDashboard className="w-5 h-5" />
-          <span>Analytics</span>
-        </button>
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 border border-line bg-surface shadow-[var(--shadow-md)] rounded-xl px-5 py-2.5 flex items-center gap-6 md:hidden">
+        {([
+          { id: "dashboard", icon: LayoutDashboard, label: "Home" },
+          { id: "table", icon: LayoutList, label: "Roster" },
+          { id: "tasks", icon: KanbanSquare, label: "Tasks" },
+          { id: "calendar", icon: CalendarDays, label: "Calendar" },
+        ] as const).map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => handleTabChange(id)}
+            className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors ${
+              activeTab === id ? "text-accent" : "text-faint hover:text-muted"
+            }`}
+          >
+            <Icon className="w-5 h-5" />
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
-
       {/* Application Modals */}
       <Suspense fallback={null}>
       <LazyAddRosterModal
@@ -1145,12 +935,24 @@ export default function App() {
           const leaveType = LEAVE_CODE_TO_TYPE[code] || code;
           const displayCode = getDisplayCode(code);
           const previousCode = leavePickerEntry.currentStatusId || leavePickerEntry.originalStatusId || "";
+          // Partial leaves (Short Leave / Half Day) keep the base work status:
+          // the day is still worked, so NWD/RTD must NOT be replaced.
+          const partial = isPartialLeaveCode(code);
+          const actionText = !partial
+            ? leaveType
+            : code === "Short Leave"
+              ? `Short Leave (Arrive by ${getShortLeaveCutoff(previousCode)})`
+              : code === "LEAVE(Half)-Annual"
+                ? "Half Day (Annual)"
+                : "Half Day (Casual)";
           try {
             await api.updateRoster(leavePickerEntry.id, {
-              currentStatusId: displayCode,
-              action: leaveType,
-              reason: reason || `Leave applied (${leaveType})`,
-              notes: reason || `Converted from ${previousCode} to ${leaveType}`,
+              currentStatusId: partial ? previousCode : displayCode,
+              action: actionText,
+              reason: reason || `${actionText} applied`,
+              notes: reason || (partial
+                ? `${actionText} on ${previousCode} - status unchanged`
+                : `Converted from ${previousCode} to ${leaveType}`),
               ot: false,
               clockIn: "",
               clockOut: "",
@@ -1161,7 +963,8 @@ export default function App() {
             });
             setLeavePickerEntry(null);
             loadData();
-            const after = balRow && balRow.balance !== null ? Math.max(0, balRow.balance - 1) : null;
+            const unit = code.startsWith("LEAVE(Half)") ? 0.5 : 1;
+            const after = balRow && balRow.balance !== null ? Math.max(0, balRow.balance - unit) : null;
             pushToast(
               "success",
               `${leaveType} applied for ${formatDateDisplay(leavePickerEntry.date)}`,

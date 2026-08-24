@@ -55,7 +55,7 @@ export const DEFAULT_ROSTER_STATUSES: RosterStatusConfig[] = [
   {
     code: 'DOS',
     displayName: 'DOS - Day Off Settlement',
-    description: 'WORK WITH DAY OFF SETTLEMENT',
+    description: 'WORK WITH DAY OFF SETTLEMENT (08:15 - 17:30)',
     color: '#2563eb', // Blue
     badgeBg: 'bg-blue-100 dark:bg-blue-950/80',
     badgeText: 'text-blue-800 dark:text-blue-200',
@@ -64,9 +64,26 @@ export const DEFAULT_ROSTER_STATUSES: RosterStatusConfig[] = [
     isWorkDay: true,
     calendarEventConfig: {
       isAllDay: false,
-      startTime: '10:15',
-      endTime: '19:30',
+      startTime: '08:15',
+      endTime: '17:30',
       titlePrefix: 'WORK (DOS) —',
+    },
+  },
+  {
+    code: 'DOS(10.00)',
+    displayName: 'DOS (10.00) - Day Off Settlement',
+    description: 'WORK WITH DAY OFF SETTLEMENT (10:00 - 19:00)',
+    color: '#1d4ed8', // Darker Blue
+    badgeBg: 'bg-indigo-100 dark:bg-indigo-950/80',
+    badgeText: 'text-indigo-800 dark:text-indigo-200',
+    badgeBorder: 'border-indigo-300 dark:border-indigo-800',
+    active: true,
+    isWorkDay: true,
+    calendarEventConfig: {
+      isAllDay: false,
+      startTime: '10:00',
+      endTime: '19:00',
+      titlePrefix: 'WORK (DOS 10.00) —',
     },
   },
   {

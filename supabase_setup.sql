@@ -289,3 +289,87 @@ CREATE POLICY "Allow public delete" ON public.leave_entitlements FOR DELETE USIN
 -- ALTER TABLE public.roster_entries ADD COLUMN IF NOT EXISTS "otMorningHours" NUMERIC DEFAULT 0;
 -- ALTER TABLE public.roster_entries ADD COLUMN IF NOT EXISTS "otNightHours" NUMERIC DEFAULT 0;
 
+-- ==========================================
+-- TASK MANAGEMENT TABLES (Task Manager)
+-- ==========================================
+-- Mirrors the app's Task/TaskGroup/TaskTemplate shapes. The server
+-- auto-seeds these from the local JSON store on first read.
+-- (Same content as supabase_tasks.sql — kept here so one script
+--  sets up the entire database.)
+
+CREATE TABLE IF NOT EXISTS public.tasks (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    notes TEXT,
+    status TEXT NOT NULL DEFAULT 'todo',
+    priority TEXT NOT NULL DEFAULT 'medium',
+    "dueDate" TEXT,
+    tags JSONB DEFAULT '[]'::jsonb,
+    "user" TEXT DEFAULT 'User',
+    "createdAt" TEXT NOT NULL,
+    "updatedAt" TEXT NOT NULL,
+    "completedAt" TEXT,
+    "groupId" TEXT,
+    sequence INTEGER,
+    "dependsOn" JSONB DEFAULT '[]'::jsonb,
+    category TEXT NOT NULL DEFAULT 'work'
+);
+
+CREATE INDEX IF NOT EXISTS idx_tasks_group_id ON public.tasks("groupId");
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON public.tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON public.tasks("dueDate");
+
+CREATE TABLE IF NOT EXISTS public.task_groups (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    color TEXT,
+    "createdAt" TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.task_templates (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    "titleTemplate" TEXT NOT NULL DEFAULT '',
+    "notesTemplate" TEXT,
+    priority TEXT NOT NULL DEFAULT 'medium',
+    tags JSONB DEFAULT '[]'::jsonb,
+    category TEXT NOT NULL DEFAULT 'work',
+    variables JSONB DEFAULT '[]'::jsonb,
+    children JSONB,
+    "createdAt" TEXT NOT NULL,
+    "updatedAt" TEXT NOT NULL
+);
+
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.task_templates ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public select" ON public.tasks;
+DROP POLICY IF EXISTS "Allow public insert" ON public.tasks;
+DROP POLICY IF EXISTS "Allow public update" ON public.tasks;
+DROP POLICY IF EXISTS "Allow public delete" ON public.tasks;
+CREATE POLICY "Allow public select" ON public.tasks FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON public.tasks FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON public.tasks FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON public.tasks FOR DELETE USING (true);
+
+DROP POLICY IF EXISTS "Allow public select" ON public.task_groups;
+DROP POLICY IF EXISTS "Allow public insert" ON public.task_groups;
+DROP POLICY IF EXISTS "Allow public update" ON public.task_groups;
+DROP POLICY IF EXISTS "Allow public delete" ON public.task_groups;
+CREATE POLICY "Allow public select" ON public.task_groups FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON public.task_groups FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON public.task_groups FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON public.task_groups FOR DELETE USING (true);
+
+DROP POLICY IF EXISTS "Allow public select" ON public.task_templates;
+DROP POLICY IF EXISTS "Allow public insert" ON public.task_templates;
+DROP POLICY IF EXISTS "Allow public update" ON public.task_templates;
+DROP POLICY IF EXISTS "Allow public delete" ON public.task_templates;
+CREATE POLICY "Allow public select" ON public.task_templates FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON public.task_templates FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON public.task_templates FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete" ON public.task_templates FOR DELETE USING (true);
+

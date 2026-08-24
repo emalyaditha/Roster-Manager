@@ -1,8 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Only staff accounts on the roster allow-list may touch Firestore data.
+    // Keep this list in sync with app settings (allowedEmails).
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if request.auth != null &&
+        request.auth.token.email in ['emalyaditha@gmail.com'];
     }
   }
 }

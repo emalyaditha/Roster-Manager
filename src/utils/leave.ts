@@ -35,13 +35,14 @@ export const LEAVE_OPTIONS: LeaveOption[] = [
     label: 'Short Leave',
     colorDot: '#E60023',
     unit: 1,
+    subtitle: 'Arrive within 1h of start — status stays NWD/RTD',
   },
   {
     code: 'Leave(Half)',
     label: 'Half Day Leave',
     colorDot: '#E60023',
     unit: 0.5,
-    subtitle: 'Pick Annual or Casual pool',
+    subtitle: 'Status stays NWD/RTD — pick Annual or Casual pool',
   },
   {
     code: 'ML',
@@ -74,6 +75,29 @@ export const LEAVE_CODE_TO_TYPE: Record<string, string> = {
 export const LEAVE_ELIGIBLE_CODES = ['NWD', 'RTD', 'WFH'];
 // Training is allowed but requires confirmation (warn).
 export const LEAVE_WARN_CODES = ['Training'];
+
+// Partial leaves: the day is still worked, so the base status (NWD/RTD/WFH) is KEPT
+// and the leave is recorded via the action text instead of replacing the status.
+export const PARTIAL_LEAVE_CODES = ['Short Leave', 'LEAVE(Half)-Annual', 'LEAVE(Half)-Casual'];
+
+export function isPartialLeaveCode(code: string): boolean {
+  return PARTIAL_LEAVE_CODES.includes(code);
+}
+
+// Detect a previously applied partial leave from the action text stored on an entry.
+export function isPartialLeaveAction(action: string | null | undefined): boolean {
+  if (!action) return false;
+  const a = action.trim();
+  return /^short leave/i.test(a) || /^half day \((annual|casual)\)/i.test(a);
+}
+
+// Short Leave = arriving up to 1 hour after the official start without penalty.
+// Aligned with getScheduledShiftWindow: NWD/WFH start 08:15 -> arrive by 09:15;
+// RTD starts 10:15 -> arrive by 11:15.
+export function getShortLeaveCutoff(baseCode: string): string {
+  const base = (baseCode || '').toUpperCase();
+  return base === 'RTD' ? '11:15' : '09:15';
+}
 
 // Current shift window context shown at the top of the picker.
 export const SHIFT_CONTEXT: Record<string, { label: string; hours: string }> = {
@@ -120,6 +144,13 @@ export type ValidationResult =
   | { ok: true; warn?: boolean; after?: number }
   | { ok: false; reason: 'no_balance' | 'blocked'; current?: number; message?: string };
 
+// Balance units consumed per application (half-day codes consume half a day).
+const LEAVE_UNIT: Record<string, number> = {
+  'Leave(Half)': 0.5,
+  'LEAVE(Half)-Annual': 0.5,
+  'LEAVE(Half)-Casual': 0.5,
+};
+
 export function validateLeaveApplication(
   selectedCode: string,
   currentBalances: LeaveRow[],
@@ -148,5 +179,6 @@ export function validateLeaveApplication(
     return { ok: false, reason: 'no_balance', current: row.balance };
   }
 
-  return { ok: true, after: (row.balance ?? 0) - 1 };
+  const unit = LEAVE_UNIT[selectedCode] ?? 1;
+  return { ok: true, after: (row.balance ?? 0) - unit };
 }

@@ -1,533 +1,529 @@
-import React, { useState, useEffect } from 'react';
-import { RosterEntry, RosterStatusConfig, RosterChangeHistory, AppSettings, OtDayResult } from '../types/roster';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, RefreshCw, Square } from 'lucide-react';
 import { api } from '../services/api';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import { formatMonthYearDisplay } from '../utils/date';
-
-function useIsDarkMode(): boolean {
-  const [isDark, setIsDark] = useState(() =>
-    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false
-  );
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-  return isDark;
-}
-import { LayoutDashboard, BarChart2, TrendingUp, PieChart as PieIcon } from 'lucide-react';
-import { calculateDayOt, DEFAULT_OT_SETTINGS, formatTo12hDisplay } from '../utils/otCalculator';
-import { LeaveBalanceCard } from './LeaveBalanceCard';
-import { LeaveRow } from '../types/roster';
-import { DosDofLedger } from './DosDofLedger';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { LeaveRow, RosterEntry, RosterStatusConfig } from '../types/roster';
+import { computeRosterStats } from '../utils/rosterStats';
+import { Task, TaskCategory, TaskGroup } from '../types/tasks';
 
 interface DashboardOverviewProps {
   entries: RosterEntry[];
   statuses: RosterStatusConfig[];
   currentMonthYear: string;
-  settings?: AppSettings;
   leaveRows: LeaveRow[];
   leaveLoading: boolean;
   onSyncLeave: () => Promise<void>;
+  onOpenTasks?: () => void;
+  onOpenRoster?: () => void;
 }
+
+const TASK_CATEGORY_META: Record<TaskCategory, { label: string; dot: string }> = {
+  work: { label: 'Work', dot: 'var(--color-primary)' },
+  personal: { label: 'Personal', dot: 'var(--success)' },
+  projects: { label: 'Projects', dot: 'var(--warning)' },
+};
+
+const CARD_TITLE = 'text-xs font-semibold uppercase tracking-wide text-muted';
+
+function localToday(): string {
+  const now = new Date();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${m}-${d}`;
+}
+
+function formatDueChip(due: string | null | undefined, today: string): { label: string; cls: string } | null {
+  if (!due) return null;
+  const [y, m, d] = due.split('-').map(Number);
+  const label = new Date(y, (m || 1) - 1, d || 1).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+  if (due < today) return { label, cls: 'chip-danger' };
+  if (due === today) return { label, cls: 'chip-accent' };
+  return { label, cls: 'chip-neutral' };
+}
+
+function formatDateShort(date: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+const SkeletonRows: React.FC<{ rows: number }> = ({ rows }) => (
+  <div className="space-y-2.5">
+    {Array.from({ length: rows }).map((_, i) => (
+      <div
+        key={i}
+        className="h-4 rounded bg-well animate-pulse"
+        style={{ width: `${92 - i * 14}%` }}
+      />
+    ))}
+  </div>
+);
+
+const StatTile: React.FC<{ label: string; value: number; tone?: string; sub?: string; onClick?: () => void }> = ({ label, value, tone, sub, onClick }) => (
+  <div className={`stat-tile ${onClick ? 'clickable cursor-pointer' : ''}`} onClick={onClick}>
+    <div className="stat-tile-label">{label}</div>
+    <div className="stat-tile-value" style={tone ? { color: tone } : undefined}>
+      {value}
+    </div>
+    {sub && <div className="text-[11px] text-faint tabular-nums -mt-0.5">{sub}</div>}
+  </div>
+);
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   entries,
   statuses,
   currentMonthYear,
-  settings,
   leaveRows,
   leaveLoading,
   onSyncLeave,
+  onOpenTasks,
+  onOpenRoster,
 }) => {
-  const [history, setHistory] = useState<RosterChangeHistory[]>([]);
-  const isMobile = useIsMobile(640);
-  const isDark = useIsDarkMode();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [groups, setGroups] = useState<TaskGroup[]>([]);
+  const [tasksLoading, setTasksLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
-    const fetchHistory = async () => {
+    const load = async () => {
       try {
-        const data = await api.getHistory();
+        const [taskList, groupList] = await Promise.all([api.getTasks(), api.getTaskGroups()]);
         if (active) {
-          setHistory(data);
+          setTasks(taskList);
+          setGroups(groupList);
         }
-      } catch (err) {
-        console.error('Failed to fetch roster change history for dashboard:', err);
+      } catch {
+        /* dashboard stays usable without task data */
+      } finally {
+        if (active) setTasksLoading(false);
       }
     };
-    fetchHistory();
+    load();
     return () => {
       active = false;
     };
-  }, [entries]);
+  }, []);
 
-  // Status Distribution Data
-  const statusCounts = new Map<string, number>();
-  entries.forEach((e) => {
-    statusCounts.set(e.currentStatusId, (statusCounts.get(e.currentStatusId) || 0) + 1);
-  });
+  const today = useMemo(() => localToday(), []);
 
-  const pieData = Array.from(statusCounts.entries()).map(([code, count]) => {
-    const config = statuses.find((s) => s.code === code);
+  const [yearNum, monthNum] = currentMonthYear.split('-').map(Number);
+  const monthLabel =
+    Number.isFinite(yearNum) && Number.isFinite(monthNum)
+      ? `${new Date(yearNum, monthNum - 1, 1).toLocaleString('en-US', { month: 'long' })} ${yearNum}`
+      : currentMonthYear;
+
+  const statusById = useMemo(() => new Map(statuses.map((s) => [s.code, s])), [statuses]);
+
+  const rosterStats = useMemo(() => {
+    // App passes entries already scoped to the active roster cycle — no re-filtering
+    const stats = computeRosterStats(entries, statuses);
+
+    const effCount = new Map<string, number>();
+    entries.forEach((e) => {
+      // Count on the effective status so distribution matches the KPI tiles and roster filters
+      const effId = e.currentStatusId;
+      effCount.set(effId, (effCount.get(effId) ?? 0) + 1);
+    });
+
+    const distRows = Array.from(effCount.entries())
+      .map(([code, count]) => ({
+        code,
+        count,
+        color: statusById.get(code)?.color || 'var(--color-text-faint)',
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    // Next 7 days starting today: status dot per day from the roster.
+    const weekStrip = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const dateStr = `${y}-${m}-${day}`;
+      const entry = entries.find((e) => e.date === dateStr);
+      const effId = entry ? entry.changedStatusId ?? entry.currentStatusId : undefined;
+      return {
+        dateStr,
+        weekday: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        dayNum: d.getDate(),
+        isToday: i === 0,
+        color: effId ? statusById.get(effId)?.color : undefined,
+        name: effId ? statusById.get(effId)?.displayName : undefined,
+        entry,
+      };
+    });
+
+    const todayEntry = entries.find((e) => e.date === localToday());
+    const todayEffId = todayEntry ? todayEntry.changedStatusId ?? todayEntry.currentStatusId : undefined;
+    const todayStatus = todayEffId
+      ? {
+          code: todayEffId,
+          name: statusById.get(todayEffId)?.displayName ?? '',
+          color: statusById.get(todayEffId)?.color ?? 'var(--color-text-faint)',
+        }
+      : null;
+
+    const activity = entries
+      .filter(
+        (e) =>
+          Boolean(e.notes && e.notes.trim()) ||
+          Boolean(e.changedStatusId && e.changedStatusId !== e.originalStatusId),
+      )
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 5);
+
     return {
-      name: code,
-      value: count,
-      color: config?.color || '#94a3b8',
+      total: stats.total,
+      dutyDays: stats.workingDays,
+      daysOff: stats.daysOff,
+      leaveDays: stats.leaveDays,
+      otShifts: stats.otShifts,
+      otMorning: stats.otMorningHours,
+      otNight: stats.otNightHours,
+      changedCount: stats.changedCount,
+      distRows,
+      activity,
+      weekStrip,
+      todayEntry,
+      todayStatus,
     };
-  });
+  }, [entries, statuses, currentMonthYear, statusById]);
 
-  const totalDays = pieData.reduce((sum, item) => sum + item.value, 0);
+  const taskStats = useMemo(() => {
+    const open = tasks.filter((t) => t.status !== 'done');
+    const overdue = open.filter((t) => t.dueDate && t.dueDate < today).length;
+    const done = tasks.length - open.length;
+    const completion = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
 
-  // Original vs Changed Comparison Data
-  let originalCounts = new Map<string, number>();
-  let currentCounts = new Map<string, number>();
+    const openByCategory: Record<TaskCategory, number> = { work: 0, personal: 0, projects: 0 };
+    open.forEach((t) => {
+      if (t.category in openByCategory) openByCategory[t.category] += 1;
+    });
 
-  entries.forEach((e) => {
-    originalCounts.set(e.originalStatusId, (originalCounts.get(e.originalStatusId) || 0) + 1);
-    currentCounts.set(e.currentStatusId, (currentCounts.get(e.currentStatusId) || 0) + 1);
-  });
+    const upcoming = [...open]
+      .sort((a, b) => {
+        if (!a.dueDate && !b.dueDate) return 0;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return a.dueDate.localeCompare(b.dueDate);
+      })
+      .slice(0, 6);
 
-  const allStatusKeys = Array.from(new Set([...originalCounts.keys(), ...currentCounts.keys()]));
-
-  const comparisonData = allStatusKeys.map((code) => ({
-    status: code,
-    Original: originalCounts.get(code) || 0,
-    Current: currentCounts.get(code) || 0,
-  }));
-
-  // Changed Breakdown
-  const changedEntries = entries.filter((e) => e.originalStatusId !== e.currentStatusId);
-
-  // Overtime Breakdown (All entries with OT) using the compliant calculateDayOt
-  const otSettings = settings?.otCalculationSettings || DEFAULT_OT_SETTINGS;
-  const calculatedOtEntries = entries.map((entry) => {
-    const res = calculateDayOt(entry, entry.clockIn, entry.clockOut, otSettings);
-    return {
-      entry,
-      res,
-    };
-  }).filter(({ entry, res }) => {
-    return (entry.otMorningHours || 0) > 0 || (entry.otNightHours || 0) > 0 || res.billableOtMinutes > 0 || res.rawOtMinutes > 0;
-  });
-
-  const allOtEntries = [...calculatedOtEntries]
-    .sort((a, b) => new Date(a.entry.date).getTime() - new Date(b.entry.date).getTime());
-
-  const formatHoursMinutes = (hours: number): string => {
-    const totalMinutes = Math.round(hours * 60);
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
-    if (h === 0) return `${m}min`;
-    if (m === 0) return `${h}h`;
-    return `${h}h ${m}min`;
-  };
-
-  const breakdownFor = (item: { entry: RosterEntry; res: OtDayResult }) => {
-    const { entry, res } = item;
-    const rawMorning = (entry.otMorningHours || 0) > 0
-      ? entry.otMorningHours as number
-      : res.earlyInMinutes > 0 ? parseFloat((res.earlyInMinutes / 60).toFixed(2)) : 0;
-    const rawNight = (entry.otNightHours || 0) > 0
-      ? entry.otNightHours as number
-      : res.lateOutMinutes > 0 ? parseFloat((res.lateOutMinutes / 60).toFixed(2)) : 0;
-    const rawTotal = rawMorning + rawNight;
-    const billable = res.billableOtMinutes / 60;
-    const morning = rawTotal > 0 ? parseFloat((billable * (rawMorning / rawTotal)).toFixed(2)) : 0;
-    const night = rawTotal > 0 ? parseFloat((billable * (rawNight / rawTotal)).toFixed(2)) : 0;
-    const total = parseFloat(billable.toFixed(2));
-    return { morning, night, total };
-  };
-
-  const otTotals = allOtEntries.reduce(
-    (acc, item) => {
-      const b = breakdownFor(item);
-      acc.morning += b.morning;
-      acc.night += b.night;
-      acc.total += b.total;
-      return acc;
-    },
-    { morning: 0, night: 0, total: 0 },
-  );
+    return { openCount: open.length, overdue, done, completion, openByCategory, upcoming };
+  }, [tasks, today]);
 
   return (
-    <div className="space-y-6 mb-24">
-      {/* Leave Balance Card */}
-      <LeaveBalanceCard
-        year={parseInt(currentMonthYear.split('-')[0], 10)}
-        rows={leaveRows}
-        loading={leaveLoading}
-        onSync={onSyncLeave}
-      />
-
-      {/* Day-Off Settlement Ledger */}
-      <DosDofLedger entries={entries} />
-
-      {/* Dashboard Section Title */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-zinc-800/80">
-        <div>
-          <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            Roster Analytics & Trends — {formatMonthYearDisplay(currentMonthYear)}
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
-            Real-time analytics comparing original office assignments vs actual roster modifications
-          </p>
+    <div className="space-y-2.5">
+      {/* Page header */}
+      <div className="flex items-end justify-between gap-3 pb-1">
+        <div className="min-w-0">
+          <h1 className="text-lg font-semibold tracking-tight text-fg">Dashboard</h1>
+          <p className="text-sm text-muted">{monthLabel} overview</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button type="button" className="btn-min btn-secondary shrink-0" onClick={() => onOpenRoster?.()}>
+            Open Roster Manager
+          </button>
+          <button type="button" className="btn-min btn-secondary shrink-0 hidden sm:inline-flex" onClick={() => onOpenTasks?.()}>
+            Task Manager
+          </button>
         </div>
       </div>
 
-      {/* Analytics Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Chart 1: Roster Distribution */}
-        <div className="bg-white dark:bg-zinc-900/90 p-5 rounded-3xl border border-slate-200 dark:border-zinc-800/80 shadow-xs">
-          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-            <PieIcon className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            Current Roster Distribution
-          </h3>
-
-          {pieData.length === 0 ? (
-            <div className="py-16 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
-              No roster data to display.
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-5">
-              <div className="relative h-44 w-full max-w-[260px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={62}
-                      outerRadius={86}
-                      paddingAngle={2}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 12,
-                        border: `1px solid ${isDark ? '#3f3f46' : '#ebebeb'}`,
-                        background: isDark ? '#18181b' : '#fff',
-                        color: isDark ? '#e4e4e7' : '#111',
-                        fontSize: 12,
-                        fontWeight: 600,
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white leading-none">
-                    {totalDays}
-                  </span>
-                  <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
-                    days
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2 w-full">
-                {pieData.map((item) => {
-                  const pct = totalDays > 0 ? Math.round((item.value / totalDays) * 100) : 0;
-                  return (
-                    <div
-                      key={item.name}
-                      className="flex items-center justify-between gap-2 text-xs"
-                    >
-                      <span className="flex items-center gap-2 min-w-0">
-                        <span
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ background: item.color }}
-                        />
-                        <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
-                          {item.name}
-                        </span>
-                      </span>
-                      <span className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
-                        {item.value}
-                        <span className="text-slate-400 dark:text-zinc-500 font-medium ml-1">
-                          {pct}%
-                        </span>
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Chart 2: Original vs Current Comparison */}
-        <div className="bg-white dark:bg-zinc-900/90 p-5 rounded-3xl border border-slate-200 dark:border-zinc-800/80 shadow-xs">
-          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-            <BarChart2 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            Original Office Roster vs Current Active
-          </h3>
-
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonData}>
-                <XAxis dataKey="status" stroke={isDark ? '#71717a' : '#a1a1aa'} fontSize={11} />
-                <YAxis stroke={isDark ? '#71717a' : '#a1a1aa'} fontSize={11} />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: 12,
-                    border: `1px solid ${isDark ? '#3f3f46' : '#ebebeb'}`,
-                    background: isDark ? '#18181b' : '#fff',
-                    color: isDark ? '#e4e4e7' : '#111',
-                    fontSize: 12,
-                    fontWeight: 600,
-                  }}
-                />
-                <Bar dataKey="Original" fill="#71717a" radius={[6, 6, 0, 0]} name="Original Office" />
-                <Bar dataKey="Current" fill="#a855f7" radius={[6, 6, 0, 0]} name="Current Active" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Roster Change Audit Table in Dashboard */}
-      <div className="bg-white dark:bg-zinc-900/90 p-5 rounded-3xl border border-slate-200 dark:border-zinc-800/80 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-amber-500" />
-              Roster Modifications Breakdown ({changedEntries.length} entries changed)
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
-              List of all days where Changed Roster diverges from Original Roster
-            </p>
-          </div>
-        </div>
-
-        {changedEntries.length === 0 ? (
-          <div className="py-8 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
-            No roster changes recorded for this month.
-          </div>
-        ) : isMobile ? (
-          <div className="space-y-3">
-            {changedEntries.map((e) => {
-              const entryHistory = history
-                .filter((h) => h.rosterEntryId === e.id || h.date === e.date)
-                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-              const reason = entryHistory[0]?.reason || e.notes || e.action || 'Roster status changed';
-
-              return (
-                <div key={e.id} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2">
-                  <div className="font-extrabold text-slate-900 dark:text-white text-xs">
-                    {e.date} ({e.day})
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                    <span className="text-slate-500 dark:text-zinc-400 font-medium">Original: {e.originalStatusId}</span>
-                    <span className="text-slate-300 dark:text-zinc-700">→</span>
-                    <span className="font-extrabold text-purple-600 dark:text-purple-400">{e.currentStatusId}</span>
-                  </div>
-                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">{reason}</div>
-                  {e.notes && <div className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">{e.notes}</div>}
-                </div>
-              );
+      {/* Hero — today at a glance */}
+      <div className="card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-muted">Today</div>
+          <div className="text-xl sm:text-2xl font-semibold tracking-tight text-fg mt-0.5">
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
             })}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-zinc-800 text-slate-400 dark:text-zinc-500 font-extrabold text-[10px] uppercase">
-                  <th className="py-2.5 px-3">Date</th>
-                  <th className="py-2.5 px-3">Original</th>
-                  <th className="py-2.5 px-3">Current</th>
-                  <th className="py-2.5 px-3">Reason for Change</th>
-                  <th className="py-2.5 px-3">Notes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
-                {changedEntries.map((e) => {
-                  const entryHistory = history
-                    .filter((h) => h.rosterEntryId === e.id || h.date === e.date)
-                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                  const reason = entryHistory[0]?.reason || e.notes || e.action || 'Roster status changed';
-
-                  return (
-                    <tr key={e.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
-                      <td className="py-2.5 px-3 font-extrabold text-slate-900 dark:text-white">{e.date} ({e.day})</td>
-                      <td className="py-2.5 px-3 text-slate-500 dark:text-zinc-400 font-medium">{e.originalStatusId}</td>
-                      <td className="py-2.5 px-3 font-extrabold text-purple-600 dark:text-purple-400">{e.currentStatusId}</td>
-                      <td className="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300">{reason}</td>
-                      <td className="py-2.5 px-3 text-slate-500 dark:text-zinc-400">{e.notes || '-'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          {rosterStats.todayEntry?.notes?.trim() && (
+            <p className="text-xs text-muted mt-1 truncate max-w-md" title={rosterStats.todayEntry.notes}>
+              {rosterStats.todayEntry.notes.trim()}
+            </p>
+          )}
+        </div>
+        {rosterStats.todayStatus ? (
+          <div className="flex items-center gap-3 shrink-0">
+            {rosterStats.todayEntry?.clockIn && (
+              <div className="text-right hidden sm:block">
+                <div className="stat-tile-label">Clock</div>
+                <div className="text-sm font-medium text-fg tabular-nums mt-0.5">
+                  {rosterStats.todayEntry.clockIn}
+                  {rosterStats.todayEntry?.clockOut ? ` – ${rosterStats.todayEntry.clockOut}` : ''}
+                </div>
+              </div>
+            )}
+            <span
+              className="chip !text-sm !px-3 !py-1.5 font-semibold"
+              style={{ background: `${rosterStats.todayStatus.color}1f`, color: rosterStats.todayStatus.color }}
+              title={rosterStats.todayStatus.name}
+            >
+              <span className="w-2 h-2 rounded-full" style={{ background: rosterStats.todayStatus.color }} />
+              {rosterStats.todayStatus.code}
+            </span>
           </div>
+        ) : (
+          <span className="chip chip-neutral shrink-0">No entry for today</span>
         )}
       </div>
 
-      {/* Overtime Modifications Breakdown */}
-      <div className="bg-white dark:bg-zinc-900/90 p-5 rounded-3xl border border-slate-200 dark:border-zinc-800/80 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              Overtime Modifications Breakdown (All entries with OT)
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
-              Detailed list of overtime allocations, clock timings, and calculated morning/night OT hours with a monthly total
-            </p>
+      {/* Week strip */}
+      <div className="grid grid-cols-7 gap-1.5">
+        {rosterStats.weekStrip.map((d) => (
+          <div
+            key={d.dateStr}
+            title={d.name ?? d.dateStr}
+            className={`rounded-lg border p-1.5 sm:p-2 text-center transition-colors ${
+              d.isToday ? 'border-accent bg-[var(--accent-soft)]' : 'border-line bg-surface'
+            }`}
+          >
+            <div className={`text-[9px] sm:text-[10px] font-medium uppercase ${d.isToday ? 'text-accent' : 'text-faint'}`}>
+              {d.isToday ? 'TODAY' : d.weekday}
+            </div>
+            <div className="text-xs sm:text-sm font-semibold text-fg tabular-nums">{d.dayNum}</div>
+            <div className="mt-1 h-1.5 rounded-full mx-auto w-4" style={{ background: d.color ?? 'var(--color-border)' }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Row A — KPI strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <StatTile label="Total days" value={rosterStats.total} />
+        <StatTile label="Duty / Working" value={rosterStats.dutyDays} tone="var(--success)" />
+        <StatTile label="Days off" value={rosterStats.daysOff} />
+        <StatTile label="Leaves" value={rosterStats.leaveDays} tone="var(--info)" />
+        <StatTile
+          label="Overtime shifts"
+          value={rosterStats.otShifts}
+          tone="var(--warning)"
+          sub={`${Math.round(rosterStats.otMorning * 10) / 10}h AM · ${Math.round(rosterStats.otNight * 10) / 10}h PM`}
+        />
+        <StatTile label="Changed entries" value={rosterStats.changedCount} tone="var(--color-primary)" />
+      </div>
+
+      {/* Row B — distribution + task health */}
+      <div className="grid lg:grid-cols-3 gap-2.5">
+        <div className="card p-4 lg:col-span-2 flex flex-col">
+          <h2 className={CARD_TITLE}>Status distribution</h2>
+          <div className="mt-3 flex-1">
+            {rosterStats.distRows.length === 0 ? (
+              <p className="text-xs text-muted py-4 text-center">No roster data this cycle.</p>
+            ) : (
+              <div className="space-y-2.5">
+                {rosterStats.distRows.map((row) => {
+                  const pct = rosterStats.total > 0 ? Math.round((row.count / rosterStats.total) * 100) : 0;
+                  return (
+                    <div key={row.code} className="flex items-center gap-2.5">
+                      <span className="w-20 shrink-0 truncate text-xs font-medium text-fg">{row.code}</span>
+                      <div className="flex-1 h-1.5 rounded-full bg-well overflow-hidden">
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${pct}%`, backgroundColor: row.color }}
+                        />
+                      </div>
+                      <span className="w-8 shrink-0 text-right text-xs tabular-nums text-muted">{row.count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="mt-auto pt-3 border-t border-line">
+            <button
+              type="button"
+              onClick={() => onOpenRoster?.()}
+              className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              Open Roster Manager
+              <ArrowRight className="w-3 h-3" aria-hidden />
+            </button>
           </div>
         </div>
 
-        {calculatedOtEntries.length === 0 ? (
-          <div className="py-8 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl">
-            No overtime entries recorded for this month.
-          </div>
-        ) : isMobile ? (
-          <div className="space-y-3">
-            {allOtEntries.map((item) => {
-              const { entry, res } = item;
-              const { total } = breakdownFor(item);
-              const hasEarlyOt = res.earlyInMinutes > 0;
-              const hasLateOt = res.lateOutMinutes > 0;
-
-              return (
-                <div key={entry.id} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-extrabold text-slate-900 dark:text-white text-xs">
-                      {entry.date} ({entry.day})
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 shrink-0">
-                      {entry.currentStatusId}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-center">
-                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">In Time</div>
-                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {res.actualClockIn ? formatTo12hDisplay(res.actualClockIn) : '-'}
-                      </div>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Out Time</div>
-                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {res.actualClockOut ? formatTo12hDisplay(res.actualClockOut) : '-'}
-                      </div>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">OT Start</div>
-                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {hasEarlyOt && formatTo12hDisplay(res.actualClockIn)}
-                        {hasEarlyOt && hasLateOt && <br />}
-                        {hasLateOt && formatTo12hDisplay(res.scheduledEnd)}
-                        {!hasEarlyOt && !hasLateOt && '-'}
-                      </div>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-zinc-800/60 rounded-lg py-1.5">
-                      <div className="text-[9px] font-bold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">OT End</div>
-                      <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-300 mt-0.5">
-                        {hasEarlyOt && formatTo12hDisplay(res.scheduledStart)}
-                        {hasEarlyOt && hasLateOt && <br />}
-                        {hasLateOt && formatTo12hDisplay(res.actualClockOut)}
-                        {!hasEarlyOt && !hasLateOt && '-'}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-purple-50 dark:bg-purple-950/40 rounded-lg py-1.5 text-center">
-                    <div className="text-[9px] font-bold uppercase text-purple-500 dark:text-purple-400 tracking-wider">Total H</div>
-                    <div className="text-xs font-mono font-extrabold text-purple-600 dark:text-purple-400 mt-0.5">
-                      {total > 0 ? formatHoursMinutes(total) : '-'}
-                    </div>
+        <div className="card p-4 flex flex-col">
+          <h2 className={CARD_TITLE}>Task health</h2>
+          {tasksLoading ? (
+            <div className="mt-3 flex-1">
+              <SkeletonRows rows={4} />
+            </div>
+          ) : (
+            <div className="mt-3 flex-1">
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <div className="stat-tile-label">Open</div>
+                  <div className="text-lg font-semibold tabular-nums">{taskStats.openCount}</div>
+                </div>
+                <div>
+                  <div className="stat-tile-label">Overdue</div>
+                  <div className="text-lg font-semibold tabular-nums" style={{ color: 'var(--danger)' }}>
+                    {taskStats.overdue}
                   </div>
                 </div>
-              );
-            })}
-            <div className="flex items-center justify-between border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-800/60 rounded-xl px-4 py-3">
-              <span className="font-extrabold text-slate-900 dark:text-white text-xs">Total OT (All Dates)</span>
-              <span className="font-extrabold text-purple-600 dark:text-purple-400 font-mono text-sm">
-                {formatHoursMinutes(otTotals.total)}
-              </span>
+                <div>
+                  <div className="stat-tile-label">Done</div>
+                  <div className="text-lg font-semibold tabular-nums">{taskStats.done}</div>
+                </div>
+              </div>
+              <div className="h-1.5 rounded-full bg-well overflow-hidden mt-3">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${taskStats.completion}%` }} />
+              </div>
+              <p className="text-[11px] text-faint mt-1 mb-3 tabular-nums">{taskStats.completion}% complete</p>
+              <div className="space-y-1.5">
+                {(Object.keys(TASK_CATEGORY_META) as TaskCategory[]).map((cat) => (
+                  <div key={cat} className="flex items-center gap-2 text-xs">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ background: TASK_CATEGORY_META[cat].dot }}
+                    />
+                    <span className="text-muted flex-1">{TASK_CATEGORY_META[cat].label}</span>
+                    <span className="font-medium text-fg tabular-nums">{taskStats.openByCategory[cat]}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+          )}
+          <div className="mt-auto pt-3 border-t border-line">
+            <button
+              type="button"
+              onClick={() => onOpenTasks?.()}
+              className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              Open Task Manager
+              <ArrowRight className="w-3 h-3" aria-hidden />
+            </button>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+        </div>
+      </div>
+
+      {/* Row C — upcoming tasks + leave balance */}
+      <div className="grid lg:grid-cols-2 gap-2.5">
+        <div className="card p-4 flex flex-col">
+          <h2 className={CARD_TITLE}>Upcoming tasks</h2>
+          <div className="mt-3 flex-1">
+            {tasksLoading ? (
+              <SkeletonRows rows={4} />
+            ) : taskStats.upcoming.length === 0 ? (
+              <p className="text-xs text-muted py-4 text-center">No open tasks</p>
+            ) : (
+              <ul className="space-y-2">
+                {taskStats.upcoming.map((t) => {
+                  const chip = formatDueChip(t.dueDate, today);
+                  return (
+                    <li key={t.id} className="flex items-center gap-2 min-w-0">
+                      <Square className="w-3.5 h-3.5 shrink-0 text-faint" aria-hidden />
+                      <span className="flex-1 truncate text-sm text-fg">{t.title}</span>
+                      {chip && (
+                        <span className={`chip ${chip.cls} shrink-0 tabular-nums`} title={t.dueDate ?? undefined}>
+                          {chip.label}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+          <div className="mt-auto pt-3 border-t border-line">
+            <button
+              type="button"
+              onClick={() => onOpenTasks?.()}
+              className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
+              style={{ color: 'var(--color-primary)' }}
+            >
+              Open Task Manager
+              <ArrowRight className="w-3 h-3" aria-hidden />
+            </button>
+          </div>
+        </div>
+
+        <div className="card p-4 flex flex-col">
+          <h2 className={CARD_TITLE}>Leave balance</h2>
+          {leaveLoading ? (
+            <div className="flex-1 flex items-center justify-center py-10">
+              <RefreshCw className="w-5 h-5 animate-spin" style={{ color: 'var(--color-primary)' }} />
+            </div>
+          ) : leaveRows.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 py-8">
+              <p className="text-xs text-muted">No leave data</p>
+              <button type="button" className="btn-min btn-secondary !h-7 !px-3 !text-xs" onClick={() => void onSyncLeave()}>
+                Sync balance
+              </button>
+            </div>
+          ) : (
+            <table className="w-full text-left mt-2">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-zinc-800 text-slate-400 dark:text-zinc-500 font-extrabold text-[10px] uppercase">
-                  <th className="py-2.5 px-3">Date</th>
-                  <th className="py-2.5 px-3">In Time</th>
-                  <th className="py-2.5 px-3">Out Time</th>
-                  <th className="py-2.5 px-3">OT Start Time</th>
-                  <th className="py-2.5 px-3">OT End Time</th>
-                  <th className="py-2.5 px-3 text-right">Total H</th>
+                <tr className="border-b border-line text-[10px] uppercase text-faint">
+                  <th className="py-1.5 pr-2 font-medium">Code</th>
+                  <th className="py-1.5 px-2 font-medium text-right">Used</th>
+                  <th className="py-1.5 pl-2 font-medium text-right">Balance</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
-                {allOtEntries.map((item) => {
-                  const { entry, res } = item;
-                  const { total } = breakdownFor(item);
-                  const hasEarlyOt = res.earlyInMinutes > 0;
-                  const hasLateOt = res.lateOutMinutes > 0;
-
+              <tbody>
+                {leaveRows.map((r) => {
+                  const isShort = r.leaveType.toLowerCase().includes('short');
                   return (
-                    <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors">
-                      <td className="py-2.5 px-3 font-extrabold text-slate-900 dark:text-white">
-                        {entry.date} ({entry.day})
+                    <tr
+                      key={r.leaveType}
+                      style={isShort ? { background: 'var(--danger-bg)' } : undefined}
+                    >
+                      <td className="py-1.5 pr-2 text-xs font-medium text-fg">{r.leaveType}</td>
+                      <td className="py-1.5 px-2 text-right">
+                        <span className="chip chip-neutral tabular-nums">{r.utilized}</span>
                       </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {res.actualClockIn ? formatTo12hDisplay(res.actualClockIn) : '-'}
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono">
-                        {res.actualClockOut ? formatTo12hDisplay(res.actualClockOut) : '-'}
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono leading-relaxed">
-                        {hasEarlyOt && formatTo12hDisplay(res.actualClockIn)}
-                        {hasEarlyOt && hasLateOt && <br />}
-                        {hasLateOt && formatTo12hDisplay(res.scheduledEnd)}
-                        {!hasEarlyOt && !hasLateOt && '-'}
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 font-medium font-mono leading-relaxed">
-                        {hasEarlyOt && formatTo12hDisplay(res.scheduledStart)}
-                        {hasEarlyOt && hasLateOt && <br />}
-                        {hasLateOt && formatTo12hDisplay(res.actualClockOut)}
-                        {!hasEarlyOt && !hasLateOt && '-'}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
-                        {total > 0 ? formatHoursMinutes(total) : '-'}
+                      <td className="py-1.5 pl-2 text-right">
+                        {r.balance === null ? (
+                          <span className="text-xs text-faint">—</span>
+                        ) : (
+                          <span className={`chip tabular-nums ${r.balance <= 0 ? 'chip-danger' : 'chip-success'}`}>
+                            {r.balance}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
-              <tfoot>
-                <tr className="border-t-2 border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800/60">
-                  <td colSpan={5} className="py-3 px-3 font-extrabold text-slate-900 dark:text-white">
-                    Total OT (All Dates)
-                  </td>
-                  <td className="py-3 px-3 text-right font-extrabold text-purple-600 dark:text-purple-400 font-mono">
-                    {formatHoursMinutes(otTotals.total)}
-                  </td>
-                </tr>
-              </tfoot>
             </table>
-          </div>
+          )}
+        </div>
+      </div>
+
+      {/* Row D — recent activity */}
+      <div className="card p-4">
+        <h2 className={CARD_TITLE}>Recent activity</h2>
+        {rosterStats.activity.length === 0 ? (
+          <p className="text-xs text-muted mt-3">No recent changes this cycle.</p>
+        ) : (
+          <ul className="mt-2 divide-y divide-line">
+            {rosterStats.activity.map((e) => {
+              const isChange = Boolean(e.changedStatusId && e.changedStatusId !== e.originalStatusId);
+              const detail = e.notes && e.notes.trim()
+                ? e.notes.trim()
+                : `${e.originalStatusId} → ${e.changedStatusId}`;
+              return (
+                <li key={e.id} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                  <span className="w-24 shrink-0 text-xs text-muted tabular-nums">{formatDateShort(e.date)}</span>
+                  <span className="flex-1 min-w-0 truncate text-sm text-fg">{detail}</span>
+                  {isChange && !e.notes?.trim() && (
+                    <span className="chip chip-accent shrink-0 hidden sm:inline-flex">changed</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
     </div>

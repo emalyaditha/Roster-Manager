@@ -44,104 +44,97 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     }
   };
 
+  const formatCard = (
+    selected: boolean
+  ) => `card p-3 cursor-pointer transition-colors text-center text-xs font-medium flex flex-col items-center gap-1.5 ${
+    selected
+      ? 'border-accent bg-[var(--accent-soft)] text-fg'
+      : 'text-muted hover:border-[var(--color-text-faint)] hover:text-fg'
+  }`;
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transition-all my-8">
-        
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-6 sm:py-10 px-4">
+      <div className="fixed inset-0 bg-black/40 dark:bg-black/60" />
+      <div className="relative card shadow-[var(--shadow-md)] rounded-xl w-full max-w-md overflow-hidden animate-scaleIn">
+
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-              <Download className="w-5 h-5" />
+        <div className="px-5 py-3.5 border-b border-line flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-lg bg-[var(--accent-soft)] text-accent shrink-0">
+              <Download className="w-4 h-4" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-fg truncate">
                 Export Roster
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted truncate">
                 Export current view ({filteredEntries.length} entries)
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="btn-icon shrink-0" aria-label="Close">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-4">
-          
+        <div className="px-5 py-4 space-y-4">
+
           {/* Export Format Selector */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-xs font-medium text-fg mb-2">
               Select Export Format
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setExportFormat('csv')}
-                className={`p-3 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1.5 ${
-                  exportFormat === 'csv'
-                    ? 'border-purple-600 bg-purple-50 dark:bg-purple-950 text-purple-900 dark:text-purple-100 ring-2 ring-purple-500/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
-                }`}
+                className={formatCard(exportFormat === 'csv')}
               >
-                <FileText className="w-5 h-5 text-purple-600" />
+                <FileText className="w-5 h-5 text-accent" />
                 CSV Format
               </button>
 
               <button
                 type="button"
                 onClick={() => setExportFormat('xlsx')}
-                className={`p-3 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1.5 ${
-                  exportFormat === 'xlsx'
-                    ? 'border-purple-600 bg-purple-50 dark:bg-purple-950 text-purple-900 dark:text-purple-100 ring-2 ring-purple-500/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
-                }`}
+                className={formatCard(exportFormat === 'xlsx')}
               >
-                <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
+                <FileSpreadsheet className="w-5 h-5 text-accent" />
                 Excel (XLSX)
               </button>
 
               <button
                 type="button"
                 onClick={() => setExportFormat('print')}
-                className={`p-3 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1.5 ${
-                  exportFormat === 'print'
-                    ? 'border-purple-600 bg-purple-50 dark:bg-purple-950 text-purple-900 dark:text-purple-100 ring-2 ring-purple-500/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300'
-                }`}
+                className={formatCard(exportFormat === 'print')}
               >
-                <Printer className="w-5 h-5 text-indigo-600" />
+                <Printer className="w-5 h-5 text-accent" />
                 Print / PDF
               </button>
             </div>
           </div>
 
           {/* Export Filters */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
-            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+          <div className="pt-2 border-t border-line space-y-3">
+            <label className="flex items-center gap-2 text-xs font-medium text-fg cursor-pointer">
               <input
                 type="checkbox"
                 checked={changedOnlyFilter}
                 onChange={(e) => setChangedOnlyFilter(e.target.checked)}
-                className="rounded border-slate-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500"
+                className="rounded border-line accent-[var(--color-primary)]"
               />
               Export only modified rosters (Original != Current)
             </label>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-fg mb-1">
                 Filter by Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                className="input-min"
               >
                 <option value="ALL">All Roster Statuses</option>
                 {statuses.map((s) => (
@@ -155,23 +148,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-          >
+        <div className="px-5 py-3.5 border-t border-line flex items-center justify-end gap-2">
+          <button onClick={onClose} className="btn-min btn-secondary">
             Cancel
           </button>
-          <button
-            onClick={handleExport}
-            className="px-5 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-sm flex items-center gap-1.5"
-          >
+          <button onClick={handleExport} className="btn-min btn-primary">
             <Download className="w-3.5 h-3.5" />
             Download Export
           </button>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };

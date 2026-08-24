@@ -3,7 +3,7 @@ import { RosterEntry, RosterChangeHistory, RosterStatusConfig } from '../types/r
 import { StatusBadge } from './StatusBadge';
 import { formatDateDisplay, formatTimestamp } from '../utils/date';
 import { api } from '../services/api';
-import { X, History, ArrowDown, CheckCircle2, User, Clock, Calendar, RefreshCw } from 'lucide-react';
+import { History, ArrowDown, CheckCircle2, User, Clock, Calendar, RefreshCw } from 'lucide-react';
 
 interface AuditHistoryModalProps {
   isOpen: boolean;
@@ -36,70 +36,73 @@ export const AuditHistoryModal: React.FC<AuditHistoryModalProps> = ({
 
   if (!isOpen || !entry) return null;
 
+  const statusColor = (code: string | null) =>
+    statuses.find((s) => s.code === code)?.color;
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full md:max-h-[85vh] max-h-[90vh] flex flex-col overflow-hidden transition-all my-8">
-        
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-6 sm:py-10 px-4">
+      <div className="fixed inset-0 bg-black/40 dark:bg-black/60" />
+      <div className="relative card shadow-[var(--shadow-md)] rounded-xl w-full max-w-lg md:max-h-[85vh] max-h-[90vh] flex flex-col overflow-hidden">
+
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <div className="px-5 py-3.5 border-b border-line flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">
-              <History className="w-5 h-5" />
+            <div className="p-2 rounded-lg bg-accent text-on-accent">
+              <History className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm font-semibold text-fg">
                 Roster Audit History
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-muted">
                 {formatDateDisplay(entry.date)} ({entry.day})
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="btn-icon" aria-label="Close">
+            ✕
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="px-5 py-4 overflow-y-auto space-y-4 flex-1">
           {/* Current Roster Flow Summary Card */}
-          <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+          <div className="bg-well rounded-lg p-4 border border-line">
+            <h4 className="text-[11px] font-semibold uppercase tracking-wide text-faint mb-3">
               Roster Progression Overview
             </h4>
 
             <div className="flex flex-col items-center justify-center gap-2 text-center">
               {/* Office Roster */}
-              <div className="w-full bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <div className="w-full bg-surface p-2.5 rounded-md border border-line flex items-center justify-between">
+                <span className="text-xs font-medium text-muted">
                   Office Roster:
                 </span>
                 <StatusBadge statusId={entry.originalStatusId} statuses={statuses} size="md" />
               </div>
 
-              <ArrowDown className="w-4 h-4 text-slate-400" />
+              <ArrowDown className="w-4 h-4 text-faint" />
 
               {/* Changed To */}
-              <div className="w-full bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <div className="w-full bg-surface p-2.5 rounded-md border border-line flex items-center justify-between">
+                <span className="text-xs font-medium text-muted">
                   Changed To:
                 </span>
                 {entry.changedStatusId ? (
                   <StatusBadge statusId={entry.changedStatusId} statuses={statuses} size="md" />
                 ) : (
-                  <span className="text-xs text-slate-400 italic">No change (Matches Original)</span>
+                  <span className="text-xs text-faint italic">No change (Matches Original)</span>
                 )}
               </div>
 
-              <ArrowDown className="w-4 h-4 text-purple-500" />
+              <ArrowDown className="w-4 h-4 text-accent" />
 
               {/* Current Active */}
-              <div className="w-full bg-purple-50 dark:bg-purple-950/60 p-2.5 rounded-lg border border-purple-200 dark:border-purple-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-purple-900 dark:text-purple-200">
+              <div
+                className="w-full p-2.5 rounded-md border flex items-center justify-between"
+                style={{ background: 'var(--accent-soft)', borderColor: 'var(--color-border)' }}
+              >
+                <span className="text-xs font-semibold text-fg">
                   Current Active Roster:
                 </span>
                 <StatusBadge statusId={entry.currentStatusId} statuses={statuses} size="lg" />
@@ -109,57 +112,65 @@ export const AuditHistoryModal: React.FC<AuditHistoryModalProps> = ({
 
           {/* Audit History Timeline */}
           <div>
-            <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-3 flex items-center justify-between">
+            <h4 className="text-xs font-semibold text-fg mb-3 flex items-center justify-between">
               <span>Audit Records Log ({historyList.length})</span>
-              <span className="text-[10px] text-slate-400 font-normal">Chronological order</span>
+              <span className="text-[10px] text-faint font-normal">Chronological order</span>
             </h4>
 
             {loading ? (
-              <div className="py-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+              <div className="py-8 text-center text-xs text-muted flex items-center justify-center gap-2">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Loading history records...
               </div>
             ) : historyList.length === 0 ? (
-              <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500">
+              <div className="p-4 rounded-lg border border-dashed border-line text-center text-xs text-muted">
                 No changes have been made yet. This roster entry remains in its original office state.
               </div>
             ) : (
-              <div className="space-y-3 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+              <div className="border-l border-line pl-4 space-y-3">
                 {historyList.map((record) => (
-                  <div key={record.id} className="relative pl-8 text-xs">
-                    <span className="absolute left-2 top-1.5 w-3 h-3 rounded-full bg-purple-600 ring-4 ring-white dark:ring-slate-900" />
-                    
-                    <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 shadow-2xs space-y-2">
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pb-1.5 border-b border-slate-100 dark:border-slate-700">
-                        <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
-                          <User className="w-3 h-3 text-purple-500" />
-                          {record.user || 'User'}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {formatTimestamp(record.timestamp)}
-                        </span>
-                      </div>
+                  <div key={record.id} className="card p-3 space-y-2 text-xs">
+                    <div className="flex items-center justify-between text-[11px] pb-1.5 border-b border-line">
+                      <span className="flex items-center gap-1 font-medium text-fg">
+                        <User className="w-3 h-3 text-faint" />
+                        {record.user || 'User'}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-muted tabular-nums">
+                        <Clock className="w-3 h-3" />
+                        {formatTimestamp(record.timestamp)}
+                      </span>
+                    </div>
 
-                      {/* Status Transition */}
-                      <div className="flex flex-wrap items-center gap-2 py-1">
-                        <span className="text-slate-500">Changed:</span>
-                        <StatusBadge statusId={record.previousStatusId} statuses={statuses} size="sm" />
-                        <span className="text-slate-400">→</span>
-                        <StatusBadge statusId={record.newStatusId} statuses={statuses} size="sm" />
-                      </div>
+                    {/* Status Transition */}
+                    <div className="flex flex-wrap items-center gap-2 py-1">
+                      <span className="text-muted">Changed:</span>
+                      <span className="chip chip-neutral">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: statusColor(record.previousStatusId) || 'var(--color-text-faint)' }}
+                        />
+                        {record.previousStatusId}
+                      </span>
+                      <span className="text-faint">→</span>
+                      <span className="chip chip-success">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: statusColor(record.newStatusId) || 'currentColor' }}
+                        />
+                        {record.newStatusId}
+                      </span>
+                    </div>
 
-                      {/* Reason */}
-                      <div className="bg-slate-50 dark:bg-slate-900/60 p-2 rounded-lg text-[11px] text-slate-700 dark:text-slate-300">
-                        <span className="font-semibold text-slate-500 block text-[10px] uppercase">Reason:</span>
-                        {record.reason}
-                      </div>
+                    {/* Reason */}
+                    <div className="bg-well p-2 rounded-md text-[11px] text-muted">
+                      <span className="font-semibold text-fg block text-[10px] uppercase">Reason:</span>
+                      {record.reason}
+                    </div>
 
-                      {/* Google Calendar sync result */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        Google Calendar: {record.googleCalendarSyncResult || 'Updated'}
-                      </div>
+                    {/* Google Calendar sync result */}
+                    <div className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: 'var(--success)' }}>
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Google Calendar: {record.googleCalendarSyncResult || 'Updated'}
                     </div>
                   </div>
                 ))}
@@ -169,16 +180,12 @@ export const AuditHistoryModal: React.FC<AuditHistoryModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-right">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 transition-colors"
-          >
+        <div className="px-5 py-3.5 border-t border-line flex items-center justify-end gap-2">
+          <button onClick={onClose} className="btn-secondary">
             Close History
           </button>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };

@@ -17,15 +17,9 @@ interface ToastProps {
 
 export const Toast: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
   const icons = {
-    success: <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />,
-    warn: <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />,
-    error: <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />,
-  };
-
-  const borderColors = {
-    success: 'border-l-emerald-500',
-    warn: 'border-l-amber-500',
-    error: 'border-l-red-500',
+    success: <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--success)' }} />,
+    warn: <AlertTriangle className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--warning)' }} />,
+    error: <XCircle className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--danger)' }} />,
   };
 
   return createPortal(
@@ -35,17 +29,21 @@ export const Toast: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
           <motion.button
             key={t.id}
             layout
-            initial={{ opacity: 0, y: -12, scale: 0.95, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: 80, scale: 0.95, filter: 'blur(4px)' }}
+            initial={{ opacity: 0, y: -12, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 80, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             onClick={() => onDismiss(t.id)}
-            className={`pointer-events-auto flex items-start gap-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 border-l-4 ${borderColors[t.type]} rounded-2xl shadow-xl shadow-black/5 dark:shadow-black/30 p-3.5 max-w-[360px] cursor-pointer text-left hover:shadow-2xl transition-shadow`}
+            className={`toast-card pointer-events-auto text-left ${
+              t.type === 'success' ? 'toast-success' :
+              t.type === 'warn' ? 'toast-warn' :
+              'toast-error'
+            }`}
           >
             {icons[t.type]}
             <div className="min-w-0">
-              <div className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">{t.message}</div>
-              {t.sub && <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 leading-snug">{t.sub}</div>}
+              <div className="toast-message leading-tight">{t.message}</div>
+              {t.sub && <div className="toast-sub leading-snug">{t.sub}</div>}
             </div>
           </motion.button>
         ))}

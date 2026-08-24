@@ -9,13 +9,63 @@ import {
   ImportOptions,
   LeaveBalanceResponse,
 } from '../types/roster';
+import {
+  Task,
+  TaskInput,
+  TaskGroup,
+  TaskGroupInput,
+  TaskTemplate,
+  InstantiateResult,
+} from '../types/tasks';
+import { auth } from './googleAuth';
+
+const API_TIMEOUT_MS = 15_000;
+
+/** ApiError carries the HTTP status so callers can react to 401/403/409 etc. */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
 
 async function authorizedFetch(url: string, init: RequestInit = {}): Promise<Response> {
-  const headers = { ...(init.headers || {}) } as Record<string, string>;
-  return fetch(url, { ...init, headers });
+  const headers = { 'Content-Type': 'application/json', ...(init.headers || {}) } as Record<string, string>;
+  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  const res = await fetch(url, {
+    ...init,
+    headers,
+    signal: init.signal ?? AbortSignal.timeout(API_TIMEOUT_MS),
+  });
+  if (!res.ok) {
+    // Throw ApiError with the HTTP status at the single choke point so every
+    // caller (and App.tsx's 401/403 handling) can react to auth failures.
+    const body = await res.json().catch(() => ({} as any));
+    throw new ApiError(body?.error || `Request failed (${res.status})`, res.status);
+  }
+  return res;
+}
+
+/** Fetch + parse JSON, throwing ApiError with the HTTP status on failure. */
+async function requestJson<T>(url: string, init: RequestInit = {}): Promise<T> {
+  const res = await authorizedFetch(url, init);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({} as any));
+    throw new ApiError(body?.error || `Request failed (${res.status})`, res.status);
+  }
+  return res.json() as Promise<T>;
 }
 
 export const api = {
+  // Identity of the currently authenticated user (403 when not allow-listed)
+  async getMe(): Promise<{ email: string | null; uid: string | null }> {
+    return requestJson('/api/auth/me');
+  },
+
   // Fetch Roster entries with filters
   async getRosters(params?: {
     monthYear?: string;
@@ -225,12 +275,6 @@ export const api = {
   },
 
   // Google Calendar Integration
-  async getCalendars(): Promise<GoogleCalendarInfo[]> {
-    const res = await authorizedFetch('/api/calendar/calendars');
-    if (!res.ok) throw new Error('Failed to fetch Google Calendars');
-    return res.json();
-  },
-
   async syncSingleCalendar(id: string, googleCalendarEventId?: string, syncStatus?: string): Promise<RosterEntry> {
     const res = await authorizedFetch(`/api/calendar/sync/${id}`, {
       method: 'POST',
@@ -296,22 +340,6 @@ export const api = {
       body: JSON.stringify({ rows, options }),
     });
     if (!res.ok) throw new Error('Import failed');
-    return res.json();
-  },
-
-  // Generate Template
-  async generateTemplate(data: {
-    startDate: string;
-    endDate: string;
-    template: Record<string, string>;
-    overwrite: boolean;
-  }): Promise<{ count: number; entries: RosterEntry[] }> {
-    const res = await authorizedFetch('/api/templates/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error('Failed to generate template rosters');
     return res.json();
   },
 
@@ -383,6 +411,117 @@ export const api = {
       body: JSON.stringify({ startDate, endDate, events }),
     });
     if (!res.ok) throw new Error('Failed to sync clock events');
+    return res.json();
+  },
+
+  // Tasks API (Notion-style task management)
+  async getTasks(): Promise<Task[]> {
+    const res = await authorizedFetch('/api/tasks');
+    if (!res.ok) throw new Error('Failed to fetch tasks');
+    return res.json();
+  },
+
+  async createTask(input: TaskInput): Promise<Task> {
+    const res = await authorizedFetch('/api/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to create task');
+    }
+    return res.json();
+  },
+
+  async updateTask(id: string, input: TaskInput): Promise<Task> {
+    const res = await authorizedFetch(`/api/tasks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      let msg: string = body.error || 'Failed to update task';
+      // 409 blocker payloads arrive JSON-stringified: {message, blockers:[{id,title}]}
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed && typeof parsed === 'object' && parsed.message) {
+          msg = `${parsed.message}: ${(parsed.blockers || []).map((b: { title: string }) => b.title).join(', ')}`;
+        }
+      } catch {
+        /* plain message */
+      }
+      throw new Error(msg);
+    }
+    return res.json();
+  },
+
+  async deleteTask(id: string): Promise<void> {
+    const res = await authorizedFetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete task');
+  },
+
+  // --- TMS: task groups (runtime containers) ---
+  async getTaskGroups(): Promise<TaskGroup[]> {
+    const res = await authorizedFetch('/api/task-groups');
+    if (!res.ok) throw new Error('Failed to fetch task groups');
+    return res.json();
+  },
+
+  async createTaskGroup(input: TaskGroupInput): Promise<TaskGroup> {
+    const res = await authorizedFetch('/api/task-groups', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to create task group');
+    }
+    return res.json();
+  },
+
+  async updateTaskGroup(id: string, input: TaskGroupInput): Promise<TaskGroup> {
+    const res = await authorizedFetch(`/api/task-groups/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to update task group');
+    }
+    return res.json();
+  },
+
+  async deleteTaskGroup(id: string): Promise<void> {
+    const res = await authorizedFetch(`/api/task-groups/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete task group');
+  },
+
+  // --- TMS: task templates (definition stage) ---
+  async getTaskTemplates(): Promise<TaskTemplate[]> {
+    const res = await authorizedFetch('/api/task-templates');
+    if (!res.ok) throw new Error('Failed to fetch task templates');
+    return res.json();
+  },
+
+  async createTaskFromTemplate(body: {
+    templateId: string;
+    variableValues?: Record<string, string>;
+    dueDate?: string | null;
+    user?: string;
+  }): Promise<InstantiateResult> {
+    const res = await authorizedFetch('/api/tasks/from-template', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const payload = await res.json().catch(() => ({}));
+      throw new Error(payload.error || 'Failed to instantiate template');
+    }
     return res.json();
   },
 };

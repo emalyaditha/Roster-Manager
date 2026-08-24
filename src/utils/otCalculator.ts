@@ -124,9 +124,9 @@ export function getScheduledShiftWindow(
     const match = status.match(/DOS\(([0-9\.\:]+)\)/i);
     if (match) {
       const startTime = match[1].replace('.', ':');
-      return { start: startTime.includes(':') ? startTime : `${startTime}:00`, end: '19:30' };
+      return { start: startTime.includes(':') ? startTime : `${startTime}:00`, end: '19:00' };
     }
-    return { start: '10:15', end: '19:30' };
+    return { start: '08:15', end: '17:30' };
   }
 
   if (actionText) {
@@ -280,6 +280,27 @@ export function calculateDayOt(
     }
   }
 
+  // Partial leaves keep the base work status (NWD/RTD); they are recorded via the
+  // action text. Short Leave allows arriving up to 1 hour after the official start.
+  const actionTrimmed = (entry.action || '').trim();
+  const isShortLeaveDay = /^short leave/i.test(actionTrimmed);
+  const isHalfDayWorked = /^half day/i.test(actionTrimmed);
+
+  if (isShortLeaveDay && schedStartMins !== null) {
+    const cutoffMins = schedStartMins + 60;
+    if (clockInMins === null) {
+      flags.push('Short Leave day without a clock-in record. Requires review.');
+    } else if (clockInMins > cutoffMins) {
+      flags.push(`Arrived ${formatMinutesToTime(clockInMins)} — beyond the 1-hour short-leave window (cutoff ${formatMinutesToTime(cutoffMins)}). Supervisor review required.`);
+    } else {
+      flags.push(`Short Leave: arrived within the 1-hour grace window (by ${formatMinutesToTime(cutoffMins)}). No late penalty.`);
+    }
+  }
+
+  if (isHalfDayWorked) {
+    flags.push('Half Day worked: partial attendance on a working day.');
+  }
+
   const billableOtHours = parseFloat((billableOtMinutes / 60).toFixed(2));
 
   return {
@@ -305,7 +326,14 @@ export function calculateDayOt(
 }
 
 /**
- * Match DOS and DOF days to build Day-Off Settlement Ledger
+ * Match DOS and DOF days to build Day-Off Settlement Ledger.
+ *
+ * Matching strategy (FIFO chronological):
+ * 1. Sort DOS entries and DOF entries by date (ascending).
+ * 2. Pair them in order — earliest DOS with earliest DOF, and so on.
+ * 3. A pair is only SETTLED if the DOF date is today or in the past.
+ *    Future DOF dates keep the DOS as PENDING until the DOF day arrives.
+ * 4. Unmatched DOS entries are PENDING, unmatched DOF entries are ORPHANED_DOF.
  */
 export function buildDosDofLedger(entries: RosterEntry[]): {
   matches: DosDofMatch[];
@@ -316,84 +344,82 @@ export function buildDosDofLedger(entries: RosterEntry[]): {
   unsettledDoses: RosterEntry[];
 } {
   const matches: DosDofMatch[] = [];
-  const dosEntries = entries.filter((e) => (e.currentStatusId || '').toUpperCase().startsWith('DOS'));
-  const dofEntries = entries.filter((e) => (e.currentStatusId || '').toUpperCase().startsWith('DOF'));
-  const settlementDofEntries = dofEntries.filter((e) => /DOF\(([^)]+)\)/i.test(e.currentStatusId || ''));
+  const dosEntries = entries
+    .filter((e) => (e.currentStatusId || '').toUpperCase().startsWith('DOS'))
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const dofEntries = entries
+    .filter((e) => (e.currentStatusId || '').toUpperCase().startsWith('DOF'))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
-  const dosMap = new Map<string, RosterEntry>();
-  const dosClaimedSet = new Set<string>();
+  const matchedDosDates = new Set<string>();
+  const matchedDofIndices = new Set<number>();
 
-  dosEntries.forEach((e) => {
-    dosMap.set(e.date, e);
-  });
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  const orphanedDofs: RosterEntry[] = [];
-
-  dofEntries.forEach((dofEntry) => {
-    const dofCode = dofEntry.currentStatusId;
-    const match = dofCode.match(/DOF\(([^)]+)\)/i);
-    if (match) {
-      const refStr = match[1].trim();
-      let matchedDosDate: string | null = null;
-
-      dosEntries.forEach((dosEntry) => {
-        if (dosEntry.date.endsWith(refStr) || dosEntry.date.includes(refStr.replace('/', '-'))) {
-          matchedDosDate = dosEntry.date;
-        }
-      });
-
-      if (matchedDosDate && dosMap.has(matchedDosDate)) {
-        dosClaimedSet.add(matchedDosDate);
-        const dosEntry = dosMap.get(matchedDosDate)!;
-        matches.push({
-          dosDate: dosEntry.date,
-          dosCode: dosEntry.currentStatusId,
-          dofDate: dofEntry.date,
-          dofCode: dofEntry.currentStatusId,
-          status: 'SETTLED',
-          notes: `DOF taken on ${dofEntry.date} settles DOS worked on ${dosEntry.date}`,
-        });
-      } else {
-        orphanedDofs.push(dofEntry);
-        matches.push({
-          dosDate: refStr,
-          dosCode: 'MISSING_DOS',
-          dofDate: dofEntry.date,
-          dofCode: dofEntry.currentStatusId,
-          status: 'ORPHANED_DOF',
-          notes: `⚠️ Orphaned DOF! No DOS record found for referenced date (${refStr}).`,
-        });
-      }
-    } else {
+  // FIFO chronological matching: pair earliest DOS with earliest DOF
+  let dofIdx = 0;
+  for (const dosEntry of dosEntries) {
+    while (dofIdx < dofEntries.length && matchedDofIndices.has(dofIdx)) {
+      dofIdx++;
+    }
+    if (dofIdx < dofEntries.length) {
+      const dofEntry = dofEntries[dofIdx];
+      matchedDosDates.add(dosEntry.date);
+      matchedDofIndices.add(dofIdx);
+      const dofPassed = dofEntry.date <= todayStr;
       matches.push({
-        dosDate: 'N/A',
-        dosCode: 'GENERAL_DOF',
+        dosDate: dosEntry.date,
+        dosCode: dosEntry.currentStatusId,
         dofDate: dofEntry.date,
         dofCode: dofEntry.currentStatusId,
-        status: 'SETTLED',
-        notes: 'Standard Day Off',
+        status: dofPassed ? 'SETTLED' : 'PENDING',
+        notes: dofPassed
+          ? `DOF taken on ${dofEntry.date} settles DOS worked on ${dosEntry.date}`
+          : `⏳ DOF scheduled on ${dofEntry.date} (future). Pending until day arrives.`,
       });
+      dofIdx++;
     }
-  });
+  }
 
+  // Unmatched DOS entries → PENDING
   const unsettledDoses: RosterEntry[] = [];
-  dosEntries.forEach((dosEntry) => {
-    if (!dosClaimedSet.has(dosEntry.date)) {
+  for (const dosEntry of dosEntries) {
+    if (!matchedDosDates.has(dosEntry.date)) {
       unsettledDoses.push(dosEntry);
       matches.push({
         dosDate: dosEntry.date,
         dosCode: dosEntry.currentStatusId,
         status: 'PENDING',
-        notes: '⏳ Pending settlement. Day off owed to employee.',
+        notes: '⏳ Pending settlement. No DOF scheduled yet.',
       });
     }
-  });
+  }
+
+  // Unmatched DOF entries → ORPHANED_DOF
+  const orphanedDofs: RosterEntry[] = [];
+  for (let i = 0; i < dofEntries.length; i++) {
+    if (!matchedDofIndices.has(i)) {
+      const dofEntry = dofEntries[i];
+      orphanedDofs.push(dofEntry);
+      matches.push({
+        dosDate: 'N/A',
+        dosCode: 'ORPHANED_DOF',
+        dofDate: dofEntry.date,
+        dofCode: dofEntry.currentStatusId,
+        status: 'ORPHANED_DOF',
+        notes: `⚠️ Orphaned DOF on ${dofEntry.date}! No matching DOS entry available.`,
+      });
+    }
+  }
+
+  const unsettledCount = matches.filter((m) => m.status === 'PENDING').length;
 
   return {
     matches,
     dosCount: dosEntries.length,
-    dofCount: settlementDofEntries.length,
-    owedBalance: dosEntries.length - settlementDofEntries.length,
+    dofCount: dofEntries.length,
+    owedBalance: unsettledCount,
     orphanedDofs,
     unsettledDoses,
   };
@@ -461,6 +487,54 @@ export function runComplianceAudit(
       status: 'PASS',
       details: '100% matched date reference lineage.',
     });
+  }
+
+  const dosOnWeekday = entries.filter((e) => {
+    const status = (e.currentStatusId || '').toUpperCase();
+    if (!status.startsWith('DOS')) return false;
+    const day = new Date(e.date).getDay();
+    return day !== 0 && day !== 6; // 0=Sun, 6=Sat
+  });
+  if (dosOnWeekday.length > 0) {
+    items.push({
+      title: 'DOS on Non-Weekend Day',
+      description: `Found ${dosOnWeekday.length} DOS entry(s) on a weekday. DOS is only valid on Saturdays and Sundays.`,
+      status: 'WARNING',
+      details: `Dates: ${dosOnWeekday.map((e) => `${e.date} (${e.day})`).join(', ')}`,
+    });
+  } else if (ledger.dosCount > 0) {
+    items.push({
+      title: 'DOS Weekend Compliance',
+      description: `All ${ledger.dosCount} DOS entry(s) fall on Saturdays or Sundays.`,
+      status: 'PASS',
+      details: 'DOS scheduling complies with weekend-only policy.',
+    });
+  }
+
+  const shortLeaveDays = entries.filter((e) => /^short leave/i.test((e.action || '').trim()));
+  if (shortLeaveDays.length > 0) {
+    const overruns = shortLeaveDays.filter((e) => {
+      const status = (e.currentStatusId || e.originalStatusId || '').toUpperCase();
+      const win = getScheduledShiftWindow(status, e.action);
+      const startMins = parseTimeToMinutes(win?.start);
+      const inMins = parseTimeToMinutes(e.clockIn || '');
+      return startMins !== null && inMins !== null && inMins > startMins + 60;
+    });
+    if (overruns.length > 0) {
+      items.push({
+        title: 'Short Leave Grace Exceeded',
+        description: `${overruns.length} Short Leave day(s) with arrival later than official start + 1 hour.`,
+        status: 'WARNING',
+        details: `Dates: ${overruns.map((e) => `${e.date} (in ${e.clockIn || '?'})`).join(', ')}`,
+      });
+    } else {
+      items.push({
+        title: 'Short Leave Compliance',
+        description: `All ${shortLeaveDays.length} Short Leave day(s) had arrivals within the 1-hour grace window.`,
+        status: 'PASS',
+        details: 'Short leave policy respected.',
+      });
+    }
   }
 
   items.push({

@@ -1,0 +1,21 @@
+[
+  {
+    "id": "9786d9f6-7acf-4a8a-b36b-65c131a178ae",
+    "title": "Laksala BRD",
+    "notes": "4.2.1 Inter-outlet and head office request note creation\nRemove Employee and add Request Reson\n \n4.2.4 Selection of TOG reasons for Transfer of Goods Notes (TOG)\nRemove this and change it to TOG Return Reason\n \n4.2.5 Adding a new option to accept Transfer of Goods Note (TOG)\n* Only the added Reasons can be selected to the Return Reson text Box\n* Change the Qty text to Tog Qty and add a new Column as Requsted Qty after selling Price\n \n4.2.6 Giving a new report as ‘TOG Acceptance Summary Report’\n* Add a new Column to Accepted Pending Days after the column Assepted User\n \n4.2.7 Giving a new report as ‘TOG Transits List report’\n* Add a Column Created User After \"TO Location\" and Request Qty after \"Model\"",
+    "status": "in_progress",
+    "priority": "urgent",
+    "dueDate": "2026-08-25",
+    "tags": [
+      "Office"
+    ],
+    "user": "Emal Yaditha",
+    "createdAt": "2026-08-23T21:01:58.106Z",
+    "updatedAt": "2026-08-24T15:41:07.682Z",
+    "completedAt": null,
+    "groupId": null,
+    "sequence": null,
+    "dependsOn": [],
+    "category": "work"
+  }
+]

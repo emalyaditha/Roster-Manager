@@ -47,18 +47,18 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
   const leadingBlanks = Array.from({ length: leadingBlankCount });
 
   return (
-    <div className="bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800/80 rounded-3xl shadow-sm overflow-hidden transition-all mb-24">
+    <div className="card overflow-hidden transition-all mb-24">
       {/* Calendar Bar */}
-      <div className="p-4 border-b border-slate-200 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80 dark:bg-zinc-950/60">
+      <div className="p-4 border-b border-line flex flex-wrap items-center justify-between gap-3 bg-well/50">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+          <div className="p-2 rounded-lg bg-[var(--accent-soft)] text-accent">
             <CalendarIcon className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm leading-tight">
+            <h3 className="font-semibold text-fg text-sm leading-tight">
               Duty Roster Calendar
             </h3>
-            <p className="text-[11px] text-slate-500 dark:text-zinc-400">
+            <p className="text-[11px] text-muted">
               Click any date tile to view or update shift details
             </p>
           </div>
@@ -66,22 +66,22 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
 
         <button
           onClick={() => setShowLegend(!showLegend)}
-          className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0"
+          className="btn-min btn-secondary shrink-0"
         >
-          <Info className="w-3.5 h-3.5 text-purple-500" />
+          <Info className="w-3.5 h-3.5 text-accent" />
           <span>{showLegend ? 'Hide Legend' : 'Status Legend'}</span>
         </button>
       </div>
 
       {/* Expandable Legend Section */}
       {showLegend && (
-        <div className="px-4 py-3 bg-slate-100/60 dark:bg-zinc-950/80 border-b border-slate-200 dark:border-zinc-800/80 animate-fadeIn">
+        <div className="px-4 py-3 bg-well/50 border-b border-line animate-fadeIn">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
             {statuses.map((s) => (
-              <div key={s.code} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+              <div key={s.code} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface border border-line">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                <span className="font-extrabold text-slate-900 dark:text-white">{s.code}</span>
-                <span className="text-[11px] text-slate-500 dark:text-zinc-400 hidden sm:inline">({s.displayName})</span>
+                <span className="font-semibold text-fg">{s.code}</span>
+                <span className="text-[11px] text-muted hidden sm:inline">({s.displayName})</span>
               </div>
             ))}
           </div>
@@ -91,7 +91,7 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
       {/* Calendar Grid Container */}
       <div className="p-1.5 sm:p-4">
         {/* Day Name Headers */}
-        <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-center font-extrabold text-slate-400 dark:text-zinc-500 text-[9px] sm:text-[11px] uppercase tracking-wider mb-1.5 sm:mb-2 px-0.5">
+        <div className="grid grid-cols-7 gap-1 text-center font-medium text-muted text-[9px] sm:text-[11px] uppercase tracking-wide mb-1.5 sm:mb-2">
           <div>Sun</div>
           <div>Mon</div>
           <div>Tue</div>
@@ -102,11 +102,11 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
         </div>
 
         {/* Days Grid */}
-        <div className="grid grid-cols-7 gap-0.5 sm:gap-2 auto-rows-fr">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2 auto-rows-fr">
           {leadingBlanks.map((_, idx) => (
             <div
               key={`blank-${idx}`}
-              className="min-h-[64px] sm:min-h-[88px] rounded-xl sm:rounded-2xl bg-slate-50/40 dark:bg-zinc-950/20 border border-slate-100/60 dark:border-zinc-800/30 p-1 opacity-25"
+              className="min-h-[64px] sm:min-h-[84px] rounded-lg bg-well/40 border border-line p-1 opacity-40"
             />
           ))}
 
@@ -121,21 +121,17 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
               <div
                 key={dateStr}
                 onClick={() => entry && onEntryClick(entry)}
-                className={`group min-h-[68px] sm:min-h-[92px] rounded-xl sm:rounded-3xl border p-1 sm:p-2.5 flex flex-col justify-between transition-all cursor-pointer relative overflow-hidden ${
-                  isToday
-                    ? 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-500/5 dark:bg-purple-950/20 shadow-sm'
-                    : isChanged
-                    ? 'border-amber-400/50 dark:border-amber-700/60 bg-amber-500/5 dark:bg-amber-950/15 hover:border-amber-400'
-                    : 'border-slate-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 hover:border-purple-500/50 dark:hover:border-purple-500/50 hover:shadow-md'
+                className={`group min-h-[64px] sm:min-h-[84px] rounded-lg border border-line bg-surface p-1.5 flex flex-col justify-between transition-colors cursor-pointer relative overflow-hidden hover:border-[var(--color-text-faint)] ${
+                  isToday ? 'ring-1 ring-accent bg-[var(--accent-soft)]' : ''
                 }`}
               >
                 {/* Date Header Row */}
                 <div className="flex items-center justify-between">
                   <span
-                    className={`font-black w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs transition-transform group-hover:scale-110 ${
+                    className={`font-semibold w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs ${
                       isToday
-                        ? 'bg-purple-600 text-white shadow-xs'
-                        : 'text-slate-800 dark:text-zinc-200'
+                        ? 'bg-accent text-on-accent'
+                        : 'text-fg'
                     }`}
                   >
                     {dayNum}
@@ -143,10 +139,13 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
 
                   <div className="flex items-center gap-0.5 sm:gap-1">
                     {entry?.ot && (
-                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500" title="Overtime" />
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full" style={{ background: 'var(--warning)' }} title="Overtime" />
                     )}
                     {isChanged && (
-                      <span className="text-[7px] sm:text-[8px] font-extrabold px-1 sm:px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                      <span
+                        className="text-[7px] sm:text-[8px] font-bold px-1 sm:px-1.5 py-0.5 rounded-full"
+                        style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}
+                      >
                         MOD
                       </span>
                     )}
@@ -157,35 +156,35 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
                 {entry ? (
                   <div className="my-0.5 sm:my-1">
                     <div
-                      className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-extrabold flex items-center justify-center sm:justify-between gap-1 shadow-2xs truncate"
+                      className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-xs font-semibold flex items-center justify-center sm:justify-between gap-1 truncate"
                       style={{
-                        backgroundColor: statusConfig ? `${statusConfig.color}20` : 'rgba(148, 163, 184, 0.2)',
-                        color: statusConfig?.color || '#a1a1aa',
-                        border: `1px solid ${statusConfig ? `${statusConfig.color}40` : 'rgba(148, 163, 184, 0.3)'}`,
+                        backgroundColor: statusConfig ? `${statusConfig.color}20` : 'var(--color-surface-alt)',
+                        color: statusConfig?.color || 'var(--color-text-faint)',
+                        border: `1px solid ${statusConfig ? `${statusConfig.color}40` : 'var(--color-border)'}`,
                       }}
                     >
                       <div className="flex items-center gap-0.5 sm:gap-1 truncate">
-                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: statusConfig?.color || '#a1a1aa' }} />
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: statusConfig?.color || 'var(--color-text-faint)' }} />
                         <span className="truncate">{entry.currentStatusId}</span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <span className="text-[9px] sm:text-[10px] text-slate-300 dark:text-zinc-700 font-medium text-center">Off</span>
+                  <span className="text-[9px] sm:text-[10px] text-faint font-medium text-center">Off</span>
                 )}
 
                 {/* Clock Times - Mobile */}
                 {entry && (entry.clockIn || entry.clockOut) && (
-                  <div className="sm:hidden flex items-center justify-center gap-0.5 text-[7px] font-mono font-semibold text-slate-500 dark:text-zinc-400 mt-0.5">
+                  <div className="sm:hidden flex items-center justify-center gap-0.5 text-[8px] font-mono text-muted mt-0.5">
                     {entry.clockIn && <span>{formatTimeShort(entry.clockIn)}</span>}
-                    {entry.clockIn && entry.clockOut && <ArrowRight className="w-2 h-2 shrink-0 text-slate-300 dark:text-zinc-600" />}
+                    {entry.clockIn && entry.clockOut && <ArrowRight className="w-2 h-2 shrink-0 text-faint" />}
                     {entry.clockOut && <span>{formatTimeShort(entry.clockOut)}</span>}
                   </div>
                 )}
 
                 {/* Action Text - Desktop */}
                 {entry?.action && (
-                  <div className="hidden sm:flex items-center gap-1 text-[9px] text-slate-400 dark:text-zinc-500 font-medium truncate">
+                  <div className="hidden sm:flex items-center gap-1 text-[10px] text-muted truncate">
                     <Clock className="w-2.5 h-2.5 shrink-0" />
                     <span className="truncate">{entry.action}</span>
                   </div>
@@ -193,8 +192,11 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
 
                 {/* OT Badge */}
                 {entry?.ot && ((entry.otMorningHours || 0) + (entry.otNightHours || 0)) > 0 && (
-                  <div className="flex items-center justify-center sm:justify-start gap-0.5 sm:gap-1 text-[7px] sm:text-[8px] font-semibold text-orange-600 dark:text-orange-400 mt-0.5 whitespace-nowrap overflow-hidden">
-                    <span className="bg-orange-100 dark:bg-orange-950 px-1 py-0.2 rounded shrink-0">
+                  <div className="flex items-center justify-center sm:justify-start gap-1 mt-0.5 whitespace-nowrap overflow-hidden">
+                    <span
+                      className="px-1 py-0.5 rounded shrink-0 text-[8px] font-semibold"
+                      style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}
+                    >
                       OT {((entry.otMorningHours || 0) + (entry.otNightHours || 0)).toFixed(1)}h
                     </span>
                   </div>
@@ -207,4 +209,3 @@ export const RosterCalendarView = React.memo<RosterCalendarViewProps>(({
     </div>
   );
 });
-

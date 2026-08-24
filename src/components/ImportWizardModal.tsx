@@ -512,8 +512,11 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
       } else if (upperRoster.startsWith('DOF(') || upperRoster.startsWith('DOF')) {
         // e.g. DOF(08/02) or DOF(08/09)
         detectedStatus = 'DOF';
-      } else if (upperRoster.startsWith('DOS(') || upperRoster.startsWith('DOS')) {
-        // e.g. DOS(10.00) or DOS
+      } else if (/^DOS\s*\(\s*([0-9]+(?:[.:][0-9]+)?)\s*\)/.test(upperRoster)) {
+        // e.g. DOS(10.00) or DOS(9.30) — preserve the shift-time variant as its own status code
+        const timePart = upperRoster.match(/^DOS\s*\(\s*([0-9]+(?:[.:][0-9]+)?)\s*\)/)![1].replace(':', '.');
+        detectedStatus = `DOS(${timePart})`;
+      } else if (upperRoster.startsWith('DOS')) {
         detectedStatus = 'DOS';
       } else {
         detectedStatus = rawRoster;
@@ -642,56 +645,65 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
     }
   };
 
+  const stepDot = (current: boolean, done: boolean) => ({
+    dot: current
+      ? 'w-2 h-2 rounded-full ring-1 ring-accent'
+      : 'w-2 h-2 rounded-full',
+    dotColor: current
+      ? 'transparent'
+      : done
+      ? 'var(--success)'
+      : 'var(--color-border)',
+    label: current ? 'text-accent' : done ? 'text-fg' : 'text-muted',
+  });
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full md:max-h-[85vh] max-h-[90vh] flex flex-col overflow-hidden transition-all my-8">
-        
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-6 sm:py-10 px-4">
+      <div className="fixed inset-0 bg-black/40 dark:bg-black/60" />
+      <div className="relative card shadow-[var(--shadow-md)] rounded-xl w-full max-w-3xl md:max-h-[85vh] max-h-[90vh] flex flex-col overflow-hidden animate-scaleIn">
+
         {/* Header Bar */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-purple-50/50 dark:bg-purple-950/40">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-purple-600 text-white shadow-sm">
-              <FileSpreadsheet className="w-5 h-5" />
+        <div className="px-5 py-3.5 border-b border-line flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 rounded-lg bg-[var(--accent-soft)] text-accent shrink-0">
+              <FileSpreadsheet className="w-4 h-4" />
             </div>
-            <div>
-              <h3 className="text-base font-extrabold text-purple-950 dark:text-purple-100 flex items-center gap-2">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-fg truncate">
                 Import Original Office Roster
               </h3>
-              <p className="text-xs text-purple-700 dark:text-purple-300">
+              <p className="text-xs text-muted truncate">
                 Official Excel spreadsheet import with automatic detection & protection
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Download Template Button */}
             <button
               onClick={handleDownloadTemplate}
               title="Download Excel Roster Template"
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 shadow-2xs"
+              className="btn-min btn-secondary text-xs"
             >
-              <Download className="w-3.5 h-3.5 text-emerald-600" />
+              <Download className="w-3.5 h-3.5 text-accent" />
               <span className="hidden sm:inline">Excel Template</span>
             </button>
 
-            <button
-              onClick={onClose}
-              className="p-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-            >
-              <X className="w-5 h-5" />
+            <button onClick={onClose} className="btn-icon" aria-label="Close">
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Top Tab Toggle: Import Wizard vs Import History */}
-        <div className="px-6 pt-3 bg-slate-50/60 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-1">
+        <div className="px-5 py-3 border-b border-line flex items-center justify-between gap-3 flex-wrap">
+          <div className="inline-flex gap-1 bg-well p-1 rounded-lg">
             <button
               onClick={() => setActiveTab('import')}
-              className={`px-4 py-2 font-bold rounded-t-xl transition-all border-b-2 ${
+              className={`rounded-md px-3 h-8 text-xs font-medium transition-colors ${
                 activeTab === 'import'
-                  ? 'border-purple-600 text-purple-700 dark:text-purple-300 bg-white dark:bg-slate-900 shadow-2xs'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-surface text-fg shadow-[var(--shadow-xs)]'
+                  : 'text-muted hover:text-fg'
               }`}
             >
               Import Roster Wizard
@@ -699,10 +711,10 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
 
             <button
               onClick={() => setActiveTab('history')}
-              className={`px-4 py-2 font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-1.5 ${
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 h-8 text-xs font-medium transition-colors ${
                 activeTab === 'history'
-                  ? 'border-purple-600 text-purple-700 dark:text-purple-300 bg-white dark:bg-slate-900 shadow-2xs'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-surface text-fg shadow-[var(--shadow-xs)]'
+                  : 'text-muted hover:text-fg'
               }`}
             >
               <History className="w-3.5 h-3.5" />
@@ -711,29 +723,47 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
           </div>
 
           {/* Stepper Progress Bar */}
-          {activeTab === 'import' && (
-            <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-              <span className={step === 'upload' ? 'text-purple-600' : ''}>1. Upload</span>
-              <span>→</span>
-              <span className={step === 'column_map' ? 'text-purple-600' : ''}>2. Map Columns</span>
-              <span>→</span>
-              <span className={step === 'preview' ? 'text-purple-600' : ''}>3. Preview</span>
-              <span>→</span>
-              <span className={step === 'result' ? 'text-purple-600' : ''}>4. Complete</span>
-            </div>
-          )}
+          {activeTab === 'import' && (() => {
+            const stepsDone: Record<string, boolean[]> = {
+              upload: [false, false, false, false],
+              sheet_select: [true, false, false, false],
+              employee_select: [true, false, false, false],
+              column_map: [true, true, false, false],
+              preview: [true, true, true, false],
+              result: [true, true, true, true],
+            };
+            const flags = stepsDone[step];
+            const labels = ['Upload', 'Map Columns', 'Preview', 'Complete'];
+            const currents = ['upload', 'column_map', 'preview', 'result'];
+            return (
+              <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-medium">
+                {labels.map((label, i) => {
+                  const s = stepDot(currents[i] === step, flags[i]);
+                  return (
+                    <React.Fragment key={label}>
+                      {i > 0 && <ArrowRight className="w-3 h-3 text-faint" />}
+                      <span className="flex items-center gap-1.5">
+                        <span className={s.dot} style={{ backgroundColor: s.dotColor }} />
+                        <span className={s.label}>{label}</span>
+                      </span>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
-          
+        <div className="px-5 py-4 space-y-4 overflow-y-auto flex-1">
+
           {/* TAB 1: IMPORT WIZARD */}
           {activeTab === 'import' && (
             <>
               {/* STEP: UPLOAD */}
               {step === 'upload' && (
                 <div className="space-y-4">
-                  <div className="border-2 border-dashed border-purple-300 dark:border-purple-800/80 rounded-3xl p-10 text-center bg-purple-50/20 dark:bg-purple-950/10 hover:bg-purple-50/50 transition-all cursor-pointer relative shadow-2xs group">
+                  <div className="border border-dashed border-line rounded-lg p-6 text-center hover:border-accent transition-colors cursor-pointer relative group">
                     <input
                       type="file"
                       accept=".xlsx,.xls,.csv"
@@ -744,27 +774,25 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                       }}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <div className="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform shadow-xs">
-                      <Upload className="w-7 h-7" />
+                    <div className="w-12 h-12 rounded-lg bg-[var(--accent-soft)] text-accent flex items-center justify-center mx-auto mb-3">
+                      <Upload className="w-6 h-6" />
                     </div>
-                    <h4 className="text-base font-extrabold text-slate-900 dark:text-white mb-1">
+                    <h4 className="text-sm font-semibold text-fg mb-1">
                       Drag & Drop Official Office Excel Roster Here
                     </h4>
-                    <p className="text-slate-500 mb-4 font-medium">
+                    <p className="text-xs text-muted mb-3">
                       or click to browse your computer (.xlsx, .xls, .csv)
                     </p>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                      <span>Supports: XLSX • XLS • CSV</span>
-                    </div>
+                    <span className="chip chip-neutral">Supports: XLSX • XLS • CSV</span>
                   </div>
 
                   {/* Highlights Callout */}
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
-                    <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-purple-600" />
+                  <div className="card p-4 space-y-2">
+                    <span className="text-xs font-semibold text-fg flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-accent" />
                       Smart Office Import Guarantees
                     </span>
-                    <ul className="grid sm:grid-cols-2 gap-2 text-slate-600 dark:text-slate-400 text-[11px] list-disc list-inside">
+                    <ul className="grid sm:grid-cols-2 gap-2 text-muted text-[11px] list-disc list-inside">
                       <li>Automatic date parsing & status code mapping</li>
                       <li>Preserves your manual roster changes (e.g. WFH)</li>
                       <li>Multi-sheet and multi-employee column auto-detection</li>
@@ -777,11 +805,11 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
               {/* STEP: SHEET SELECTION */}
               {step === 'sheet_select' && (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800">
-                    <h4 className="font-bold text-purple-950 dark:text-purple-100 text-sm mb-1">
+                  <div className="card p-4">
+                    <h4 className="text-sm font-medium text-fg mb-1">
                       Multiple Roster Sheets Detected
                     </h4>
-                    <p className="text-purple-700 dark:text-purple-300">
+                    <p className="text-xs text-muted">
                       Please select the worksheet containing the official office roster data:
                     </p>
                   </div>
@@ -795,17 +823,17 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                           setSelectedSheet(s);
                           if (workbook) processSheetData(workbook, s);
                         }}
-                        className={`p-4 rounded-2xl border text-left transition-all font-bold flex items-center justify-between ${
+                        className={`p-4 rounded-lg border text-left font-medium flex items-center justify-between transition-colors ${
                           selectedSheet === s
-                            ? 'border-purple-600 bg-purple-50 dark:bg-purple-950 text-purple-950 dark:text-purple-100 shadow-xs'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200'
+                            ? 'border-accent bg-[var(--accent-soft)] text-fg'
+                            : 'border-line bg-surface text-fg hover:border-[var(--color-text-faint)]'
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          <Layers className="w-4 h-4 text-purple-600" />
+                          <Layers className="w-4 h-4 text-accent" />
                           {s}
                         </span>
-                        {selectedSheet === s && <Check className="w-4 h-4 text-purple-600" />}
+                        {selectedSheet === s && <Check className="w-4 h-4 text-accent" />}
                       </button>
                     ))}
                   </div>
@@ -815,11 +843,11 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
               {/* STEP: EMPLOYEE SELECTION */}
               {step === 'employee_select' && (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800">
-                    <h4 className="font-bold text-purple-950 dark:text-purple-100 text-sm mb-1">
+                  <div className="card p-4">
+                    <h4 className="text-sm font-medium text-fg mb-1">
                       Select Employee Roster
                     </h4>
-                    <p className="text-purple-700 dark:text-purple-300">
+                    <p className="text-xs text-muted">
                       The uploaded spreadsheet contains roster data for multiple employees. Select your column/profile:
                     </p>
                   </div>
@@ -834,13 +862,13 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                           setColumnMap((prev) => ({ ...prev, rosterCol: emp }));
                           setStep('column_map');
                         }}
-                        className={`p-3 rounded-2xl border text-left font-bold flex items-center gap-2.5 transition-all ${
+                        className={`p-3 rounded-lg border text-left font-medium flex items-center gap-2.5 transition-colors ${
                           selectedEmployee === emp
-                            ? 'border-purple-600 bg-purple-50 dark:bg-purple-950 text-purple-900 dark:text-purple-100'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                            ? 'border-accent bg-[var(--accent-soft)] text-fg'
+                            : 'border-line bg-surface text-fg hover:border-[var(--color-text-faint)]'
                         }`}
                       >
-                        <User className="w-4 h-4 text-purple-600" />
+                        <User className="w-4 h-4 text-accent" />
                         <span>{emp}</span>
                       </button>
                     ))}
@@ -851,29 +879,27 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
               {/* STEP: COLUMN MAPPING */}
               {step === 'column_map' && (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 flex items-center justify-between">
+                  <div className="card p-4 flex items-center justify-between gap-3 flex-wrap">
                     <div>
-                      <h4 className="font-bold text-purple-950 dark:text-purple-100 text-sm">
+                      <h4 className="font-medium text-fg text-sm">
                         Confirm Excel Column Mapping
                       </h4>
-                      <p className="text-purple-700 dark:text-purple-300">
+                      <p className="text-xs text-muted">
                         File: <strong>{file?.name}</strong> | Sheet: <strong>{selectedSheet}</strong>
                       </p>
                     </div>
-                    <span className="px-3 py-1 rounded-full bg-purple-200 text-purple-900 dark:bg-purple-900 dark:text-purple-200 font-extrabold text-[10px]">
-                      Auto-Detected
-                    </span>
+                    <span className="chip chip-accent">Auto-Detected</span>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Date Column <span className="text-red-500">*</span>
+                      <label className="block text-xs font-medium text-fg mb-1">
+                        Date Column <span style={{ color: 'var(--danger)' }}>*</span>
                       </label>
                       <select
                         value={columnMap.dateCol}
                         onChange={(e) => setColumnMap({ ...columnMap, dateCol: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
+                        className="input-min"
                       >
                         {sheetHeaders.map((h, i) => (
                           <option key={`dateCol-${h}-${i}`} value={h}>
@@ -884,13 +910,13 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-fg mb-1">
                         Day Column (Optional)
                       </label>
                       <select
                         value={columnMap.dayCol}
                         onChange={(e) => setColumnMap({ ...columnMap, dayCol: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
+                        className="input-min"
                       >
                         <option value="">-- Calculate Automatically --</option>
                         {sheetHeaders.map((h, i) => (
@@ -902,13 +928,13 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Original Roster Status Column <span className="text-red-500">*</span>
+                      <label className="block text-xs font-medium text-fg mb-1">
+                        Original Roster Status Column <span style={{ color: 'var(--danger)' }}>*</span>
                       </label>
                       <select
                         value={columnMap.rosterCol}
                         onChange={(e) => setColumnMap({ ...columnMap, rosterCol: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold text-purple-600 dark:text-purple-400"
+                        className="input-min"
                       >
                         {sheetHeaders.map((h, i) => (
                           <option key={`rosterCol-${h}-${i}`} value={h}>
@@ -919,13 +945,13 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-fg mb-1">
                         Action / Shift Title Column
                       </label>
                       <select
                         value={columnMap.actionCol}
                         onChange={(e) => setColumnMap({ ...columnMap, actionCol: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold"
+                        className="input-min"
                       >
                         <option value="">-- Default Duty Description --</option>
                         {sheetHeaders.map((h, i) => (
@@ -941,7 +967,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                     <button
                       type="button"
                       onClick={generatePreview}
-                      className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold flex items-center gap-1.5 shadow-sm"
+                      className="btn-min btn-primary"
                     >
                       <span>Generate Roster Preview</span>
                       <ArrowRight className="w-4 h-4" />
@@ -955,13 +981,19 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                 <div className="space-y-4">
                   {/* Duplicate Notice Warning */}
                   {duplicateNotice?.isDuplicate && (
-                    <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex items-center justify-between">
-                      <span className="font-bold flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <div
+                      className="p-3.5 rounded-lg flex items-center justify-between gap-3 flex-wrap"
+                      style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}
+                    >
+                      <span className="text-xs font-semibold flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4" />
                         This roster file was previously imported on{' '}
                         {new Date(duplicateNotice.previousImport?.uploadTimestamp || '').toLocaleDateString()}
                       </span>
-                      <span className="px-2 py-0.5 rounded-md bg-amber-200 dark:bg-amber-900 font-extrabold text-[10px]">
+                      <span
+                        className="px-2 py-0.5 rounded font-semibold text-[10px]"
+                        style={{ background: 'var(--warning)', color: 'var(--on-accent)' }}
+                      >
                         Duplicate File Detected
                       </span>
                     </div>
@@ -969,17 +1001,23 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
 
                   {/* Missing Dates Auto-Filled Notice */}
                   {autoFilledMissingDates.length > 0 && (
-                    <div className="p-3.5 rounded-2xl bg-sky-50 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 text-sky-900 dark:text-sky-200">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-extrabold flex items-center gap-2 text-xs">
-                          <CheckCircle2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                    <div
+                      className="p-3.5 rounded-lg"
+                      style={{ background: 'var(--info-bg)', color: 'var(--info)' }}
+                    >
+                      <div className="flex items-center justify-between mb-1 gap-3 flex-wrap">
+                        <span className="font-semibold flex items-center gap-2 text-xs">
+                          <CheckCircle2 className="w-4 h-4" />
                           {autoFilledMissingDates.length} Missing Date(s) Auto-Detected & Included as Normal Holiday (HOL)
                         </span>
-                        <span className="px-2 py-0.5 rounded-md bg-sky-200 dark:bg-sky-900 font-extrabold text-[10px] text-sky-900 dark:text-sky-100">
+                        <span
+                          className="px-2 py-0.5 rounded font-semibold text-[10px]"
+                          style={{ background: 'var(--info)', color: 'var(--on-accent)' }}
+                        >
                           Date Continuity Verified
                         </span>
                       </div>
-                      <p className="text-[11px] text-sky-700 dark:text-sky-300">
+                      <p className="text-[11px]">
                         The uploaded Excel file skipped the following date(s): <strong>{autoFilledMissingDates.join(', ')}</strong>.
                         To ensure your roster is 100% complete without missing days, they have been automatically inserted as <strong>Normal Holiday (HOL)</strong> before saving.
                       </p>
@@ -987,59 +1025,57 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                   )}
 
                   {/* Summary Bar */}
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+                  <div className="card p-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <h4 className="font-extrabold text-slate-900 dark:text-white text-sm">
+                      <h4 className="font-medium text-fg text-sm">
                         Original Roster Import Preview
                       </h4>
-                      <p className="text-slate-500 text-xs">
+                      <p className="text-xs text-muted">
                         File: {file?.name} | Employee: {selectedEmployee}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-3 text-xs">
-                      <div className="px-3 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
+                      <span className="chip chip-success">
                         {previewRows.length} Valid Rows
-                      </div>
-                      <div className="px-3 py-1 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold">
+                      </span>
+                      <span className="chip chip-accent">
                         Protected User Changes
-                      </div>
+                      </span>
                     </div>
                   </div>
 
                   {/* Preview Table */}
-                  <div className="max-h-64 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
-                    <table className="w-full table-fixed text-left text-xs border-collapse">
+                  <div className="max-h-64 overflow-y-auto border border-line rounded-lg">
+                    <table className="w-full table-fixed text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                          <th className="p-2.5 w-[20%]">Date</th>
-                          <th className="p-2.5 w-[13%]">Day</th>
-                          <th className="p-2.5 w-[20%]">Original Roster</th>
-                          <th className="p-2.5 w-[32%]">Action / Shift Title</th>
-                          <th className="p-2.5 w-[15%]">OT</th>
+                        <tr className="bg-well">
+                          <th className="text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line px-3 py-2 w-[20%]">Date</th>
+                          <th className="text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line px-3 py-2 w-[13%]">Day</th>
+                          <th className="text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line px-3 py-2 w-[20%]">Original Roster</th>
+                          <th className="text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line px-3 py-2 w-[32%]">Action / Shift Title</th>
+                          <th className="text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line px-3 py-2 w-[15%]">OT</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                      <tbody>
                         {previewRows.map((r, i) => (
-                          <tr key={r.date || `row-${i}`} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td className="p-2.5 font-bold font-mono text-slate-900 dark:text-white break-words">
+                          <tr key={r.date || `row-${i}`} className="hover:bg-well">
+                            <td className="px-3 py-2 text-sm border-b border-line font-mono text-fg break-words">
                               {r.date}
                             </td>
-                            <td className="p-2.5 text-slate-600 dark:text-slate-400">{r.day}</td>
-                            <td className="p-2.5 font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-2 break-words">
-                              <span>{r.originalStatus}</span>
-                              {r.isAutoFilled && (
-                                <span className="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 text-[9px] font-bold">
-                                  Auto-Filled
-                                </span>
-                              )}
+                            <td className="px-3 py-2 text-sm border-b border-line text-muted">{r.day}</td>
+                            <td className="px-3 py-2 text-sm border-b border-line break-words">
+                              <span className="flex items-center gap-2 font-semibold text-accent">
+                                <span>{r.originalStatus}</span>
+                                {r.isAutoFilled && (
+                                  <span className="chip chip-accent">Auto-Filled</span>
+                                )}
+                              </span>
                             </td>
-                            <td className="p-2.5 text-slate-700 dark:text-slate-300 break-words">{r.action}</td>
-                            <td className="p-2.5">
+                            <td className="px-3 py-2 text-sm border-b border-line text-fg break-words">{r.action}</td>
+                            <td className="px-3 py-2 text-sm border-b border-line">
                               {r.ot ? (
-                                <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 font-bold text-[10px]">
-                                  OT
-                                </span>
+                                <span className="chip chip-warning">OT</span>
                               ) : (
                                 'NO'
                               )}
@@ -1050,16 +1086,19 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                     </table>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-200 flex items-center justify-between">
-                    <span className="font-semibold flex items-center gap-2 text-xs">
-                      <ShieldCheck className="w-4 h-4 text-purple-600" />
+                  <div
+                    className="p-3.5 rounded-lg flex items-center justify-between gap-3 flex-wrap"
+                    style={{ background: 'var(--accent-soft)', color: 'var(--color-primary)' }}
+                  >
+                    <span className="font-medium flex items-center gap-2 text-xs">
+                      <ShieldCheck className="w-4 h-4" />
                       Original roster values will be saved without overwriting your manual changes.
                     </span>
 
                     <button
                       onClick={handleConfirmImport}
                       disabled={isSubmitting}
-                      className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-sm flex items-center gap-1.5"
+                      className="btn-min btn-primary"
                     >
                       {isSubmitting ? 'Importing...' : 'Confirm & Import Original Roster'}
                     </button>
@@ -1069,15 +1108,16 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
 
               {/* STEP: RESULT REPORT */}
               {step === 'result' && importResult && (
-                <div className="space-y-6">
-                  <div className="p-6 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-center space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-sm">
-                      <CheckCircle2 className="w-7 h-7" />
-                    </div>
-                    <h4 className="text-lg font-extrabold text-emerald-950 dark:text-emerald-100">
+                <div className="space-y-4">
+                  <div
+                    className="p-6 rounded-lg text-center space-y-3"
+                    style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+                  >
+                    <CheckCircle2 className="w-10 h-10 mx-auto" />
+                    <h4 className="text-base font-semibold">
                       Original Roster Successfully Imported!
                     </h4>
-                    <p className="text-xs text-emerald-800 dark:text-emerald-300">
+                    <p className="text-xs">
                       {importResult.successCount} roster entries were processed from{' '}
                       <strong>{file?.name}</strong>.
                     </p>
@@ -1085,37 +1125,31 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
 
                   {/* Summary Metric Cards */}
                   <div className="grid grid-cols-3 gap-3 text-center">
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-2xl font-black text-slate-900 dark:text-white block">
-                        {importResult.createdCount}
-                      </span>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase">New Entries</span>
+                    <div className="stat-tile">
+                      <div className="stat-tile-value">{importResult.createdCount}</div>
+                      <div className="stat-tile-label">New Entries</div>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800">
-                      <span className="text-2xl font-black text-purple-700 dark:text-purple-300 block">
+                    <div className="stat-tile">
+                      <div className="stat-tile-value" style={{ color: 'var(--color-primary)' }}>
                         {importResult.updatedCount}
-                      </span>
-                      <span className="text-[11px] font-bold text-purple-700 dark:text-purple-300 uppercase">
-                        Updated Entries
-                      </span>
+                      </div>
+                      <div className="stat-tile-label">Updated Entries</div>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-2xl font-black text-slate-600 dark:text-slate-400 block">
-                        0
-                      </span>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase">Errors</span>
+                    <div className="stat-tile">
+                      <div className="stat-tile-value text-muted">0</div>
+                      <div className="stat-tile-label">Errors</div>
                     </div>
                   </div>
 
                   {/* Google Calendar Action Banner */}
-                  <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between">
+                  <div className="card p-4 flex items-center justify-between gap-3 flex-wrap">
                     <div>
-                      <h5 className="font-bold text-indigo-950 dark:text-indigo-100 text-xs">
+                      <h5 className="text-xs font-semibold text-fg">
                         Google Calendar Synchronization
                       </h5>
-                      <p className="text-[11px] text-indigo-700 dark:text-indigo-300">
+                      <p className="text-[11px] text-muted">
                         Synchronize your new roster schedule directly to Google Calendar
                       </p>
                     </div>
@@ -1123,7 +1157,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                     <button
                       onClick={handleSyncCalendarPostImport}
                       disabled={calendarSynced}
-                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                      className="btn-min btn-primary text-xs"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${calendarSynced ? '' : 'animate-spin'}`} />
                       {calendarSynced ? 'Synced to Google Calendar ✓' : 'Sync to Google Calendar'}
@@ -1131,10 +1165,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                   </div>
 
                   <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={onClose}
-                      className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-sm"
-                    >
+                    <button onClick={onClose} className="btn-min btn-primary">
                       Done & View Roster
                     </button>
                   </div>
@@ -1148,19 +1179,19 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-extrabold text-slate-900 dark:text-white text-sm">
+                  <h4 className="font-medium text-fg text-sm">
                     Past Original Roster Imports
                   </h4>
-                  <p className="text-slate-500 text-xs">
+                  <p className="text-xs text-muted">
                     Audit log of all imported official office spreadsheets
                   </p>
                 </div>
               </div>
 
               {loadingHistory ? (
-                <div className="py-12 text-center text-slate-400">Loading import history...</div>
+                <div className="py-12 text-center text-muted">Loading import history...</div>
               ) : importHistoryList.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 border border-dashed rounded-2xl">
+                <div className="py-12 text-center text-muted border border-dashed border-line rounded-lg">
                   No past imports found.
                 </div>
               ) : (
@@ -1168,19 +1199,19 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                   {importHistoryList.map((item) => (
                     <div
                       key={item.id}
-                      className="p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 shadow-2xs"
+                      className="card p-3.5 flex items-center justify-between gap-3"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-2 rounded-lg bg-[var(--accent-soft)] text-accent shrink-0">
                           <FileSpreadsheet className="w-5 h-5" />
                         </div>
-                        <div>
-                          <h5 className="font-extrabold text-slate-900 dark:text-white text-xs">
+                        <div className="min-w-0">
+                          <h5 className="font-semibold text-fg text-xs truncate">
                             {item.filename}
                           </h5>
-                          <div className="flex items-center gap-3 text-[11px] text-slate-500 mt-0.5">
+                          <div className="flex items-center gap-3 text-[11px] text-muted mt-0.5 flex-wrap">
                             <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-slate-400" />
+                              <Clock className="w-3 h-3 text-faint" />
                               {new Date(item.uploadTimestamp).toLocaleString()}
                             </span>
                             <span>•</span>
@@ -1191,8 +1222,8 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-extrabold text-[10px]">
+                      <div className="text-right shrink-0">
+                        <span className="chip chip-success">
                           ✓ {item.rowCount} Records
                         </span>
                       </div>
@@ -1205,6 +1236,5 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };

@@ -4,8 +4,9 @@ import { RosterEntry, RosterStatusConfig } from '../types/roster';
 import { StatusBadge } from './StatusBadge';
 import { ClockTimePicker } from './ClockTimePicker';
 import { formatDateDisplay } from '../utils/date';
-import { X, ArrowRight, Calendar, AlertCircle, Calculator, Clock, CalendarDays } from 'lucide-react';
+import { ArrowRight, Calendar, AlertCircle, Calculator, Clock, CalendarDays } from 'lucide-react';
 import { canApplyLeaveToCode, isAlreadyLeaveCode } from '../utils/leave';
+import { sortByStatusDisplayOrder } from '../utils/statusOrder';
 
 interface RosterChangeModalProps {
   isOpen: boolean;
@@ -175,7 +176,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
     }
   };
 
-  const activeStatuses = statuses.filter((s) => s.active);
+  const activeStatuses = sortByStatusDisplayOrder(statuses.filter((s) => s.active));
 
   return (
     <AnimatePresence>
@@ -185,41 +186,47 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs"
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-6 sm:py-10 px-4"
         >
-          <div className="flex min-h-full items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 8 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transition-all my-8"
-            >
-        
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 dark:bg-black/60"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 8 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="relative card shadow-[var(--shadow-md)] rounded-xl w-full max-w-lg overflow-hidden"
+          >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+        <div className="px-5 py-3.5 border-b border-line flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-fg flex items-center gap-2">
               Change Roster Entry
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-muted">
               {formatDateDisplay(entry.date)} ({entry.day})
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="btn-icon" aria-label="Close">
+            ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit}>
+          <div className="px-5 py-4 space-y-4 text-xs">
+
           {/* Important Rule Banner */}
-          <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/80 text-xs text-purple-900 dark:text-purple-200 flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+          <div
+            className="p-3 rounded-lg border text-xs text-fg flex items-start gap-2.5"
+            style={{ background: 'var(--accent-soft)', borderColor: 'var(--color-border)' }}
+          >
+            <AlertCircle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
             <div>
-              <span className="font-bold block">Original Roster Preserved</span>
+              <span className="font-semibold block">Original Roster Preserved</span>
               <span className="text-[11px] opacity-90">
                 The office-provided roster (<strong className="font-semibold">{entry.originalStatusId}</strong>) will NEVER be overwritten.
               </span>
@@ -235,12 +242,14 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                   type="button"
                   onClick={async () => {
                     if (!entry) return;
+                    const origCode = entry.originalStatusId || 'NWD';
+                    const origStatus = statuses.find((s) => s.code === origCode);
                     try {
                       await onSave({
-                        newStatusId: entry.originalStatusId || 'NWD',
-                        action: entry.action || 'Reverted to original roster status',
+                        newStatusId: origCode,
+                        action: origStatus?.description || origStatus?.displayName || 'Reverted to original roster status',
                         reason: 'Leave reverted by user',
-                        notes: `Reverted from ${currentCode} back to ${entry.originalStatusId || 'NWD'}`,
+                        notes: `Reverted from ${currentCode} back to ${origCode}`,
                         clockIn: '',
                         clockOut: '',
                         ot: false,
@@ -252,20 +261,20 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                       console.error(err);
                     }
                   }}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-300 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/20 text-left transition-colors flex items-center justify-between"
+                  className="w-full p-3 rounded-lg border border-line hover:border-[var(--success)] transition-colors flex items-center justify-between text-left cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
-                    <CalendarDays className="w-4 h-4 text-emerald-600" />
+                    <CalendarDays className="w-4 h-4" style={{ color: 'var(--success)' }} />
                     <span>
-                      <span className="block text-xs font-bold text-slate-800 dark:text-slate-100">
+                      <span className="block text-xs font-semibold text-fg">
                         Remove Leave / Revert to Original
                       </span>
-                      <span className="block text-[10px] text-slate-500 dark:text-slate-400">
+                      <span className="block text-[10px] text-muted">
                         Restore {entry.originalStatusId || 'NWD'} and credit the leave balance back
                       </span>
                     </span>
                   </span>
-                  <ArrowRight className="w-4 h-4 text-slate-400" />
+                  <ArrowRight className="w-4 h-4 text-faint" />
                 </button>
               );
             }
@@ -274,40 +283,40 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                 <button
                   type="button"
                   onClick={() => onApplyLeave && onApplyLeave(entry)}
-                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-red-300 hover:bg-red-50/60 dark:hover:bg-red-950/20 text-left transition-colors flex items-center justify-between"
+                  className="w-full p-3 rounded-lg border border-line hover:border-[var(--danger)] transition-colors flex items-center justify-between text-left cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
-                    <CalendarDays className="w-4 h-4 text-[#E60023] dark:text-rose-400" />
+                    <CalendarDays className="w-4 h-4" style={{ color: 'var(--danger)' }} />
                     <span>
-                      <span className="block text-xs font-bold text-slate-800 dark:text-slate-100">
+                      <span className="block text-xs font-semibold text-fg">
                         Apply Leave
                       </span>
-                      <span className="block text-[10px] text-slate-500 dark:text-slate-400">
+                      <span className="block text-[10px] text-muted">
                         Convert this working day to a leave type
                       </span>
                     </span>
                   </span>
-                  <ArrowRight className="w-4 h-4 text-slate-400" />
+                  <ArrowRight className="w-4 h-4 text-faint" />
                 </button>
               );
             }
             return (
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400">
+              <div className="p-3 bg-well border border-line rounded-lg text-[11px] text-muted">
                 Leave cannot be applied to this day type ({currentCode}).
               </div>
             );
           })()}
 
           {/* Current vs Original Display */}
-          <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+          <div className="grid grid-cols-2 gap-3 p-3 bg-well rounded-lg border border-line text-xs">
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-faint block mb-1">
                 Original Office Roster
               </span>
               <StatusBadge statusId={entry.originalStatusId} statuses={statuses} size="md" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-faint block mb-1">
                 Current Active Roster
               </span>
               <StatusBadge statusId={entry.currentStatusId} statuses={statuses} size="md" />
@@ -316,8 +325,8 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
 
           {/* New Roster Status Selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              New Roster Status <span className="text-red-500">*</span>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted mb-1 block">
+              New Roster Status <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {activeStatuses.map((s) => {
@@ -327,20 +336,19 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                     key={s.code}
                     type="button"
                     onClick={() => handleStatusSelect(s.code)}
-                    className={`p-2 rounded-xl border text-left text-xs transition-all flex flex-col justify-between ${
-                      isSelected
-                        ? 'border-purple-600 bg-purple-50/80 dark:bg-purple-950/80 text-purple-950 dark:text-purple-100 ring-2 ring-purple-500/20 font-bold'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200'
+                    className={`chip chip-neutral w-full !whitespace-normal flex-col !items-start justify-between p-2 rounded-md border transition-colors ${
+                      isSelected ? 'border-[var(--color-primary)]' : 'border-line hover:bg-well'
                     }`}
+                    style={isSelected && s.color ? { background: `${s.color}1f` } : undefined}
                   >
-                    <div className="flex items-center justify-between mb-1">
+                    <span className="flex items-center justify-between w-full mb-1">
                       <span
                         className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: s.color }}
                       />
-                      <span className="font-extrabold text-[11px]">{s.code}</span>
-                    </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      <span className="font-bold text-[11px]">{s.code}</span>
+                    </span>
+                    <span className="text-[10px] text-muted truncate w-full">
                       {s.description || s.displayName}
                     </span>
                   </button>
@@ -351,8 +359,8 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
 
           {/* Action / Reason */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Action Title <span className="text-red-500">*</span>
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted mb-1 block">
+              Action Title <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
             <input
               type="text"
@@ -360,13 +368,13 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
               value={action}
               onChange={(e) => setAction(e.target.value)}
               placeholder="e.g. Work From Home, Full day leave, Training..."
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="input-min text-xs"
             />
           </div>
 
           {/* Reason for Change (Audit record) */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label className="text-[11px] font-semibold uppercase tracking-wide text-muted mb-1 block">
               Reason for Change (Audit Record)
             </label>
             <input
@@ -374,15 +382,15 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Approved by Manager / Personal errand / Home service..."
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="input-min text-xs"
             />
           </div>
 
           {/* Clock In & Clock Out Times with AM/PM Clock Picker */}
-          <div className="grid grid-cols-2 gap-3 p-3 bg-purple-50/40 dark:bg-purple-950/20 rounded-xl border border-purple-100 dark:border-purple-900/40">
+          <div className="grid grid-cols-2 gap-3 p-3 bg-well rounded-lg border border-line">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+              <label className="block text-[11px] font-semibold uppercase tracking-wide text-muted mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-faint" />
                 Clock In (Arrival)
               </label>
               <ClockTimePicker
@@ -393,8 +401,8 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+              <label className="block text-[11px] font-semibold uppercase tracking-wide text-muted mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-faint" />
                 Clock Out (Departure)
               </label>
               <ClockTimePicker
@@ -409,10 +417,10 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
           {/* Notes / Remark */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label className="block text-[11px] font-semibold uppercase tracking-wide text-muted">
                 Remark / Duty Note
               </label>
-              <span className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">
+              <span className="text-[10px] text-faint font-medium">
                 Saved to Supabase DB
               </span>
             </div>
@@ -421,28 +429,28 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Swapped with John for emergency duty / OT approved for release deployment..."
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none resize-none"
+              className="input-min text-xs resize-none"
             />
           </div>
 
           {/* Options: OT & Calendar */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs">
+          <div className="pt-2 border-t border-line space-y-2 text-xs">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={ot}
                 onChange={(e) => setOt(e.target.checked)}
-                className="rounded border-slate-300 dark:border-slate-700 text-purple-600 focus:ring-purple-500"
+                className="rounded border-line accent-[var(--color-primary)] cursor-pointer"
               />
-              <span className="font-semibold text-slate-800 dark:text-slate-200">
+              <span className="font-medium text-fg">
                 Include Overtime (OT)
               </span>
             </label>
 
             {ot && (
-              <div className="p-3 bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/60 rounded-xl space-y-3 my-1">
-                <p className="font-bold text-[11px] text-purple-900 dark:text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
+              <div className="p-3 bg-well border border-line rounded-lg space-y-3 my-1">
+                <p className="font-semibold text-[11px] text-fg uppercase tracking-wide flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-accent" />
                   OT Hours Breakdown (Same Day)
                 </p>
                 <div className="grid grid-cols-2 gap-3">
@@ -454,7 +462,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                       max="24"
                       value={otMorningHours}
                       onChange={(e) => setOtMorningHours(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="input-min !h-auto py-1.5 text-xs"
                     />
                   </div>
                   <div>
@@ -465,36 +473,36 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                       max="24"
                       value={otNightHours}
                       onChange={(e) => setOtNightHours(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="input-min !h-auto py-1.5 text-xs"
                     />
                   </div>
                 </div>
 
                 {/* Shift-Time OT Helper */}
-                <div className="pt-2 border-t border-purple-100/60 dark:border-purple-900/40">
+                <div className="pt-2 border-t border-line">
                   <button
                     type="button"
                     onClick={() => setShowCalculator(!showCalculator)}
-                    className="flex items-center gap-1.5 text-purple-700 dark:text-purple-400 font-bold text-[10px] uppercase tracking-wider hover:underline focus:outline-none cursor-pointer"
+                    className="flex items-center gap-1.5 text-accent font-semibold text-[10px] uppercase tracking-wide hover:underline focus:outline-none cursor-pointer"
                   >
                     <Calculator className="w-3.5 h-3.5" />
                     {showCalculator ? 'Hide Shift-Time Helper' : 'Calculate from shift times'}
                   </button>
                   
                   {showCalculator && (
-                    <div className="mt-2.5 p-2.5 bg-white dark:bg-slate-900/60 rounded-lg border border-purple-100 dark:border-purple-950/80 space-y-3">
+                    <div className="mt-2.5 p-2.5 bg-surface rounded-lg border border-line space-y-3">
                       <div className="space-y-1.5">
-                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-slate-500">
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">Morning (Early Arrival):</span>
-                          <span>Expected Start: <strong className="text-purple-700 dark:text-purple-300">{getExpectedTimes().startLabel}</strong></span>
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-muted">
+                          <span className="font-semibold">Morning (Early Arrival):</span>
+                          <span>Expected Start: <strong className="text-accent">{getExpectedTimes().startLabel}</strong></span>
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
-                          <span className="text-[10px] text-slate-400">Arrived:</span>
+                          <span className="text-[10px] text-faint">Arrived:</span>
                           <input
                             type="time"
                             value={calcMorningArrival}
                             onChange={(e) => setCalcMorningArrival(e.target.value)}
-                            className="px-2 py-1 text-xs rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            className="input-min !h-7 !w-auto px-2 text-xs"
                           />
                           <button
                             type="button"
@@ -502,35 +510,35 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                               const calculated = calculateMorningOT(calcMorningArrival);
                               setOtMorningHours(String(calculated));
                             }}
-                            className="px-2 py-1 text-[10px] bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/80 dark:hover:bg-purple-900/80 text-purple-700 dark:text-purple-300 rounded font-bold transition-colors cursor-pointer"
+                            className="chip chip-accent font-semibold cursor-pointer hover:opacity-90"
                           >
                             Apply ({calculateMorningOT(calcMorningArrival)}h)
                           </button>
                         </div>
-                        <p className="text-[9px] text-slate-400 leading-normal">
+                        <p className="text-[9px] text-faint leading-normal">
                           Arriving before {getExpectedTimes().startLabel} earns morning OT. For example, arriving at 08:15 AM calculates {calculateMorningOT('08:15').toFixed(1)} hrs.
                         </p>
                       </div>
 
-                      <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/60">
-                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-slate-500">
-                          <span className="font-semibold text-slate-700 dark:text-slate-300">Night (Late Departure):</span>
-                          <span>Expected End: <strong className="text-purple-700 dark:text-purple-300">{getExpectedTimes().endLabel}</strong></span>
+                      <div className="space-y-1.5 pt-2 border-t border-line">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[10px] text-muted">
+                          <span className="font-semibold">Night (Late Departure):</span>
+                          <span>Expected End: <strong className="text-accent">{getExpectedTimes().endLabel}</strong></span>
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
-                          <span className="text-[10px] text-slate-400">Departed:</span>
+                          <span className="text-[10px] text-faint">Departed:</span>
                           <input
                             type="time"
                             value={calcNightDeparture}
                             onChange={(e) => setCalcNightDeparture(e.target.value)}
-                            className="px-2 py-1 text-xs rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            className="input-min !h-7 !w-auto px-2 text-xs"
                           />
-                          <label className="flex items-center gap-1 text-[10px] text-slate-600 dark:text-slate-300 cursor-pointer">
+                          <label className="flex items-center gap-1 text-[10px] text-muted cursor-pointer">
                             <input
                               type="checkbox"
                               checked={calcNightNextDay}
                               onChange={(e) => setCalcNightNextDay(e.target.checked)}
-                              className="rounded border-slate-300 dark:border-slate-700 text-purple-600 focus:ring-purple-500"
+                              className="rounded border-line accent-[var(--color-primary)] cursor-pointer"
                             />
                             Next day (after midnight)
                           </label>
@@ -540,12 +548,12 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                               const calculated = calculateNightOT(calcNightDeparture, calcNightNextDay);
                               setOtNightHours(String(calculated));
                             }}
-                            className="px-2 py-1 text-[10px] bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/80 dark:hover:bg-purple-900/80 text-purple-700 dark:text-purple-300 rounded font-bold transition-colors cursor-pointer"
+                            className="chip chip-accent font-semibold cursor-pointer hover:opacity-90"
                           >
                             Apply ({calculateNightOT(calcNightDeparture, calcNightNextDay)}h)
                           </button>
                         </div>
-                        <p className="text-[9px] text-slate-400 leading-normal">
+                        <p className="text-[9px] text-faint leading-normal">
                           Departing after {getExpectedTimes().endLabel} earns night OT. Tick "Next day" when the shift finishes after midnight. For example, departing at 02:00 next day calculates {calculateNightOT('02:00', true).toFixed(1)} hrs.
                         </p>
                       </div>
@@ -557,7 +565,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                             setOtMorningHours(String(calculateMorningOT(calcMorningArrival)));
                             setOtNightHours(String(calculateNightOT(calcNightDeparture, calcNightNextDay)));
                           }}
-                          className="w-full px-2.5 py-1.5 text-[10px] bg-purple-600 hover:bg-purple-700 text-white font-bold rounded shadow-xs transition-colors cursor-pointer text-center"
+                          className="btn-primary w-full h-7 text-[10px] font-semibold rounded-md cursor-pointer text-center"
                         >
                           Apply Both ({(calculateMorningOT(calcMorningArrival) + calculateNightOT(calcNightDeparture, calcNightNextDay)).toFixed(1)} hrs total)
                         </button>
@@ -566,9 +574,9 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-purple-100/60 dark:border-purple-900/40 text-xs">
-                  <span className="text-slate-600 dark:text-slate-400 font-medium">Daily Total OT:</span>
-                  <span className="font-extrabold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 px-2 py-0.5 rounded-md">
+                <div className="flex items-center justify-between pt-2 border-t border-line text-xs">
+                  <span className="text-muted font-medium">Daily Total OT:</span>
+                  <span className="chip chip-accent font-bold tabular-nums">
                     {((parseFloat(otMorningHours) || 0) + (parseFloat(otNightHours) || 0)).toFixed(1)} hrs
                   </span>
                 </div>
@@ -580,37 +588,38 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
                 type="checkbox"
                 checked={updateCalendar}
                 onChange={(e) => setUpdateCalendar(e.target.checked)}
-                className="rounded border-slate-300 dark:border-slate-700 text-purple-600 focus:ring-purple-500"
+                className="rounded border-line accent-[var(--color-primary)] cursor-pointer"
               />
-              <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span className="font-medium text-fg flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-faint" />
                 Update Google Calendar automatically
               </span>
             </label>
           </div>
 
-          {/* Buttons */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+          </div>
+
+          {/* Footer */}
+          <div className="px-5 py-3.5 border-t border-line flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 text-white transition-colors shadow-sm flex items-center gap-1.5"
+              className="btn-primary flex items-center gap-1.5"
             >
               {isSubmitting ? 'Saving...' : 'Save Roster Change'}
             </button>
           </div>
         </form>
       </motion.div>
-    </div>
-  </motion.div>
+    </motion.div>
   )}
   </AnimatePresence>
 );

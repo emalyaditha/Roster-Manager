@@ -8,6 +8,8 @@ import {
   SHIFT_CONTEXT,
   getBalanceForCode,
   validateLeaveApplication,
+  isPartialLeaveCode,
+  isPartialLeaveAction,
   ValidationResult,
 } from '../utils/leave';
 import { X } from 'lucide-react';
@@ -83,6 +85,8 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
   const currentCode = entry.currentStatusId || entry.originalStatusId || '';
   const isWarnCode = currentCode === 'Training';
   const hasClockData = Boolean(entry.clockIn || entry.clockOut || entry.ot);
+  const alreadyPartial = isPartialLeaveAction(entry.action);
+  const partialSelection = effectiveCode ? isPartialLeaveCode(effectiveCode) : false;
 
   const context = SHIFT_CONTEXT[currentCode] || { label: currentCode, hours: '' };
 
@@ -127,7 +131,9 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
                 {formatDateDisplay(entry.date)} · {entry.day}
               </div>
               <div className="leave-picker-sub">
-                {currentCode} → Change to Leave · {context.hours}
+                {partialSelection
+                  ? `${currentCode} · Status stays ${currentCode}${context.hours ? ` · ${context.hours}` : ''}`
+                  : `${currentCode} → Change to Leave · ${context.hours}`}
               </div>
             </div>
             <button
@@ -142,6 +148,12 @@ export const LeavePickerModal: React.FC<LeavePickerModalProps> = ({
           {isWarnCode && (
             <div className="leave-warn-banner">
               This day is scheduled as <strong>Training</strong>. Confirm with HR before converting to leave.
+            </div>
+          )}
+
+          {alreadyPartial && (
+            <div className="leave-warn-banner">
+              This day already has <strong>{entry.action}</strong> applied ({currentCode}). Applying another leave will replace it.
             </div>
           )}
 

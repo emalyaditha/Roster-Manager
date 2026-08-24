@@ -273,93 +273,85 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
   if (!isOpen) return null;
 
+  const statusChipClass = (statusCode: string) =>
+    statusCode === 'NWD'
+      ? 'chip chip-success'
+      : statusCode === 'RTD'
+      ? 'chip chip-accent'
+      : statusCode === 'OT'
+      ? 'chip chip-warning'
+      : statusCode.startsWith('DOF')
+      ? 'chip chip-danger'
+      : statusCode.startsWith('DOS')
+      ? 'chip'
+      : 'chip chip-neutral';
+
+  const statusChipStyle = (statusCode: string): React.CSSProperties | undefined =>
+    statusCode.startsWith('DOS') ? { background: 'var(--info-bg)', color: 'var(--info)' } : undefined;
+
+  const tabButtonClass = (tab: 'timesheet' | 'ledger' | 'audit' | 'settings') =>
+    `flex items-center gap-1.5 rounded-md px-3 h-8 text-xs font-medium transition-colors ${
+      activeTab === tab ? 'bg-surface text-fg shadow-[var(--shadow-xs)]' : 'text-muted hover:text-fg'
+    }`;
+
+  const thClass = 'text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line px-3 py-2';
+  const tdClass = 'px-3 py-2 text-sm border-b border-line';
+
+  const compactInputClass =
+    'h-8 rounded-md border border-line bg-surface px-2 text-xs text-fg placeholder:text-faint outline-none transition-colors focus:border-accent';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-5xl shadow-2xl overflow-hidden my-8 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-6 sm:py-10 px-4">
+      <div className="fixed inset-0 bg-black/40 dark:bg-black/60" />
+      <div className="relative card shadow-[var(--shadow-md)] rounded-xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleIn">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-900/50">
+        <div className="px-5 py-3.5 border-b border-line flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2.5 rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400 shrink-0">
-              <Calculator className="w-6 h-6" />
+            <div className="p-2 rounded-lg bg-[var(--accent-soft)] text-accent shrink-0">
+              <Calculator className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+              <h2 className="text-sm font-semibold text-fg flex items-center gap-2 flex-wrap">
                 OT Calculation & Day-Off Settlement Engine
-                <span className="hidden sm:inline-block text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/80 text-orange-700 dark:text-orange-300 font-medium">
-                  Payroll Specification Compliant
-                </span>
+                <span className="chip chip-warning">Payroll Specification Compliant</span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-muted truncate">
                 Grace period, minimum thresholds, rounding rules & DOS/DOF ledger audit
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors shrink-0"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="btn-icon shrink-0" aria-label="Close">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-2 py-2">
-            <button
-              onClick={() => setActiveTab('timesheet')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'timesheet'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Clock className="w-4 h-4" />
+        <div className="px-5 border-b border-line flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex flex-wrap gap-1 bg-well p-1 rounded-lg my-2">
+            <button onClick={() => setActiveTab('timesheet')} className={tabButtonClass('timesheet')}>
+              <Clock className="w-3.5 h-3.5" />
               OT Timesheet ({totalBillableOtHours} hrs)
             </button>
 
-            <button
-              onClick={() => setActiveTab('ledger')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'ledger'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
+            <button onClick={() => setActiveTab('ledger')} className={tabButtonClass('ledger')}>
+              <Calendar className="w-3.5 h-3.5" />
               Day Off Settlement Ledger ({ledger.owedBalance > 0 ? `+${ledger.owedBalance}` : ledger.owedBalance} Days)
             </button>
 
-            <button
-              onClick={() => setActiveTab('audit')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'audit'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
+            <button onClick={() => setActiveTab('audit')} className={tabButtonClass('audit')}>
+              <ShieldCheck className="w-3.5 h-3.5" />
               Compliance Audit ({audit.passCount}/{audit.items.length} Passed)
             </button>
 
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === 'settings'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Settings className="w-4 h-4" />
+            <button onClick={() => setActiveTab('settings')} className={tabButtonClass('settings')}>
+              <Settings className="w-3.5 h-3.5" />
               OT Rules & Config
             </button>
           </div>
 
-          <div className="flex items-center gap-2 py-2 shrink-0">
-            <button
-              onClick={handleExportCsv}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-            >
-              <Download className="w-3.5 h-3.5 text-purple-500" />
+          <div className="flex items-center gap-2 my-2 shrink-0">
+            <button onClick={handleExportCsv} className="btn-min btn-secondary text-xs">
+              <Download className="w-3.5 h-3.5 text-accent" />
               Export CSV
             </button>
           </div>
@@ -367,77 +359,82 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
         {/* Notice Message */}
         {saveMessage && (
-          <div className="bg-emerald-50 dark:bg-emerald-950/60 border-b border-emerald-200 dark:border-emerald-800 px-6 py-2 text-xs font-medium text-emerald-800 dark:text-emerald-200 flex items-center justify-between">
+          <div
+            className="px-5 py-2 text-xs font-medium flex items-center justify-between border-b border-line"
+            style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+          >
             <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <CheckCircle2 className="w-4 h-4" />
               {saveMessage}
             </span>
           </div>
         )}
 
         {/* Tab Contents */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="px-5 py-4 overflow-y-auto flex-1">
           {/* TAB 1: TIMESHEET */}
           {activeTab === 'timesheet' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Summary Banner */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/50 rounded-xl p-4">
-                  <div className="text-xs font-medium text-orange-700 dark:text-orange-400">Total Billable OT</div>
-                  <div className="text-2xl font-bold text-orange-900 dark:text-orange-200 mt-1">
-                    {totalBillableOtHours} <span className="text-sm font-normal text-orange-700">hrs</span>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="stat-tile">
+                  <div className="stat-tile-label">Total Billable OT</div>
+                  <div className="stat-tile-value" style={{ color: 'var(--color-primary)' }}>
+                    {totalBillableOtHours}{' '}
+                    <span className="text-sm font-normal text-muted">hrs</span>
                   </div>
-                  <div className="text-[11px] text-orange-600/80 dark:text-orange-400/80 mt-0.5">
+                  <div className="text-[11px] text-faint mt-0.5">
                     ({totalBillableOtMinutes} billable mins)
                   </div>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Raw OT Before Rules</div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                    {totalRawOtHours} <span className="text-sm font-normal text-slate-500">hrs</span>
+                <div className="stat-tile">
+                  <div className="stat-tile-label">Raw OT Before Rules</div>
+                  <div className="stat-tile-value">
+                    {totalRawOtHours}{' '}
+                    <span className="text-sm font-normal text-muted">hrs</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
+                  <div className="text-[11px] text-faint mt-0.5">
                     Grace deducted: {totalRawOtMinutes - totalBillableOtMinutes} mins
                   </div>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Rules Applied</div>
-                  <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-1">
+                <div className="stat-tile">
+                  <div className="stat-tile-label">Rules Applied</div>
+                  <div className="text-xs font-medium text-fg mt-1.5">
                     Grace: {localOtSettings.gracePeriodMinutes}m | Min: {localOtSettings.minimumOtThresholdMinutes}m
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 capitalize">
+                  <div className="text-[11px] text-faint mt-0.5 capitalize">
                     Round: {localOtSettings.roundingRule} ({localOtSettings.roundingBlockMinutes}m block)
                   </div>
                 </div>
 
-                <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50 rounded-xl p-4">
-                  <div className="text-xs font-medium text-purple-700 dark:text-purple-400">Est. Overtime Pay</div>
-                  <div className="text-2xl font-bold text-purple-900 dark:text-purple-200 mt-1">
+                <div className="stat-tile">
+                  <div className="stat-tile-label">Est. Overtime Pay</div>
+                  <div className="stat-tile-value" style={{ color: 'var(--color-primary)' }}>
                     {estimatedPayout > 0 ? `$${estimatedPayout.toFixed(2)}` : 'N/A'}
                   </div>
-                  <div className="text-[11px] text-purple-600/80 dark:text-purple-400/80 mt-0.5">
+                  <div className="text-[11px] text-faint mt-0.5">
                     {localOtSettings.hourlyOtRate ? `@ $${localOtSettings.hourlyOtRate}/hr` : 'Set rate in Settings'}
                   </div>
                 </div>
               </div>
 
               {/* OT Breakdown */}
-              <div className="bg-white dark:bg-zinc-900/90 p-5 rounded-2xl border border-slate-200 dark:border-zinc-800/80 shadow-xs">
-                <div className="flex items-center justify-between mb-4">
+              <div className="card p-4 space-y-3">
+                <div className="flex items-center justify-between mb-1">
                   <div>
-                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-orange-500" />
+                    <h3 className="text-sm font-medium text-fg flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" style={{ color: 'var(--warning)' }} />
                       Overtime Modifications Breakdown ({entriesWithOt.length} entries with OT)
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium mt-1">
+                    <p className="text-xs text-muted mt-1">
                       List of all days where Raw or Billable Overtime was recorded
                     </p>
                   </div>
                 </div>
                 {entriesWithOt.length === 0 ? (
-                  <div className="py-6 text-center text-xs text-slate-400 dark:text-zinc-500 border border-dashed border-slate-200 dark:border-zinc-800 rounded-xl">
+                  <div className="py-6 text-center text-xs text-muted border border-dashed border-line rounded-lg">
                     No overtime records found for this period.
                   </div>
                 ) : isMobile ? (
@@ -466,24 +463,27 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                       };
 
                       return (
-                        <div key={i} className="border border-slate-200 dark:border-zinc-800 rounded-xl p-3.5 space-y-2">
+                        <div key={i} className="border border-line rounded-lg p-3.5 space-y-2">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-extrabold text-slate-900 dark:text-white text-xs">{e.date}</span>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                            <span className="font-semibold text-fg text-xs">{e.date}</span>
+                            <span
+                              className={statusChipClass(e.statusCode)}
+                              style={statusChipStyle(e.statusCode)}
+                            >
                               {e.statusCode}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-xs gap-2">
-                            <span className="text-slate-400 dark:text-zinc-500">
-                              In: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{formatTimeAMPM(e.actualClockIn)}</span>
+                            <span className="text-muted">
+                              In: <span className="font-mono font-medium text-fg">{formatTimeAMPM(e.actualClockIn)}</span>
                             </span>
-                            <span className="text-slate-400 dark:text-zinc-500">
-                              Out: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{formatTimeAMPM(e.actualClockOut)}</span>
+                            <span className="text-muted">
+                              Out: <span className="font-mono font-medium text-fg">{formatTimeAMPM(e.actualClockOut)}</span>
                             </span>
                           </div>
-                          <div className="flex items-center justify-between text-xs border-t border-slate-100 dark:border-zinc-800 pt-2">
-                            <span className="text-slate-400 dark:text-zinc-500">Raw OT</span>
-                            <span className="font-mono font-bold text-orange-600 dark:text-orange-400">{formatDuration(e.rawOtMinutes)}</span>
+                          <div className="flex items-center justify-between text-xs border-t border-line pt-2">
+                            <span className="text-muted">Raw OT</span>
+                            <span className="font-mono font-semibold text-fg">{formatDuration(e.rawOtMinutes)}</span>
                           </div>
                         </div>
                       );
@@ -491,17 +491,17 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
+                    <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="border-b border-slate-200 dark:border-zinc-800 text-slate-400 dark:text-zinc-500 font-extrabold text-[10px] uppercase">
-                          <th className="py-2.5 px-3">Date</th>
-                          <th className="py-2.5 px-3">Status</th>
-                          <th className="py-2.5 px-3">In Time</th>
-                          <th className="py-2.5 px-3">Out Time</th>
-                          <th className="py-2.5 px-3">Raw OT</th>
+                        <tr className="bg-well">
+                          <th className={thClass}>Date</th>
+                          <th className={thClass}>Status</th>
+                          <th className={thClass}>In Time</th>
+                          <th className={thClass}>Out Time</th>
+                          <th className={thClass}>Raw OT</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/80">
+                      <tbody>
                         {entriesWithOt.map((e, i) => {
                           const formatDuration = (totalMinutes: number) => {
                             if (!totalMinutes || totalMinutes <= 0) return '0 min';
@@ -526,20 +526,20 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                           };
 
                           return (
-                            <tr key={i} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
-                              <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">
+                            <tr key={i} className="hover:bg-well transition-colors">
+                              <td className={`${tdClass} font-medium text-fg`}>
                                 {e.date}
                               </td>
-                              <td className="py-2.5 px-3 font-medium text-slate-600 dark:text-slate-300">
+                              <td className={`${tdClass} text-muted`}>
                                 {e.statusCode}
                               </td>
-                              <td className="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">
+                              <td className={`${tdClass} text-fg`}>
                                 {formatTimeAMPM(e.actualClockIn)}
                               </td>
-                              <td className="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">
+                              <td className={`${tdClass} text-fg`}>
                                 {formatTimeAMPM(e.actualClockOut)}
                               </td>
-                              <td className="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">
+                              <td className={`${tdClass} text-fg font-mono`}>
                                 {formatDuration(e.rawOtMinutes)}
                               </td>
                             </tr>
@@ -553,8 +553,8 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
               {/* Table Toolbar */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Info className="w-4 h-4 text-purple-500 shrink-0" />
+                <div className="text-xs text-muted flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-accent shrink-0" />
                   Enter actual clock-in/out times to evaluate OT. Early-In and Late-Out are calculated against scheduled window baselines.
                 </div>
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -575,7 +575,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                         setSaveMessage('Clock sync failed.');
                       }
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                    className="btn-min btn-secondary"
                   >
                     <Clock className="w-3.5 h-3.5" />
                     Sync Clock & OT
@@ -583,7 +583,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                   {onUpdateEntryClockTimes && (
                     <button
                       onClick={handleSaveClockTimes}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                      className="btn-min btn-primary"
                     >
                       <Save className="w-3.5 h-3.5" />
                       Save Clock Times
@@ -594,7 +594,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
               {/* Calculation Table */}
               {isMobile ? (
-                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800/60">
+                <div className="border border-line rounded-lg overflow-hidden bg-surface divide-y divide-line">
                   {entries.map((entry, idx) => {
                     const result = dayResults[idx];
                     const clock = clockTimes[entry.id] || { clockIn: '', clockOut: '' };
@@ -603,44 +603,33 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                       <div
                         key={entry.id}
                         className={`p-3.5 space-y-3 ${
-                          result.billableOtMinutes > 0 ? 'bg-orange-50/20 dark:bg-orange-950/10' : ''
+                          result.billableOtMinutes > 0 ? 'bg-[var(--accent-soft)]' : ''
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0">
-                            <div className="font-medium text-slate-900 dark:text-white text-xs">{entry.date}</div>
-                            <div className="text-[10px] text-slate-400">{entry.day}</div>
+                            <div className="font-medium text-fg text-xs">{entry.date}</div>
+                            <div className="text-[10px] text-faint">{entry.day}</div>
                           </div>
                           <span
-                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
-                              result.statusCode === 'NWD'
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-200'
-                                : result.statusCode === 'RTD'
-                                ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-200'
-                                : result.statusCode === 'OT'
-                                ? 'bg-orange-100 text-orange-800 dark:bg-orange-950/80 dark:text-orange-200'
-                                : result.statusCode.startsWith('DOS')
-                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-200'
-                                : result.statusCode.startsWith('DOF')
-                                ? 'bg-red-100 text-red-800 dark:bg-red-950/80 dark:text-red-200'
-                                : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200'
-                            }`}
+                            className={`shrink-0 ${statusChipClass(result.statusCode)}`}
+                            style={statusChipStyle(result.statusCode)}
                           >
                             {entry.currentStatusId}
                           </span>
                         </div>
 
-                        <div className="text-[11px] text-slate-600 dark:text-slate-300 font-mono">
+                        <div className="text-[11px] text-muted font-mono">
                           Scheduled: {result.scheduledStart && result.scheduledEnd ? (
                             `${result.scheduledStart} - ${result.scheduledEnd}`
                           ) : (
-                            <span className="text-slate-400 italic">No scheduled window</span>
+                            <span className="text-faint italic">No scheduled window</span>
                           )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
                           <div className="min-w-0">
-                            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1">
+                            <label className="block text-[9px] font-medium uppercase tracking-wide text-muted mb-1">
                               Clock In
                             </label>
                             <ClockTimePicker
@@ -651,7 +640,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                             />
                           </div>
                           <div className="min-w-0">
-                            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1">
+                            <label className="block text-[9px] font-medium uppercase tracking-wide text-muted mb-1">
                               Clock Out
                             </label>
                             <ClockTimePicker
@@ -663,23 +652,23 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                           </div>
                         </div>
 
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <div className="text-[11px] text-muted">
                           {result.earlyInMinutes > 0 && <div>Early In: -{result.earlyInMinutes}m</div>}
                           {result.lateOutMinutes > 0 && <div>Late Out: +{result.lateOutMinutes}m</div>}
                           {result.earlyInMinutes === 0 && result.lateOutMinutes === 0 && '-'}
                         </div>
 
                         <div className="flex items-center justify-between gap-2 text-xs">
-                          <span className="text-slate-400 dark:text-zinc-500">
-                            Raw OT: <span className="font-mono text-slate-600 dark:text-slate-400">
+                          <span className="text-muted">
+                            Raw OT: <span className="font-mono text-fg">
                               {result.rawOtMinutes > 0 ? `${result.rawOtMinutes}m` : '-'}
                             </span>
                           </span>
-                          <span className="font-bold text-orange-600 dark:text-orange-400 font-mono text-right">
+                          <span className="font-semibold font-mono text-right" style={{ color: 'var(--color-primary)' }}>
                             {result.billableOtMinutes > 0 ? (
                               `${result.billableOtHours} hrs (${result.billableOtMinutes}m)`
                             ) : (
-                              <span className="text-slate-400 font-normal">Billable: 0</span>
+                              <span className="text-faint font-normal">Billable: 0</span>
                             )}
                           </span>
                         </div>
@@ -689,43 +678,43 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                           placeholder="Type remark..."
                           value={entryRemarks[entry.id] ?? (entry.notes || '')}
                           onChange={(e) => handleRemarkChange(entry.id, e.target.value)}
-                          className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400"
+                          className={`${compactInputClass} w-full`}
                         />
 
                         {result.flags.length > 0 ? (
                           <div className="space-y-1">
                             {result.flags.map((flag, fIdx) => (
-                              <div key={fIdx} className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                              <div key={fIdx} className="text-[10px] flex items-center gap-1" style={{ color: 'var(--warning)' }}>
                                 <AlertTriangle className="w-3 h-3 shrink-0" />
                                 {flag}
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-slate-400 text-[10px]">OK</span>
+                          <span className="text-faint text-[10px]">OK</span>
                         )}
                       </div>
                     );
                   })}
                 </div>
               ) : (
-              <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-slate-900">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
-                    <tr>
-                      <th className="py-2.5 px-3">Date / Day</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3">Scheduled Shift</th>
-                      <th className="py-2.5 px-3">Clock In</th>
-                      <th className="py-2.5 px-3">Clock Out</th>
-                      <th className="py-2.5 px-3">Early/Late</th>
-                      <th className="py-2.5 px-3">Raw OT</th>
-                      <th className="py-2.5 px-3">Billable OT</th>
-                      <th className="py-2.5 px-3">Remark / Note</th>
-                      <th className="py-2.5 px-3">Flags</th>
+              <div className="border border-line rounded-lg overflow-hidden bg-surface">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-well">
+                      <th className={thClass}>Date / Day</th>
+                      <th className={thClass}>Status</th>
+                      <th className={thClass}>Scheduled Shift</th>
+                      <th className={thClass}>Clock In</th>
+                      <th className={thClass}>Clock Out</th>
+                      <th className={thClass}>Early/Late</th>
+                      <th className={thClass}>Raw OT</th>
+                      <th className={thClass}>Billable OT</th>
+                      <th className={thClass}>Remark / Note</th>
+                      <th className={thClass}>Flags</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  <tbody>
                     {entries.map((entry, idx) => {
                       const result = dayResults[idx];
                       const clock = clockTimes[entry.id] || { clockIn: '', clockOut: '' };
@@ -733,44 +722,33 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                       return (
                         <tr
                           key={entry.id}
-                          className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 ${
-                            result.billableOtMinutes > 0 ? 'bg-orange-50/20 dark:bg-orange-950/10' : ''
+                          className={`hover:bg-well ${
+                            result.billableOtMinutes > 0 ? 'bg-[var(--accent-soft)]' : ''
                           }`}
                         >
-                          <td className="py-2 px-3 font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                          <td className={`${tdClass} font-medium text-fg whitespace-nowrap`}>
                             <div>{entry.date}</div>
-                            <div className="text-[10px] text-slate-400">{entry.day}</div>
+                            <div className="text-[10px] text-faint">{entry.day}</div>
                           </td>
 
-                          <td className="py-2 px-3">
+                          <td className={tdClass}>
                             <span
-                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
-                                result.statusCode === 'NWD'
-                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-200'
-                                  : result.statusCode === 'RTD'
-                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-200'
-                                  : result.statusCode === 'OT'
-                                  ? 'bg-orange-100 text-orange-800 dark:bg-orange-950/80 dark:text-orange-200'
-                                  : result.statusCode.startsWith('DOS')
-                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-200'
-                                  : result.statusCode.startsWith('DOF')
-                                  ? 'bg-red-100 text-red-800 dark:bg-red-950/80 dark:text-red-200'
-                                  : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200'
-                              }`}
+                              className={statusChipClass(result.statusCode)}
+                              style={statusChipStyle(result.statusCode)}
                             >
                               {entry.currentStatusId}
                             </span>
                           </td>
 
-                          <td className="py-2 px-3 text-slate-600 dark:text-slate-300 font-mono text-[11px]">
+                          <td className={`${tdClass} text-muted font-mono text-[11px]`}>
                             {result.scheduledStart && result.scheduledEnd ? (
                               `${result.scheduledStart} - ${result.scheduledEnd}`
                             ) : (
-                              <span className="text-slate-400 italic">No scheduled window</span>
+                              <span className="text-faint italic">No scheduled window</span>
                             )}
                           </td>
 
-                          <td className="py-2 px-3">
+                          <td className={tdClass}>
                             <ClockTimePicker
                               value={clock.clockIn}
                               onChange={(val) => handleClockChange(entry.id, 'clockIn', val)}
@@ -779,7 +757,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                             />
                           </td>
 
-                          <td className="py-2 px-3">
+                          <td className={tdClass}>
                             <ClockTimePicker
                               value={clock.clockOut}
                               onChange={(val) => handleClockChange(entry.id, 'clockOut', val)}
@@ -788,44 +766,44 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                             />
                           </td>
 
-                          <td className="py-2 px-3 text-slate-500 dark:text-slate-400 text-[11px]">
+                          <td className={`${tdClass} text-muted text-[11px]`}>
                             {result.earlyInMinutes > 0 && <div>In: -{result.earlyInMinutes}m</div>}
                             {result.lateOutMinutes > 0 && <div>Out: +{result.lateOutMinutes}m</div>}
                             {result.earlyInMinutes === 0 && result.lateOutMinutes === 0 && '-'}
                           </td>
 
-                          <td className="py-2 px-3 font-mono text-slate-600 dark:text-slate-400">
+                          <td className={`${tdClass} font-mono text-muted`}>
                             {result.rawOtMinutes > 0 ? `${result.rawOtMinutes}m` : '-'}
                           </td>
 
-                          <td className="py-2 px-3 font-bold text-orange-600 dark:text-orange-400 font-mono">
+                          <td className={`${tdClass} font-semibold font-mono`} style={{ color: 'var(--color-primary)' }}>
                             {result.billableOtMinutes > 0 ? (
                               <span>
                                 {result.billableOtHours} hrs ({result.billableOtMinutes}m)
                               </span>
                             ) : (
-                              <span className="text-slate-400 font-normal">0</span>
+                              <span className="text-faint font-normal">0</span>
                             )}
                           </td>
 
-                          <td className="py-2 px-3">
+                          <td className={tdClass}>
                             <input
                               type="text"
                               placeholder="Type remark..."
                               value={entryRemarks[entry.id] ?? (entry.notes || '')}
                               onChange={(e) => handleRemarkChange(entry.id, e.target.value)}
-                              className="w-32 sm:w-40 px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400"
+                              className={`${compactInputClass} w-32 sm:w-40`}
                             />
                           </td>
 
-                          <td className="py-2 px-3">
+                          <td className={tdClass}>
                             {result.flags.map((flag, fIdx) => (
-                              <div key={fIdx} className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                              <div key={fIdx} className="text-[10px] flex items-center gap-1" style={{ color: 'var(--warning)' }}>
                                 <AlertTriangle className="w-3 h-3 shrink-0" />
                                 {flag}
                               </div>
                             ))}
-                            {result.flags.length === 0 && <span className="text-slate-400 text-[10px]">OK</span>}
+                            {result.flags.length === 0 && <span className="text-faint text-[10px]">OK</span>}
                           </td>
                         </tr>
                       );
@@ -839,154 +817,156 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
           {/* TAB 2: LEDGER */}
           {activeTab === 'ledger' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Ledger Summary */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4">
-                  <div className="text-xs font-medium text-blue-700 dark:text-blue-400">DOS Days Worked</div>
-                  <div className="text-2xl font-bold text-blue-900 dark:text-blue-200 mt-1">
-                    {ledger.dosCount} <span className="text-sm font-normal text-blue-700">days</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="stat-tile">
+                  <div className="stat-tile-label">DOS Days Worked</div>
+                  <div className="stat-tile-value" style={{ color: 'var(--info)' }}>
+                    {ledger.dosCount}{' '}
+                    <span className="text-sm font-normal text-muted">days</span>
                   </div>
-                  <div className="text-[11px] text-blue-600/80 dark:text-blue-400/80 mt-0.5">
+                  <div className="text-[11px] text-faint mt-0.5">
                     Off-days worked for future settlement
                   </div>
                 </div>
 
-                <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl p-4">
-                  <div className="text-xs font-medium text-red-700 dark:text-red-400">DOF Days Taken</div>
-                  <div className="text-2xl font-bold text-red-900 dark:text-red-200 mt-1">
-                    {ledger.dofCount} <span className="text-sm font-normal text-red-700">days</span>
+                <div className="stat-tile">
+                  <div className="stat-tile-label">DOF Days Taken</div>
+                  <div className="stat-tile-value" style={{ color: 'var(--danger)' }}>
+                    {ledger.dofCount}{' '}
+                    <span className="text-sm font-normal text-muted">days</span>
                   </div>
-                  <div className="text-[11px] text-red-600/80 dark:text-red-400/80 mt-0.5">
+                  <div className="text-[11px] text-faint mt-0.5">
                     Day-off settlements cashed in
                   </div>
                 </div>
 
-                <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50 rounded-xl p-4">
-                  <div className="text-xs font-medium text-purple-700 dark:text-purple-400">Day Off Owed Balance</div>
-                  <div className="text-2xl font-bold text-purple-900 dark:text-purple-200 mt-1">
+                <div className="stat-tile">
+                  <div className="stat-tile-label">Day Off Owed Balance</div>
+                  <div className="stat-tile-value" style={{ color: 'var(--color-primary)' }}>
                     {ledger.owedBalance > 0 ? `+${ledger.owedBalance}` : ledger.owedBalance}{' '}
-                    <span className="text-sm font-normal text-purple-700">days</span>
+                    <span className="text-sm font-normal text-muted">days</span>
                   </div>
-                  <div className="text-[11px] text-purple-600/80 dark:text-purple-400/80 mt-0.5">
+                  <div className="text-[11px] text-faint mt-0.5">
                     Net days owed to employee by company
                   </div>
                 </div>
               </div>
 
               {/* Ledger Match Table */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-2xs bg-white dark:bg-slate-900">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-purple-500" />
+              <div className="border border-line rounded-lg overflow-hidden bg-surface">
+                <div className="p-3 bg-well border-b border-line flex items-center justify-between gap-3 flex-wrap">
+                  <h3 className="text-xs font-medium text-fg flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4 text-accent" />
                     Day Off Settlement Lineage & Verification
                   </h3>
-                  <span className="text-[10px] text-slate-500">DOS = Work | DOF = Settled Off</span>
+                  <span className="text-[10px] text-faint">DOS = Work | DOF = Settled Off</span>
                 </div>
 
                 {isMobile ? (
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  <div className="divide-y divide-line">
                     {ledger.matches.length === 0 && (
-                      <div className="py-6 text-center text-slate-400 text-xs">
+                      <div className="py-6 text-center text-muted text-xs">
                         No DOS or DOF entries found in this roster cycle.
                       </div>
                     )}
                     {ledger.matches.map((item, idx) => (
                       <div key={idx} className="p-3.5 space-y-2.5">
-                        <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                            <div className="text-[9px] font-medium uppercase tracking-wide text-muted">
                               DOS Worked Date
                             </div>
-                            <div className="font-medium text-slate-900 dark:text-white font-mono text-xs mt-0.5">
+                            <div className="font-medium text-fg font-mono text-xs mt-0.5">
                               {item.dosDate}{' '}
-                              <span className="font-bold text-blue-600 dark:text-blue-400">({item.dosCode})</span>
+                              <span className="font-semibold" style={{ color: 'var(--info)' }}>({item.dosCode})</span>
                             </div>
                           </div>
                           <div className="shrink-0">
                             {item.status === 'SETTLED' && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/80 dark:text-emerald-300 px-2 py-0.5 rounded-full">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                              <span className="chip chip-success">
+                                <CheckCircle2 className="w-3 h-3" />
                                 SETTLED
                               </span>
                             )}
                             {item.status === 'PENDING' && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-100 dark:bg-amber-950/80 dark:text-amber-300 px-2 py-0.5 rounded-full">
-                                <Clock className="w-3 h-3 text-amber-500" />
+                              <span className="chip chip-warning">
+                                <Clock className="w-3 h-3" />
                                 PENDING
                               </span>
                             )}
                             {item.status === 'ORPHANED_DOF' && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 dark:bg-red-950/80 dark:text-red-300 px-2 py-0.5 rounded-full">
-                                <XCircle className="w-3 h-3 text-red-500" />
+                              <span className="chip chip-danger">
+                                <XCircle className="w-3 h-3" />
                                 ORPHANED DOF
                               </span>
                             )}
                           </div>
                         </div>
-                        <div className="border-t border-slate-100 dark:border-zinc-800 pt-2">
-                          <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                        <div className="border-t border-line pt-2">
+                          <div className="text-[9px] font-medium uppercase tracking-wide text-muted">
                             DOF Cashing Date
                           </div>
-                          <div className="font-medium text-slate-900 dark:text-white font-mono text-xs mt-0.5">
+                          <div className="font-medium text-fg font-mono text-xs mt-0.5">
                             {item.dofDate || '—'}{' '}
-                            {item.dofCode ? <span className="font-bold text-red-600 dark:text-red-400">({item.dofCode})</span> : null}
+                            {item.dofCode ? <span className="font-semibold" style={{ color: 'var(--danger)' }}>({item.dofCode})</span> : null}
                           </div>
                         </div>
                         {item.notes && (
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{item.notes}</div>
+                          <div className="text-[11px] text-muted leading-relaxed">{item.notes}</div>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
-                    <tr>
-                      <th className="py-2.5 px-4">DOS Worked Date</th>
-                      <th className="py-2.5 px-4">DOS Code</th>
-                      <th className="py-2.5 px-4">DOF Cashing Date</th>
-                      <th className="py-2.5 px-4">DOF Code</th>
-                      <th className="py-2.5 px-4">Settlement Status</th>
-                      <th className="py-2.5 px-4">Audit Notes</th>
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-well">
+                      <th className={thClass}>DOS Worked Date</th>
+                      <th className={thClass}>DOS Code</th>
+                      <th className={thClass}>DOF Cashing Date</th>
+                      <th className={thClass}>DOF Code</th>
+                      <th className={thClass}>Settlement Status</th>
+                      <th className={thClass}>Audit Notes</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  <tbody>
                     {ledger.matches.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                        <td className="py-2.5 px-4 font-medium text-slate-900 dark:text-white font-mono">
+                      <tr key={idx} className="hover:bg-well">
+                        <td className={`${tdClass} font-medium text-fg font-mono`}>
                           {item.dosDate}
                         </td>
-                        <td className="py-2.5 px-4 font-mono text-blue-600 dark:text-blue-400 font-bold">
+                        <td className={`${tdClass} font-mono font-semibold`} style={{ color: 'var(--info)' }}>
                           {item.dosCode}
                         </td>
-                        <td className="py-2.5 px-4 font-medium text-slate-900 dark:text-white font-mono">
+                        <td className={`${tdClass} font-medium text-fg font-mono`}>
                           {item.dofDate || '—'}
                         </td>
-                        <td className="py-2.5 px-4 font-mono text-red-600 dark:text-red-400 font-bold">
+                        <td className={`${tdClass} font-mono font-semibold`} style={{ color: 'var(--danger)' }}>
                           {item.dofCode || '—'}
                         </td>
-                        <td className="py-2.5 px-4">
+                        <td className={tdClass}>
                           {item.status === 'SETTLED' && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-950/80 dark:text-emerald-300 px-2 py-0.5 rounded-full">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                            <span className="chip chip-success">
+                              <CheckCircle2 className="w-3 h-3" />
                               SETTLED
                             </span>
                           )}
                           {item.status === 'PENDING' && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-100 dark:bg-amber-950/80 dark:text-amber-300 px-2 py-0.5 rounded-full">
-                              <Clock className="w-3 h-3 text-amber-500" />
+                            <span className="chip chip-warning">
+                              <Clock className="w-3 h-3" />
                               PENDING
                             </span>
                           )}
                           {item.status === 'ORPHANED_DOF' && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-100 dark:bg-red-950/80 dark:text-red-300 px-2 py-0.5 rounded-full">
-                              <XCircle className="w-3 h-3 text-red-500" />
+                            <span className="chip chip-danger">
+                              <XCircle className="w-3 h-3" />
                               ORPHANED DOF
                             </span>
                           )}
                         </td>
-                        <td className="py-2.5 px-4 text-slate-500 dark:text-slate-400 text-[11px]">
+                        <td className={`${tdClass} text-muted text-xs`}>
                           {item.notes}
                         </td>
                       </tr>
@@ -994,7 +974,7 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
                     {ledger.matches.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-6 text-center text-slate-400">
+                        <td colSpan={6} className="py-6 text-center text-muted px-3 text-sm">
                           No DOS or DOF entries found in this roster cycle.
                         </td>
                       </tr>
@@ -1008,32 +988,32 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
           {/* TAB 3: COMPLIANCE AUDIT */}
           {activeTab === 'audit' && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Audit Header Banner */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div className="card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <ShieldCheck className="w-6 h-6 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <ShieldCheck className="w-5 h-5 text-accent shrink-0" />
                   <div className="min-w-0">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-sm font-medium text-fg">
                       Roster & OT Compliance Scanner
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-muted">
                       Automated verification against HR payroll controls & validation checklists
                     </p>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                  <span className="chip chip-success">
                     {audit.passCount} Passed
                   </span>
                   {audit.warningCount > 0 && (
-                    <span className="px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold">
+                    <span className="chip chip-warning">
                       {audit.warningCount} Warnings
                     </span>
                   )}
                   {audit.failCount > 0 && (
-                    <span className="px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
+                    <span className="chip chip-danger">
                       {audit.failCount} Failed
                     </span>
                   )}
@@ -1045,35 +1025,29 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 {audit.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className={`p-4 rounded-xl border flex items-start justify-between gap-4 transition-all ${
-                      item.status === 'PASS'
-                        ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50'
-                        : item.status === 'WARNING'
-                        ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50'
-                        : 'bg-red-50/40 dark:bg-red-950/20 border-red-200 dark:border-red-900/50'
-                    }`}
+                    className="card p-4 flex items-start justify-between gap-4"
                   >
-                    <div className="flex items-start gap-3">
-                      {item.status === 'PASS' && <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />}
-                      {item.status === 'WARNING' && <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />}
-                      {item.status === 'FAIL' && <XCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />}
+                    <div className="flex items-start gap-3 min-w-0">
+                      {item.status === 'PASS' && <CheckCircle2 className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--success)' }} />}
+                      {item.status === 'WARNING' && <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--warning)' }} />}
+                      {item.status === 'FAIL' && <XCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--danger)' }} />}
 
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <h4 className="text-xs font-semibold text-fg flex items-center gap-2">
                           {item.title}
                         </h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">{item.description}</p>
-                        <p className="text-[11px] text-slate-400 mt-1 font-mono">{item.details}</p>
+                        <p className="text-xs text-muted mt-0.5">{item.description}</p>
+                        <p className="text-[11px] text-faint mt-1 font-mono">{item.details}</p>
                       </div>
                     </div>
 
                     <span
-                      className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase shrink-0 ${
+                      className={`text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase shrink-0 ${
                         item.status === 'PASS'
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
+                          ? 'chip chip-success'
                           : item.status === 'WARNING'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          ? 'chip chip-warning'
+                          : 'chip chip-danger'
                       }`}
                     >
                       {item.status}
@@ -1086,23 +1060,23 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
 
           {/* TAB 4: SETTINGS */}
           {activeTab === 'settings' && (
-            <div className="space-y-6 max-w-2xl mx-auto">
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-purple-500" />
+            <div className="space-y-4 max-w-2xl mx-auto">
+              <div className="card p-4">
+                <h3 className="text-sm font-medium text-fg flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-accent" />
                   Payroll OT Controls & Rules Configuration
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-muted mt-1">
                   Adjust company policy values for grace periods, minimum thresholds, and rounding rules.
                 </p>
               </div>
 
-              <div className="space-y-4 text-xs">
+              <div className="space-y-3">
                 {/* Grace Period */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">Grace Period (Minutes)</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">Grace Period (Minutes)</label>
+                    <p className="text-[11px] text-muted">
                       Minutes ignored on early-in swipes; late-out OT is counted in full (default: 15 mins)
                     </p>
                   </div>
@@ -1114,15 +1088,16 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                     onChange={(e) =>
                       setLocalOtSettings({ ...localOtSettings, gracePeriodMinutes: parseInt(e.target.value) || 0 })
                     }
-                    className="w-20 px-2 py-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center"
+                    style={{ width: '5rem' }}
+                    className="input-min text-center font-mono"
                   />
                 </div>
 
                 {/* Minimum Threshold */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">Minimum OT Threshold (Minutes)</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">Minimum OT Threshold (Minutes)</label>
+                    <p className="text-[11px] text-muted">
                       Minimum net OT required to be billable (default: 30 mins)
                     </p>
                   </div>
@@ -1137,15 +1112,16 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                         minimumOtThresholdMinutes: parseInt(e.target.value) || 0,
                       })
                     }
-                    className="w-20 px-2 py-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center"
+                    style={{ width: '5rem' }}
+                    className="input-min text-center font-mono"
                   />
                 </div>
 
                 {/* Rounding Rule */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">Rounding Direction</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">Rounding Direction</label>
+                    <p className="text-[11px] text-muted">
                       How billable OT minutes are rounded
                     </p>
                   </div>
@@ -1157,7 +1133,8 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                         roundingRule: e.target.value as 'down' | 'nearest' | 'up',
                       })
                     }
-                    className="px-2 py-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                    style={{ width: '12rem' }}
+                    className="input-min"
                   >
                     <option value="down">Round Down (Strict)</option>
                     <option value="nearest">Nearest Block</option>
@@ -1166,10 +1143,10 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Rounding Block Size */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">Rounding Block Interval</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">Rounding Block Interval</label>
+                    <p className="text-[11px] text-muted">
                       Pay block size in minutes (15 or 30)
                     </p>
                   </div>
@@ -1181,7 +1158,8 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                         roundingBlockMinutes: parseInt(e.target.value) as 15 | 30,
                       })
                     }
-                    className="px-2 py-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                    style={{ width: '8rem' }}
+                    className="input-min font-mono"
                   >
                     <option value={15}>15 Minutes</option>
                     <option value={30}>30 Minutes</option>
@@ -1189,10 +1167,10 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                 </div>
 
                 {/* Hourly OT Rate */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">Hourly OT Pay Rate ($ / LKR)</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">Hourly OT Pay Rate ($ / LKR)</label>
+                    <p className="text-[11px] text-muted">
                       Optional rate multiplier for payout calculation
                     </p>
                   </div>
@@ -1204,15 +1182,16 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                     onChange={(e) =>
                       setLocalOtSettings({ ...localOtSettings, hourlyOtRate: parseFloat(e.target.value) || 0 })
                     }
-                    className="w-24 px-2 py-1 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center"
+                    style={{ width: '6rem' }}
+                    className="input-min text-center font-mono"
                   />
                 </div>
 
                 {/* WFH OT Eligibility */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">WFH Eligible for OT</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">WFH Eligible for OT</label>
+                    <p className="text-[11px] text-muted">
                       Allow Work From Home days to generate payable OT
                     </p>
                   </div>
@@ -1220,15 +1199,15 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                     type="checkbox"
                     checked={localOtSettings.wfhEligibleForOt}
                     onChange={(e) => setLocalOtSettings({ ...localOtSettings, wfhEligibleForOt: e.target.checked })}
-                    className="w-4 h-4 accent-purple-600 rounded"
+                    className="w-4 h-4 accent-[var(--color-primary)] rounded"
                   />
                 </div>
 
                 {/* Training OT Eligibility */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 border border-line rounded-lg bg-surface">
                   <div>
-                    <label className="font-bold text-slate-900 dark:text-white">Training Eligible for OT</label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <label className="font-medium text-fg">Training Eligible for OT</label>
+                    <p className="text-[11px] text-muted">
                       Allow Training days to generate payable OT
                     </p>
                   </div>
@@ -1236,16 +1215,16 @@ export const OtCalculatorModal: React.FC<OtCalculatorModalProps> = ({
                     type="checkbox"
                     checked={localOtSettings.trainingEligibleForOt}
                     onChange={(e) => setLocalOtSettings({ ...localOtSettings, trainingEligibleForOt: e.target.checked })}
-                    className="w-4 h-4 accent-purple-600 rounded"
+                    className="w-4 h-4 accent-[var(--color-primary)] rounded"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end pt-4">
+              <div className="flex justify-end pt-2">
                 <button
                   onClick={handleSaveSettings}
                   disabled={savingSettings}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs shadow-md transition-colors"
+                  className="btn-min btn-primary"
                 >
                   <Save className="w-4 h-4" />
                   {savingSettings ? 'Saving...' : 'Save OT Rules'}

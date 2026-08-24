@@ -30,10 +30,7 @@ export const CurrentEffectiveTooltip: React.FC<CurrentEffectiveTooltipProps> = (
     setError(false);
     try {
       const records = await api.getHistory(entry.id);
-      if (records && records.length > 0) {
-        // Since store sorts history descending by timestamp, the first element is the latest change record.
-        setHistoryRecord(records[0]);
-      } else {
+      if (!records || records.length === 0) {
         // Fallback if no history record is found (e.g. if updated but logs were cleared)
         setHistoryRecord({
           id: 'fallback',
@@ -47,6 +44,9 @@ export const CurrentEffectiveTooltip: React.FC<CurrentEffectiveTooltipProps> = (
           user: entry.lastChangedBy || 'User',
           timestamp: entry.updatedAt || new Date().toISOString(),
         });
+      } else if (records.length > 0) {
+        // History sorts descending by timestamp — the first element is the latest change.
+        setHistoryRecord(records[0]);
       }
     } catch (err) {
       console.warn('Failed to load roster change history for hover tooltip:', err);
@@ -83,12 +83,12 @@ export const CurrentEffectiveTooltip: React.FC<CurrentEffectiveTooltipProps> = (
           
           <h4 className="font-extrabold text-slate-900 dark:text-white mb-2 flex items-center justify-between text-[11px] uppercase tracking-wider pb-1.5 border-b border-slate-100 dark:border-slate-700/50">
             <span>Reason for Change</span>
-            <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold normal-case">Audit Record</span>
+            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold normal-case">Audit Record</span>
           </h4>
 
           {loading ? (
             <div className="flex items-center justify-center gap-2 py-3 text-slate-500 dark:text-slate-400">
-              <Loader2 className="w-4 h-4 animate-spin text-purple-600 dark:text-purple-400" />
+              <Loader2 className="w-4 h-4 animate-spin text-cyan-600 dark:text-cyan-400" />
               <span>Fetching audit details...</span>
             </div>
           ) : error ? (
@@ -105,7 +105,7 @@ export const CurrentEffectiveTooltip: React.FC<CurrentEffectiveTooltipProps> = (
                   {historyRecord.previousStatusId}
                 </span>
                 <span>→</span>
-                <span className="bg-purple-100 dark:bg-purple-950 px-1 py-0.5 rounded text-purple-700 dark:text-purple-300 font-bold">
+                <span className="bg-cyan-100 dark:bg-cyan-950 px-1 py-0.5 rounded text-cyan-700 dark:text-cyan-300 font-bold">
                   {historyRecord.newStatusId}
                 </span>
               </div>
@@ -120,7 +120,7 @@ export const CurrentEffectiveTooltip: React.FC<CurrentEffectiveTooltipProps> = (
               {/* Timestamp and author */}
               <div className="flex flex-col gap-1 text-[10px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-700/50 pt-2">
                 <div className="flex items-center gap-1">
-                  <User className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                  <User className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
                   <span className="truncate">Changed by: <strong className="text-slate-700 dark:text-slate-300 font-semibold">{historyRecord.user}</strong></span>
                 </div>
                 <div className="flex items-center gap-1">

@@ -118,9 +118,12 @@ export async function createOrUpdateCalendarEvent(
   const statusName = statusConfig ? statusConfig.displayName : entry.currentStatusId;
 
   const startDate = entry.date;
-  const endDateObj = new Date(entry.date);
+  // Compute the exclusive end date in local time (UTC-shift via toISOString
+  // could push the date back a day for users east of UTC).
+  const [y, m, d] = entry.date.split('-').map(Number);
+  const endDateObj = new Date(y, (m || 1) - 1, d || 1);
   endDateObj.setDate(endDateObj.getDate() + 1);
-  const endDate = endDateObj.toISOString().substring(0, 10);
+  const endDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
 
   const eventPayload = {
     summary: `${statusName} [Duty Roster]`,

@@ -77,7 +77,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [clearNoticeMessage, setClearNoticeMessage] = useState<string | null>(null);
   const [selectedDeleteMonth, setSelectedDeleteMonth] = useState<string>('all');
   const [deleteFromGoogleCalendar, setDeleteFromGoogleCalendar] = useState<boolean>(true);
-  
+
   const [allEntries, setAllEntries] = useState<RosterEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(false);
 
@@ -288,45 +288,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  const sideTabClass = (active: boolean) =>
+    `w-full text-left px-3 py-2 rounded-md font-medium flex items-center gap-2 transition-colors ${
+      active ? 'bg-surface text-fg shadow-[var(--shadow-xs)]' : 'text-muted hover:text-fg'
+    }`;
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full md:max-h-[85vh] max-h-[90vh] flex flex-col overflow-hidden transition-all my-8">
-        
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-6 sm:py-10 px-4">
+      <div className="fixed inset-0 bg-black/40 dark:bg-black/60" />
+      <div className="relative card shadow-[var(--shadow-md)] rounded-xl w-full max-w-2xl md:max-h-[85vh] max-h-[90vh] flex flex-col overflow-hidden animate-scaleIn">
+
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-              <Settings className="w-5 h-5" />
+        <div className="px-5 py-3.5 border-b border-line flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-lg bg-[var(--accent-soft)] text-accent shrink-0">
+              <Settings className="w-4 h-4" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-fg truncate">
                 Application Settings
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-muted truncate">
                 Configure Google Calendar, Timezone, Statuses & Notifications
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="btn-icon shrink-0" aria-label="Close">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Container Body */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Side Tabs */}
-          <div className="w-full md:w-48 bg-slate-50 dark:bg-slate-800/40 p-2 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 space-y-1 text-xs">
+          <div className="w-full md:w-48 bg-well p-1.5 border-b md:border-b-0 md:border-r border-line space-y-1 text-xs">
             <button
               onClick={() => setActiveTab('google')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'google'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'google')}
             >
               <Calendar className="w-4 h-4" />
               Google Calendar
@@ -334,11 +332,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('database')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'database'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'database')}
             >
               <Database className="w-4 h-4" />
               Supabase Database
@@ -346,11 +340,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('statuses')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'statuses'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'statuses')}
             >
               <Palette className="w-4 h-4" />
               Roster Statuses
@@ -358,11 +348,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('hours')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'hours'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'hours')}
             >
               <Clock className="w-4 h-4" />
               Working Hours
@@ -370,11 +356,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('profile')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'profile'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'profile')}
             >
               <User className="w-4 h-4" />
               Profile & Timezone
@@ -382,11 +364,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('notifications')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'notifications'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'notifications')}
             >
               <Bell className="w-4 h-4" />
               Notifications
@@ -394,11 +372,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('users')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'users'
-                  ? 'bg-purple-600 text-white shadow-2xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800'
-              }`}
+              className={sideTabClass(activeTab === 'users')}
             >
               <Users className="w-4 h-4" />
               Allowed Users
@@ -406,10 +380,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('data')}
-              className={`w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                activeTab === 'data'
-                  ? 'bg-rose-600 text-white shadow-2xs'
-                  : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+              style={{ color: 'var(--danger)' }}
+              className={`w-full text-left px-3 py-2 rounded-md font-medium flex items-center gap-2 transition-colors ${
+                activeTab === 'data' ? 'bg-surface shadow-[var(--shadow-xs)]' : 'hover:opacity-80'
               }`}
             >
               <Database className="w-4 h-4" />
@@ -418,32 +391,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Main Tab Content */}
-          <div className="flex-1 p-6 overflow-y-auto space-y-4 text-xs">
-            
+          <div className="flex-1 px-5 py-4 overflow-y-auto space-y-4 text-xs">
+
             {/* GOOGLE CALENDAR TAB */}
             {activeTab === 'database' && (
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Database className="w-4 h-4 text-purple-600" />
+                  <h3 className="text-sm font-medium text-fg flex items-center gap-1.5">
+                    <Database className="w-4 h-4 text-accent" />
                     Supabase Database Setup & Status
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     Configure your own Supabase relational database to persist roster records, history, status configurations, and user details securely.
                   </p>
                 </div>
 
                 {/* CONNECTION STATUS CARD */}
-                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                <div className="card p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="font-medium text-fg">
                       Connection Status
                     </span>
                     <button
                       type="button"
                       onClick={fetchSupabaseStatus}
                       disabled={checkingSupabase}
-                      className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors"
+                      className="btn-min btn-secondary text-[11px]"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${checkingSupabase ? 'animate-spin' : ''}`} />
                       {checkingSupabase ? 'Checking...' : 'Refresh Status'}
@@ -451,14 +424,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   {!supabaseStatus ? (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                      <RefreshCw className="w-4 h-4 animate-spin text-slate-500" />
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-well text-muted">
+                      <RefreshCw className="w-4 h-4 animate-spin text-faint" />
                       <span className="font-medium">Retrieving connection state...</span>
                     </div>
                   ) : !supabaseStatus.configured ? (
-                    <div className="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 space-y-2">
-                      <div className="flex items-center gap-2 font-bold">
-                        <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <div
+                      className="p-3.5 rounded-lg space-y-2"
+                      style={{ background: 'var(--warning-bg)', color: 'var(--warning)' }}
+                    >
+                      <div className="flex items-center gap-2 font-semibold">
+                        <AlertCircle className="w-4 h-4" />
                         <span>Supabase Environment Secrets Missing</span>
                       </div>
                       <p className="text-[11px] leading-relaxed opacity-90">
@@ -466,19 +442,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </p>
                     </div>
                   ) : supabaseStatus.tablesMissing ? (
-                    <div className="p-3.5 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 space-y-2">
-                      <div className="flex items-center gap-2 font-bold">
-                        <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                    <div
+                      className="p-3.5 rounded-lg space-y-2"
+                      style={{ background: 'var(--danger-bg)', color: 'var(--danger)' }}
+                    >
+                      <div className="flex items-center gap-2 font-semibold">
+                        <AlertCircle className="w-4 h-4" />
                         <span>Connected but Database Schema Missing</span>
                       </div>
                       <p className="text-[11px] leading-relaxed opacity-90">
-                        We successfully contacted your Supabase project, but one or more required tables (like <code className="px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 font-mono text-[10px]">roster_statuses</code> or <code className="px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 font-mono text-[10px]">roster_entries</code>) do not exist yet. Please execute the SQL script below.
+                        We successfully contacted your Supabase project, but one or more required tables (like <code className="px-1.5 py-0.5 rounded bg-surface font-mono text-[10px]">roster_statuses</code> or <code className="px-1.5 py-0.5 rounded bg-surface font-mono text-[10px]">roster_entries</code>) do not exist yet. Please execute the SQL script below.
                       </p>
                     </div>
                   ) : supabaseStatus.error ? (
-                    <div className="p-3.5 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 space-y-2">
-                      <div className="flex items-center gap-2 font-bold">
-                        <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                    <div
+                      className="p-3.5 rounded-lg space-y-2"
+                      style={{ background: 'var(--danger-bg)', color: 'var(--danger)' }}
+                    >
+                      <div className="flex items-center gap-2 font-semibold">
+                        <AlertCircle className="w-4 h-4" />
                         <span>Connection Check Failed</span>
                       </div>
                       <p className="text-[11px] leading-relaxed opacity-90 font-mono">
@@ -486,9 +468,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </p>
                     </div>
                   ) : (
-                    <div className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 space-y-1">
-                      <div className="flex items-center gap-2 font-bold text-xs">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <div
+                      className="p-3.5 rounded-lg space-y-1"
+                      style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+                    >
+                      <div className="flex items-center gap-2 font-semibold text-xs">
+                        <CheckCircle2 className="w-4 h-4" />
                         <span>Supabase is Active & Ready</span>
                       </div>
                       <p className="text-[11px] leading-relaxed opacity-90">
@@ -500,39 +485,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 {/* HOW TO CONFIGURE SECRETS */}
                 <div className="space-y-3">
-                  <h4 className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                  <h4 className="font-medium text-fg flex items-center gap-1">
                     <span>1.</span> Configure AI Studio Environment
                   </h4>
-                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-2 text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
+                  <div className="card p-4 space-y-2 text-muted leading-relaxed text-[11px]">
                     <p>
                       To let your app connect to your Supabase project, you must set these environment secrets in Google AI Studio:
                     </p>
                     <ol className="list-decimal pl-4 space-y-1 font-medium">
-                      <li>Open the <strong className="text-slate-800 dark:text-slate-200">Settings</strong> menu (gear icon) in the AI Studio editor header.</li>
-                      <li>Go to the <strong className="text-slate-800 dark:text-slate-200">Secrets / Environment Variables</strong> panel.</li>
-                      <li>Define <code className="font-mono bg-slate-100 dark:bg-slate-800 text-purple-600 dark:text-purple-400 px-1 py-0.5 rounded">SUPABASE_URL</code> with your project's endpoint URL.</li>
-                      <li>Define <code className="font-mono bg-slate-100 dark:bg-slate-800 text-purple-600 dark:text-purple-400 px-1 py-0.5 rounded">SUPABASE_KEY</code> with your project's Public/Anon key.</li>
+                      <li>Open the <strong className="text-fg">Settings</strong> menu (gear icon) in the AI Studio editor header.</li>
+                      <li>Go to the <strong className="text-fg">Secrets / Environment Variables</strong> panel.</li>
+                      <li>Define <code className="font-mono bg-well text-accent px-1 py-0.5 rounded">SUPABASE_URL</code> with your project's endpoint URL.</li>
+                      <li>Define <code className="font-mono bg-well text-accent px-1 py-0.5 rounded">SUPABASE_KEY</code> with your project's Public/Anon key.</li>
                     </ol>
                   </div>
                 </div>
 
                 {/* SQL SETUP SCRIPT */}
                 <div className="space-y-3">
-                  <h4 className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                  <h4 className="font-medium text-fg flex items-center gap-1">
                     <span>2.</span> Deploy Database Tables
                   </h4>
-                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-3">
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <div className="card p-4 space-y-3">
+                    <p className="text-[11px] text-muted leading-relaxed">
                       Copy the custom-crafted table setup schema and execute it inside your Supabase project's SQL Editor to instantiate all necessary tables and columns:
                     </p>
                     <button
                       type="button"
                       onClick={handleCopySqlInSettings}
-                      className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 font-bold hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-all cursor-pointer"
+                      className="btn-min btn-secondary w-full cursor-pointer"
                     >
                       {copiedSql ? (
                         <>
-                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          <Check className="w-4 h-4" style={{ color: 'var(--success)' }} />
                           SQL Script Copied!
                         </>
                       ) : (
@@ -542,7 +527,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </>
                       )}
                     </button>
-                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 font-mono text-[10px] text-slate-500 max-h-24 overflow-y-auto border border-slate-100 dark:border-slate-800">
+                    <div className="p-2.5 rounded-lg bg-well font-mono text-[10px] text-muted max-h-24 overflow-y-auto">
                       -- Creates roster_statuses, roster_entries, roster_history, and system tables...
                       {"\n"}-- Automatically sets up primary keys, relations, and defaults.
                     </div>
@@ -554,12 +539,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* GOOGLE CALENDAR TAB */}
             {activeTab === 'google' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <span className="font-bold text-slate-900 dark:text-white block text-sm">
+                    <span className="font-medium text-fg block text-sm">
                       Google Calendar Sync Status
                     </span>
-                    <span className="text-slate-500 text-xs">
+                    <span className="text-xs text-muted">
                       {formData.googleCalendar.connected
                         ? `Connected as ${formData.googleCalendar.accountEmail}`
                         : 'Not connected'}
@@ -570,14 +555,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {formData.googleCalendar.connected && (
                       <button
                         onClick={handleDisconnectGoogle}
-                        className="px-3 py-2 rounded-xl bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 font-bold transition-colors"
+                        className="btn-min btn-secondary"
                       >
                         Disconnect
                       </button>
                     )}
                     <button
                       onClick={handleConnectGoogle}
-                      className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold transition-colors flex items-center gap-1.5 shadow-2xs"
+                      className="btn-min btn-primary"
                     >
                       <Calendar className="w-4 h-4" />
                       {formData.googleCalendar.connected ? 'Reconnect Calendar' : 'Connect Google Calendar'}
@@ -585,48 +570,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Target Calendar
-                  </label>
-                  <select
-                    value={formData.googleCalendar.selectedCalendarId || 'work-calendar-primary'}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        googleCalendar: {
-                          ...formData.googleCalendar,
-                          selectedCalendarId: e.target.value,
-                        },
-                      })
-                    }
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                  >
-                    <option value="work-calendar-primary">Work Calendar (Primary)</option>
-                    <option value="personal-calendar">Personal Calendar</option>
-                    <option value="office-calendar-shared">Office Roster Calendar</option>
-                  </select>
-                </div>
+                <div className="card p-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-fg mb-1">
+                      Target Calendar
+                    </label>
+                    <select
+                      value={formData.googleCalendar.selectedCalendarId || 'work-calendar-primary'}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          googleCalendar: {
+                            ...formData.googleCalendar,
+                            selectedCalendarId: e.target.value,
+                          },
+                        })
+                      }
+                      className="input-min"
+                    >
+                      <option value="work-calendar-primary">Work Calendar (Primary)</option>
+                      <option value="personal-calendar">Personal Calendar</option>
+                      <option value="office-calendar-shared">Office Roster Calendar</option>
+                    </select>
+                  </div>
 
-                <label className="flex items-center gap-2 cursor-pointer pt-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.googleCalendar.autoSync}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        googleCalendar: {
-                          ...formData.googleCalendar,
-                          autoSync: e.target.checked,
-                        },
-                      })
-                    }
-                    className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
-                  />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    Automatically sync changes to Google Calendar upon save
-                  </span>
-                </label>
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={formData.googleCalendar.autoSync}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          googleCalendar: {
+                            ...formData.googleCalendar,
+                            autoSync: e.target.checked,
+                          },
+                        })
+                      }
+                      className="rounded border-line accent-[var(--color-primary)]"
+                    />
+                    <span className="text-xs font-medium text-fg">
+                      Automatically sync changes to Google Calendar upon save
+                    </span>
+                  </label>
+                </div>
               </div>
             )}
 
@@ -634,17 +621,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'statuses' && (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-bold text-slate-900 dark:text-white">
+                  <span className="text-sm font-medium text-fg">
                     Centralized Roster Status Configuration
                   </span>
-                  <span className="text-[10px] text-slate-400">Preserves original color mapping</span>
+                  <span className="text-[10px] text-faint">Preserves original color mapping</span>
                 </div>
 
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                   {statusList.map((st, idx) => (
                     <div
                       key={st.code}
-                      className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex flex-wrap items-center justify-between gap-3"
+                      className="card p-3 flex flex-wrap items-center justify-between gap-3"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <input
@@ -658,15 +645,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           className="w-6 h-6 rounded cursor-pointer border-0 shrink-0"
                         />
                         <div className="min-w-0">
-                          <span className="font-bold text-slate-900 dark:text-white block">
+                          <span className="font-semibold text-fg block text-xs">
                             {st.code}
                           </span>
-                          <span className="text-[10px] text-slate-500">{st.description}</span>
+                          <span className="text-[10px] text-muted">{st.description}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <label className="flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                        <label className="flex items-center gap-1 text-[10px] font-medium text-muted">
                           <input
                             type="checkbox"
                             checked={st.active}
@@ -675,7 +662,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               updated[idx].active = e.target.checked;
                               setStatusList(updated);
                             }}
-                            className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
+                            className="rounded border-line accent-[var(--color-primary)]"
                           />
                           Active
                         </label>
@@ -688,13 +675,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* WORKING HOURS TAB */}
             {activeTab === 'hours' && (
-              <div className="space-y-4">
-                <h4 className="font-bold text-slate-900 dark:text-white">
+              <div className="card p-4 space-y-3">
+                <h4 className="text-sm font-medium text-fg">
                   Default Working Hours for RTD Roster
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs text-muted mb-1">
                       Start Time (RTD)
                     </label>
                     <input
@@ -706,11 +693,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           workingHours: { ...formData.workingHours, start: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                      className="input-min"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 dark:text-slate-400 mb-1">
+                    <label className="block text-xs text-muted mb-1">
                       End Time (RTD)
                     </label>
                     <input
@@ -722,7 +709,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           workingHours: { ...formData.workingHours, end: e.target.value },
                         })
                       }
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                      className="input-min"
                     />
                   </div>
                 </div>
@@ -731,27 +718,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* PROFILE & TIMEZONE TAB */}
             {activeTab === 'profile' && (
-              <div className="space-y-4">
+              <div className="card p-4 space-y-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-fg mb-1">
                     Employee Name
                   </label>
                   <input
                     type="text"
                     value={formData.userName}
                     onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="input-min"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-fg mb-1">
                     Timezone (Strict Date Preserving)
                   </label>
                   <select
                     value={formData.timezone}
                     onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+                    className="input-min"
                   >
                     <option value="Asia/Colombo">Asia/Colombo (Sri Lanka / India Standard Time)</option>
                     <option value="UTC">UTC (Coordinated Universal Time)</option>
@@ -764,7 +751,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* NOTIFICATIONS TAB */}
             {activeTab === 'notifications' && (
-              <div className="space-y-3">
+              <div className="card p-4 space-y-3">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -775,9 +762,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         notifications: { ...formData.notifications, enabled: e.target.checked },
                       })
                     }
-                    className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
+                    className="rounded border-line accent-[var(--color-primary)]"
                   />
-                  <span className="font-bold text-slate-900 dark:text-white">
+                  <span className="text-sm font-medium text-fg">
                     Enable System Notifications
                   </span>
                 </label>
@@ -796,9 +783,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           },
                         })
                       }
-                      className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
+                      className="rounded border-line accent-[var(--color-primary)]"
                     />
-                    <span>Notify on roster changes</span>
+                    <span className="text-xs text-fg">Notify on roster changes</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -814,9 +801,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           },
                         })
                       }
-                      className="rounded border-slate-300 dark:border-zinc-600 text-purple-600"
+                      className="rounded border-line accent-[var(--color-primary)]"
                     />
-                    <span>Alert on Google Calendar sync errors</span>
+                    <span className="text-xs text-fg">Alert on Google Calendar sync errors</span>
                   </label>
                 </div>
               </div>
@@ -824,12 +811,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {/* ALLOWED USERS TAB */}
             {activeTab === 'users' && (
-              <div className="space-y-4">
+              <div className="card p-4 space-y-3">
                 <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                  <h4 className="text-sm font-medium text-fg mb-1">
                     Allowed Google Accounts (Access Control)
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                  <p className="text-xs text-muted">
                     Only the Gmail/Google accounts listed below will be allowed to log in and manage this roster. All other accounts will be blocked.
                   </p>
                 </div>
@@ -840,7 +827,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     placeholder="Enter Gmail or Google Workspace email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-1 focus:ring-purple-500 outline-hidden"
+                    className="input-min flex-1"
                   />
                   <button
                     type="button"
@@ -854,7 +841,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         setNewEmail('');
                       }
                     }}
-                    className="px-3 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
+                    className="btn-min btn-primary shrink-0"
                   >
                     Add User
                   </button>
@@ -864,7 +851,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   {(formData.allowedEmails || ['emalyaditha@gmail.com']).map((email) => (
                     <div
                       key={email}
-                      className="p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-300"
+                      className="border border-line rounded-md p-2.5 bg-surface flex items-center justify-between text-xs font-medium text-fg"
                     >
                       <span>{email}</span>
                       {email !== 'emalyaditha@gmail.com' && (
@@ -876,7 +863,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               allowedEmails: (formData.allowedEmails || ['emalyaditha@gmail.com']).filter((e) => e !== email),
                             });
                           }}
-                          className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                          style={{ color: 'var(--danger)' }}
+                          className="p-1 rounded-md hover:bg-[var(--danger-bg)] cursor-pointer transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -890,24 +878,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* DATA & RESET TAB */}
             {activeTab === 'data' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60">
+                <div className="card p-4">
                   <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-200 flex-shrink-0 mt-0.5">
+                    <div
+                      className="p-2 rounded-lg shrink-0 mt-0.5"
+                      style={{ background: 'var(--danger-bg)', color: 'var(--danger)' }}
+                    >
                       <Trash2 className="w-5 h-5" />
                     </div>
-                    <div className="flex-1 space-y-3">
+                    <div className="flex-1 space-y-3 min-w-0">
                       <div>
-                        <h4 className="text-sm font-bold text-rose-900 dark:text-rose-200">
+                        <h4 className="text-sm font-medium text-fg">
                           Delete Uploaded Roster & Calendar Data
                         </h4>
-                        <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">
+                        <p className="text-xs text-muted mt-0.5">
                           Select a specific roster month or choose to delete all uploaded roster entries and clear them from Google Calendar.
                         </p>
                       </div>
 
                       {/* Month Selection */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+                        <label className="block text-xs font-medium text-fg">
                           Select Roster Month to Delete:
                         </label>
                         <select
@@ -916,7 +907,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             setSelectedDeleteMonth(e.target.value);
                             setShowConfirmClear(false);
                           }}
-                          className="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-rose-200 dark:border-rose-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500"
+                          className="input-min"
                         >
                           <option value="all">🗑️ Delete All Months ({activeEntries?.length || 0} total entries)</option>
 
@@ -954,8 +945,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
 
                       {/* Google Calendar Sync Checkbox */}
-                      <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-rose-200 dark:border-rose-900/60">
-                        <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-rose-900 dark:text-rose-200">
+                      <div className="p-2.5 rounded-lg bg-well">
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-fg">
                           <input
                             type="checkbox"
                             checked={deleteFromGoogleCalendar}
@@ -963,10 +954,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               setDeleteFromGoogleCalendar(e.target.checked);
                               setShowConfirmClear(false);
                             }}
-                            className="rounded border-rose-300 dark:border-zinc-600 text-rose-600 focus:ring-rose-500"
+                            className="rounded border-line accent-[var(--color-primary)]"
                           />
                           <span className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5 text-rose-600" />
+                            <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--danger)' }} />
                             Also delete corresponding events from Google Calendar
                           </span>
                         </label>
@@ -978,7 +969,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           type="button"
                           onClick={() => setShowConfirmClear(true)}
                           disabled={isClearingData}
-                          className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-colors disabled:opacity-50"
+                          className="btn-min btn-danger-min text-xs"
                         >
                           <Trash2 className="w-4 h-4" />
                           {isClearingData
@@ -988,13 +979,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             : `Delete Selected Dataset`}
                         </button>
                       ) : (
-                        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 space-y-3">
-                          <p className="text-xs font-bold text-rose-800 dark:text-rose-200">
+                        <div
+                          className="p-3.5 rounded-lg space-y-3"
+                          style={{ background: 'var(--danger-bg)' }}
+                        >
+                          <p className="text-xs font-semibold" style={{ color: 'var(--danger)' }}>
                             ⚠️ Are you sure you want to permanently delete this roster data?
                           </p>
-                          <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                          <p className="text-[11px] text-muted leading-relaxed">
                             This action will permanently delete{' '}
-                            <span className="font-bold text-rose-700 dark:text-rose-300">
+                            <span className="font-semibold" style={{ color: 'var(--danger)' }}>
                               {selectedDeleteMonth === 'all'
                                 ? 'ALL roster entries across all months'
                                 : `ratios / entries for ${selectedDeleteMonth}`}
@@ -1006,7 +1000,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               type="button"
                               onClick={executeClearData}
                               disabled={isClearingData}
-                              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                              style={{ background: 'var(--danger)', color: '#fff' }}
+                              className="inline-flex items-center justify-center rounded-md h-9 px-3.5 text-sm font-medium cursor-pointer transition-opacity disabled:opacity-50"
                             >
                               {isClearingData ? 'Deleting...' : 'Yes, Permanently Delete'}
                             </button>
@@ -1014,7 +1009,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               type="button"
                               onClick={() => setShowConfirmClear(false)}
                               disabled={isClearingData}
-                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-bold transition-colors cursor-pointer disabled:opacity-50"
+                              className="btn-min btn-secondary text-xs"
                             >
                               Cancel
                             </button>
@@ -1026,8 +1021,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {clearSuccess && (
-                  <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs flex items-center gap-2 font-bold">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                  <div
+                    className="p-3.5 rounded-lg text-xs flex items-center gap-2 font-medium"
+                    style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+                  >
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
                     <span>{clearNoticeMessage || 'Uploaded data has been successfully deleted!'}</span>
                   </div>
                 )}
@@ -1037,8 +1035,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs flex items-center gap-1">
+        <div className="px-5 py-3.5 border-t border-line flex items-center justify-between">
+          <span className="font-medium text-xs flex items-center gap-1" style={{ color: 'var(--success)' }}>
             {saveSuccess && (
               <>
                 <CheckCircle2 className="w-4 h-4" /> Settings Saved!
@@ -1047,16 +1045,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </span>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-            >
+            <button onClick={onClose} className="btn-min btn-secondary">
               Close
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-5 py-2 text-xs font-bold rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+              className="btn-min btn-primary"
             >
               {isSaving ? 'Saving...' : 'Save Settings'}
             </button>
@@ -1064,6 +1059,5 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
