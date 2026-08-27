@@ -19,7 +19,17 @@ import {
 } from '../types/tasks';
 import { auth } from './googleAuth';
 
-const API_TIMEOUT_MS = 15_000;
+const API_TIMEOUT_MS = 8_000; // was 15s — cuts perceived hang on slow networks
+// Dedup getIdToken per request burst — firebase token fetch is ~200-400ms each time
+let tokenCache: { token: string | null; ts: number } | null = null;
+const TOKEN_CACHE_TTL = 55_000; // firebase tokens live ~1h, reuse within ~55s burst
+async function getCachedToken(): Promise<string | null> {
+  const now = Date.now();
+  if (tokenCache && now - tokenCache.ts < TOKEN_CACHE_TTL) return tokenCache.token;
+  const t = auth.currentUser ? await auth.currentUser.getIdToken().catch(() => null) : null;
+  tokenCache = { token: t, ts: now };
+  return t;
+}
 
 /** ApiError carries the HTTP status so callers can react to 401/403/409 etc. */
 export class ApiError extends Error {
@@ -32,7 +42,7 @@ export class ApiError extends Error {
 
 async function authorizedFetch(url: string, init: RequestInit = {}): Promise<Response> {
   const headers = { 'Content-Type': 'application/json', ...(init.headers || {}) } as Record<string, string>;
-  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+  const token = await getCachedToken();
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }

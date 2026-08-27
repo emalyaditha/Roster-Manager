@@ -29,7 +29,8 @@ export const CalendarLoader: React.FC<CalendarLoaderProps> = ({
 
   const text = messages && messages.length > 0 ? messages[msgIndex % messages.length] : label;
   const now = useMemo(() => new Date(), []);
-  const days = useMemo(() => Array.from({ length: 31 }, (_, i) => i + 1), []);
+  // Only 14 cells (2 weeks) for compact animation — 31 cells + 70ms stagger caused 2.1s jank on low-end
+  const days = useMemo(() => compact ? Array.from({ length: 14 }, (_, i) => i + 1) : Array.from({ length: 21 }, (_, i) => i + 1), [compact]);
   const monthLabel = now.toLocaleString('en-US', { month: 'short' }).toUpperCase();
   const today = now.getDate();
 
@@ -57,7 +58,7 @@ export const CalendarLoader: React.FC<CalendarLoaderProps> = ({
             <span
               key={d}
               className={`cal-loader-cell${d === today ? ' is-today' : ''}`}
-              style={{ animationDelay: `${((d - 1) % 31) * 70}ms` }}
+              style={{ animationDelay: `${((d - 1) % 14) * 40}ms` }}
             >
               {d}
             </span>

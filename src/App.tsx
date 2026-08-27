@@ -22,13 +22,15 @@ import {
 } from "./services/googleAuth";
 import { AppShell, type ViewTab } from "./components/AppShell";
 import { LoginScreen } from "./components/LoginScreen";
-import { RosterTable } from "./components/RosterTable";
-import { RosterCardList } from "./components/RosterCardList";
-import { RosterCalendarView } from "./components/RosterCalendarView";
-import { SummaryCards } from "./components/SummaryCards";
 import { CalendarLoader } from "./components/CalendarLoader";
 import { AccessBadgeLoader } from "./components/AccessBadgeLoader";
 import { Toast, ToastItem } from "./components/Toast";
+// Heavy views — lazy so initial JS is small
+const RosterTable = React.lazy(() => import("./components/RosterTable").then(m => ({ default: m.RosterTable })));
+const RosterCardList = React.lazy(() => import("./components/RosterCardList").then(m => ({ default: m.RosterCardList })));
+const RosterCalendarView = React.lazy(() => import("./components/RosterCalendarView").then(m => ({ default: m.RosterCalendarView })));
+const SummaryCards = React.lazy(() => import("./components/SummaryCards").then(m => ({ default: m.SummaryCards })));
+const AppShellLazyFallback = () => <div className="py-8 flex justify-center"><CalendarLoader compact label="Loading" /></div>;
 import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode, isPartialLeaveCode, getShortLeaveCutoff } from "./utils/leave";
 
 const LazyDashboardOverview = React.lazy(() => import("./components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
@@ -299,21 +301,18 @@ export default function App() {
     if (!currentUser) return;
     const seq = ++loadDataSeqRef.current;
     setLoading(true);
+    // Supabase status is non-critical — fire-and-forget so it never blocks roster paint
+    api.getSupabaseStatus().then((s) => {
+      if (seq === loadDataSeqRef.current) setSupabaseStatus(s);
+    }).catch(() => {});
     try {
-      try {
-        const sStatus = await api.getSupabaseStatus();
-        if (seq !== loadDataSeqRef.current) return;
-        setSupabaseStatus(sStatus);
-      } catch (sErr) {
-        console.warn("Could not retrieve Supabase status:", sErr);
-      }
-
-      const [fetchedEntries, fetchedStatuses, fetchedSettings, fetchedSummary] =
+      const [fetchedEntries, fetchedStatuses, fetchedSettings, fetchedSummary, leaveRes] =
         await Promise.all([
           api.getRosters({ monthYear: currentMonthYear }),
           api.getStatuses(),
           api.getSettings(),
           api.getSummary(currentMonthYear),
+          api.getLeaveBalance(currentLeaveYear).catch(() => ({ rows: [] as LeaveRow[] } as any)),
         ]);
 
       if (seq !== loadDataSeqRef.current) return;
@@ -326,6 +325,7 @@ export default function App() {
       setStatuses(mergedStatuses);
       setSettings(fetchedSettings);
       setMonthSummary(fetchedSummary);
+      if (leaveRes?.rows) setLeaveRows(leaveRes.rows);
       setSelectedIds([]);
       setAuthError(null);
     } catch (err: any) {
@@ -343,7 +343,7 @@ export default function App() {
       }
     } finally {
       setLoading(false);
-      loadLeaveBalance(currentLeaveYear);
+      setLeaveLoading(false);
     }
   };
 
@@ -780,7 +780,7 @@ export default function App() {
         ) : (
           <>
             {activeTab === "table" && (
-              <>
+              <Suspense fallback={<CalendarLoader compact label="Loading roster" />}>
                 <SummaryCards
                   entries={entries}
                   statuses={statuses}
@@ -815,10 +815,11 @@ export default function App() {
                   onDeleteClick={(entry) => setDeleteModalEntry(entry)}
                   onSyncSingleClick={handleSyncSingle}
                 />
-              </>
+              </Suspense>
             )}
 
             {activeTab === "calendar" && (
+              <Suspense fallback={<CalendarLoader compact label="Loading calendar" />}>
               <RosterCalendarView
                 entries={entries}
                 statuses={statuses}
@@ -826,6 +827,7 @@ export default function App() {
                 onMonthChange={(m) => setCurrentMonthYear(m)}
                 onEntryClick={(entry) => setChangeModalEntry(entry)}
               />
+              </Suspense>
             )}
 
             {activeTab === "dashboard" && (

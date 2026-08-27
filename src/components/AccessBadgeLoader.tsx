@@ -15,7 +15,7 @@ export const AccessBadgeLoader: React.FC<AccessBadgeLoaderProps> = ({ messages }
     if (!messages || messages.length <= 1) return;
     const timer = setInterval(() => {
       setMsgIndex((i) => (i + 1) % messages.length);
-    }, 1600);
+    }, 1800); // 1.6s -> 1.8s reduces re-renders during auth gate
     return () => clearInterval(timer);
   }, [messages]);
 
