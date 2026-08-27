@@ -233,6 +233,9 @@ function handleSupabaseError(context: string, err: any) {
       supabaseTablesMissing = true;
       console.log(`[Supabase Sync] Note: ${safeContext} is using local/firebase storage fallback. (Detail: ${safeMessage} | Code: ${errorCode})`);
     }
+  } else if (errorCode === 'PGRST204' || errorMessage.includes('column') || errorMessage.includes('schema cache')) {
+    // Schema mismatch (e.g., otMorningHours missing) — log actionable migration hint and fall back to local so UI still updates
+    console.log(`[Supabase Sync] Note: ${safeContext} — schema mismatch (Code: ${errorCode}). Run supabase_setup.sql migration in Supabase SQL Editor, then restart. Detail: ${safeMessage}`);
   } else {
     console.log(`[Supabase Sync] Note: ${safeContext} is using local/firebase storage fallback. (Detail: ${safeMessage} | Code: ${errorCode})`);
   }
@@ -260,7 +263,22 @@ async function syncFullTable(
   const ids = rows.map((r) => r[idColumn]);
   if (ids.length > 0) {
     const { error: upsertError } = await supabaseClient.from(table).upsert(rows);
-    if (upsertError) throw upsertError;
+    if (upsertError) {
+      // PGRST204 = schema cache miss (column not in table) — retry without the new OT/clock columns
+      const msg = (upsertError as any)?.message || '';
+      const code = (upsertError as any)?.code || '';
+      if (code === 'PGRST204' && table === 'roster_entries') {
+        const stripped = rows.map((r: any) => {
+          const { otMorningHours, otNightHours, ...rest } = r;
+          // Also map camelCase clock fields that may be unknown in old schema
+          return rest;
+        });
+        const { error: retryError } = await supabaseClient.from(table).upsert(stripped);
+        if (retryError) throw retryError;
+      } else {
+        throw upsertError;
+      }
+    }
 
     const escaped = ids.map((id) => `"${String(id).replace(/"/g, '""')}"`).join(',');
     const { error: deleteError } = await supabaseClient

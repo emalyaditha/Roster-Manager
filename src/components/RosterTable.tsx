@@ -103,8 +103,8 @@ export const RosterTable = React.memo<RosterTableProps>(({
                     </button>
                   </th>
                    <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[130px]">Date &amp; Day</th>
-                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[140px]">Effective Roster</th>
                    <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[120px]">Original Status</th>
+                   <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[140px]">Effective Roster</th>
                    <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[130px]">Clock Times</th>
                    <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[120px]">OT &amp; Shift</th>
                    <th className="px-3 py-2.5 text-left text-[11px] font-medium uppercase tracking-wide text-muted border-b border-line bg-well/50 min-w-[160px]">Action &amp; Notes</th>
@@ -166,6 +166,11 @@ export const RosterTable = React.memo<RosterTableProps>(({
                         </div>
                       </td>
 
+                      {/* Original Status */}
+                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
+                        <StatusBadge statusId={entry.originalStatusId} statuses={statuses} size="sm" />
+                      </td>
+
                       {/* Effective Roster Badge */}
                       <td className="px-3 py-2.5 text-sm text-fg align-middle">
                         <div className="flex items-center gap-1.5">
@@ -178,11 +183,6 @@ export const RosterTable = React.memo<RosterTableProps>(({
                             />
                           )}
                         </div>
-                      </td>
-
-                      {/* Original Status */}
-                      <td className="px-3 py-2.5 text-sm text-fg align-middle">
-                        <StatusBadge statusId={entry.originalStatusId} statuses={statuses} size="sm" />
                       </td>
 
                       {/* Clock In / Out Times */}
