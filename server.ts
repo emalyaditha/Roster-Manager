@@ -197,9 +197,14 @@ async function createServer() {
   // phases. (Cross-process safety comes from Supabase being authoritative
   // plus upsert-before-delete ordering.)
   let rosterWriteQueue: Promise<unknown> = Promise.resolve();
-  function withRosterLock(handler: (req: any, res: any) => Promise<any>): (req: any, res: any) => Promise<any> {
+  function withRosterLock(handler: (req: any, res: any) => Promise<any>, timeoutMs = 15000): (req: any, res: any) => Promise<any> {
     return async (req: any, res: any) => {
-      const run = rosterWriteQueue.then(() => handler(req, res));
+      const run = rosterWriteQueue.then(() =>
+        Promise.race([
+          handler(req, res),
+          new Promise((_, rej) => setTimeout(() => rej(Object.assign(new Error('Roster lock timeout'), { status: 504 })), timeoutMs)),
+        ])
+      );
       rosterWriteQueue = run.then(
         () => undefined,
         () => undefined

@@ -24,7 +24,6 @@ export default defineConfig(() => {
             // Heavy external deps — each gets its own chunk so initial JS is smaller
             firebase: ['firebase/app', 'firebase/auth'],
             motion: ['motion'],
-            supabase: ['@supabase/supabase-js'],
             xlsx: ['xlsx'],
             vendor: ['react', 'react-dom', 'lucide-react', '@floating-ui/react'],
           },

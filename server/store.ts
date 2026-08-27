@@ -87,17 +87,27 @@ export function readDataFileStrict<T>(filename: string, defaultValue: T): T {
 
 export function writeDataFileStrict<T>(filename: string, data: T): void {
   const filePath = getWriteFilePath(filename);
-  const tmpPath = `${filePath}.tmp`;
+  const tmpPath = `${filePath}.tmp.${process.pid}.${Date.now()}`;
   fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
-  fs.renameSync(tmpPath, filePath);
+  // Windows EBUSY/EPERM retry (AV lock) — seen in dev-server.err.log on src/index.css
+  for (let i = 0; i < 3; i++) {
+    try {
+      fs.renameSync(tmpPath, filePath);
+      return;
+    } catch (e: any) {
+      if ((e?.code === 'EBUSY' || e?.code === 'EPERM') && i < 2) {
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50 * (i + 1));
+        continue;
+      }
+      try { fs.unlinkSync(tmpPath); } catch {}
+      throw e;
+    }
+  }
 }
 
 export function writeJsonFile<T>(filename: string, data: T): void {
-  try {
-    writeDataFileStrict(filename, data);
-  } catch (error) {
-    console.warn(`Warning writing ${filename}:`, error);
-  }
+  // Must throw on failure so callers (saveRosters/saveHistory) surface 500 instead of fake 200
+  writeDataFileStrict(filename, data);
 }
 
 const DEFAULT_SETTINGS: AppSettings = {

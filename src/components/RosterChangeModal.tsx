@@ -52,27 +52,32 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastHistory, setLastHistory] = useState<RosterChangeHistory | null>(null);
 
+  // Single effect keyed by entry.id — fixes double-effect race and stale history on rapid open/close
   useEffect(() => {
-    if (entry) {
-      setNewStatusId(entry.currentStatusId || '');
-      setAction(entry.action || '');
-      setNotes(entry.notes || '');
-      setClockIn(entry.clockIn || '');
-      setClockOut(entry.clockOut || '');
-      setOt(entry.ot || false);
-      setOtMorningHours(entry.otMorningHours !== undefined ? String(entry.otMorningHours) : '0');
-      setOtNightHours(entry.otNightHours !== undefined ? String(entry.otNightHours) : '0');
-      // Fetch last audit record to show Original vs Last Updated
-      api.getHistory(entry.id).then((list) => {
-        if (list.length > 0) {
-          const sorted = [...list].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-          setLastHistory(sorted[0]);
-        } else {
-          setLastHistory(null);
-        }
-      }).catch(() => setLastHistory(null));
-    }
-  }, [entry]);
+    if (!entry?.id) { setLastHistory(null); return; }
+    const id = entry.id;
+    setNewStatusId(entry.currentStatusId || '');
+    setAction(entry.action || '');
+    setReason('');
+    setNotes(entry.notes || '');
+    setClockIn(entry.clockIn || '');
+    setClockOut(entry.clockOut || '');
+    setOt(entry.ot || false);
+    setOtMorningHours(entry.otMorningHours !== undefined ? String(entry.otMorningHours) : '0');
+    setOtNightHours(entry.otNightHours !== undefined ? String(entry.otNightHours) : '0');
+    setUpdateCalendar(true);
+    const ac = new AbortController();
+    api.getHistory(id).then((list) => {
+      if (ac.signal.aborted) return;
+      if (list.length > 0) {
+        const sorted = [...list].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setLastHistory(sorted[0]);
+      } else {
+        setLastHistory(null);
+      }
+    }).catch(() => { if (!ac.signal.aborted) setLastHistory(null); });
+    return () => ac.abort();
+  }, [entry?.id]);
 
   // Time calculator state
   const [showCalculator, setShowCalculator] = useState(false);
@@ -142,18 +147,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
     return 0;
   };
 
-  useEffect(() => {
-    if (entry) {
-      setNewStatusId(entry.currentStatusId);
-      setAction(entry.action || '');
-      setReason('');
-      setNotes(entry.notes || '');
-      setOt(entry.ot || false);
-      setOtMorningHours(entry.otMorningHours !== undefined ? String(entry.otMorningHours) : '0');
-      setOtNightHours(entry.otNightHours !== undefined ? String(entry.otNightHours) : '0');
-      setUpdateCalendar(true);
-    }
-  }, [entry]);
+
 
   // When status selection changes, auto-suggest the standard description for action
   const handleStatusSelect = (code: string) => {

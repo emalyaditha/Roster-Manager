@@ -19,17 +19,33 @@ import {
 } from '../types/tasks';
 import { auth } from './googleAuth';
 
-const API_TIMEOUT_MS = 8_000; // was 15s — cuts perceived hang on slow networks
-// Dedup getIdToken per request burst — firebase token fetch is ~200-400ms each time
-let tokenCache: { token: string | null; ts: number } | null = null;
-const TOKEN_CACHE_TTL = 55_000; // firebase tokens live ~1h, reuse within ~55s burst
-async function getCachedToken(): Promise<string | null> {
+const API_TIMEOUT_MS = 12_000; // 15s was slow, 8s aborts Supabase upserts — 12s balanced
+let tokenCache: { token: string; ts: number } | null = null;
+let tokenPromise: Promise<string | null> | null = null;
+const TOKEN_CACHE_TTL = 55_000;
+async function getCachedToken(force = false): Promise<string | null> {
   const now = Date.now();
-  if (tokenCache && now - tokenCache.ts < TOKEN_CACHE_TTL) return tokenCache.token;
-  const t = auth.currentUser ? await auth.currentUser.getIdToken().catch(() => null) : null;
-  tokenCache = { token: t, ts: now };
-  return t;
+  if (!force && tokenCache && now - tokenCache.ts < TOKEN_CACHE_TTL) return tokenCache.token;
+  if (!force && tokenPromise) return tokenPromise;
+  tokenPromise = (async () => {
+    try {
+      const t = auth.currentUser ? await auth.currentUser.getIdToken(false).catch(() => null) : null;
+      if (t) tokenCache = { token: t, ts: Date.now() };
+      else tokenCache = null;
+      return t;
+    } catch {
+      tokenCache = null;
+      return null;
+    } finally {
+      tokenPromise = null;
+    }
+  })();
+  return tokenPromise;
 }
+// Called on auth change / sign-out and on 401 to drop stale token
+function invalidateTokenCache() { tokenCache = null; tokenPromise = null; }
+// Expose for App.tsx onAuthStateChanged
+if (typeof window !== 'undefined') (window as any).__invalidateTokenCache = invalidateTokenCache;
 
 /** ApiError carries the HTTP status so callers can react to 401/403/409 etc. */
 export class ApiError extends Error {
@@ -42,18 +58,29 @@ export class ApiError extends Error {
 
 async function authorizedFetch(url: string, init: RequestInit = {}): Promise<Response> {
   const headers = { 'Content-Type': 'application/json', ...(init.headers || {}) } as Record<string, string>;
-  const token = await getCachedToken();
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-  const res = await fetch(url, {
+  let token = await getCachedToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  let res = await fetch(url, {
     ...init,
     headers,
     signal: init.signal ?? AbortSignal.timeout(API_TIMEOUT_MS),
   });
+  // On 401 try once with force-refreshed token (handles expiry mid-TTL)
+  if (res.status === 401) {
+    invalidateTokenCache();
+    token = await getCachedToken(true);
+    if (token) headers.Authorization = `Bearer ${token}`;
+    else delete (headers as any).Authorization;
+    const retry = await fetch(url, {
+      ...init,
+      headers,
+      signal: init.signal ?? AbortSignal.timeout(API_TIMEOUT_MS),
+    });
+    // If retry also 401/403, surface it; otherwise use retry response
+    if (retry.ok || retry.status === 401 || retry.status === 403) res = retry;
+    else if (retry.status !== 401) res = retry;
+  }
   if (!res.ok) {
-    // Throw ApiError with the HTTP status at the single choke point so every
-    // caller (and App.tsx's 401/403 handling) can react to auth failures.
     const body = await res.json().catch(() => ({} as any));
     throw new ApiError(body?.error || `Request failed (${res.status})`, res.status);
   }

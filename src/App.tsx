@@ -30,7 +30,7 @@ const RosterTable = React.lazy(() => import("./components/RosterTable").then(m =
 const RosterCardList = React.lazy(() => import("./components/RosterCardList").then(m => ({ default: m.RosterCardList })));
 const RosterCalendarView = React.lazy(() => import("./components/RosterCalendarView").then(m => ({ default: m.RosterCalendarView })));
 const SummaryCards = React.lazy(() => import("./components/SummaryCards").then(m => ({ default: m.SummaryCards })));
-const AppShellLazyFallback = () => <div className="py-8 flex justify-center"><CalendarLoader compact label="Loading" /></div>;
+
 import { LEAVE_CODE_TO_TYPE, getBalanceForCode, getDisplayCode, isPartialLeaveCode, getShortLeaveCutoff } from "./utils/leave";
 
 const LazyDashboardOverview = React.lazy(() => import("./components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
@@ -169,6 +169,8 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      // Invalidate stale token cache on any auth change (fixes 55s stale-null bug)
+      (window as any).__invalidateTokenCache?.();
       setAuthLoading(true);
       if (fbUser) {
         try {
@@ -206,7 +208,7 @@ export default function App() {
           setAuthLoading(false);
         }
       } else {
-        // Require explicit Google authentication on new or unauthenticated sessions
+        (window as any).__invalidateTokenCache?.();
         setCurrentUser(null);
         localStorage.removeItem("em_roster_user_session");
         localStorage.removeItem("em_roster_gcal_token");
@@ -882,21 +884,27 @@ export default function App() {
         statuses={statuses}
         onClose={() => setIsAddRosterModalOpen(false)}
         onAddRoster={async (data) => {
-          await api.addRoster({
-            date: data.date,
-            day: data.day,
-            originalStatusId: data.originalStatusId,
-            changedStatusId: data.changedStatusId,
-            action: data.action,
-            notes: data.notes,
-            ot: data.ot,
-            clockIn: data.clockIn,
-            clockOut: data.clockOut,
-            otMorningHours: data.otMorningHours,
-            otNightHours: data.otNightHours,
-          });
-          setIsAddRosterModalOpen(false);
-          loadData();
+          try {
+            await api.addRoster({
+              date: data.date,
+              day: data.day,
+              originalStatusId: data.originalStatusId,
+              changedStatusId: data.changedStatusId,
+              action: data.action,
+              notes: data.notes,
+              ot: data.ot,
+              clockIn: data.clockIn,
+              clockOut: data.clockOut,
+              otMorningHours: data.otMorningHours,
+              otNightHours: data.otNightHours,
+            });
+            setIsAddRosterModalOpen(false);
+            pushToast("success", "Roster entry added");
+            loadData();
+          } catch (e: any) {
+            pushToast("error", "Failed to add roster", e?.message || String(e));
+            throw e;
+          }
         }}
       />
 
@@ -911,21 +919,27 @@ export default function App() {
         }}
         onSave={async (data) => {
           if (!changeModalEntry) return;
-          await api.updateRoster(changeModalEntry.id, {
-            currentStatusId: data.newStatusId,
-            action: data.action,
-            reason: data.reason,
-            notes: data.notes,
-            ot: data.ot,
-            clockIn: data.clockIn,
-            clockOut: data.clockOut,
-            otMorningHours: data.otMorningHours,
-            otNightHours: data.otNightHours,
-            user: currentUser?.displayName || "User",
-            updateCalendar: data.updateCalendar,
-          });
-          setChangeModalEntry(null);
-          loadData();
+          try {
+            await api.updateRoster(changeModalEntry.id, {
+              currentStatusId: data.newStatusId,
+              action: data.action,
+              reason: data.reason,
+              notes: data.notes,
+              ot: data.ot,
+              clockIn: data.clockIn,
+              clockOut: data.clockOut,
+              otMorningHours: data.otMorningHours,
+              otNightHours: data.otNightHours,
+              user: currentUser?.displayName || "User",
+              updateCalendar: data.updateCalendar,
+            });
+            setChangeModalEntry(null);
+            pushToast("success", `Roster updated to ${data.newStatusId}`);
+            loadData();
+          } catch (e: any) {
+            pushToast("error", "Roster update failed", e?.message || String(e));
+            throw e;
+          }
         }}
       />
 
@@ -1001,9 +1015,15 @@ export default function App() {
         onClose={() => setDeleteModalEntry(null)}
         onConfirmDelete={async (deleteGCal) => {
           if (!deleteModalEntry) return;
-          await api.deleteRoster(deleteModalEntry.id, deleteGCal);
-          setDeleteModalEntry(null);
-          loadData();
+          try {
+            await api.deleteRoster(deleteModalEntry.id, deleteGCal);
+            setDeleteModalEntry(null);
+            pushToast("success", "Entry deleted");
+            loadData();
+          } catch (e: any) {
+            pushToast("error", "Delete failed", e?.message || String(e));
+            throw e;
+          }
         }}
       />
 
@@ -1033,12 +1053,18 @@ export default function App() {
           entries={entries}
           onClose={() => setIsSettingsModalOpen(false)}
           onSettingsUpdate={async (newSettings) => {
-            await api.updateSettings(newSettings);
-            setSettings(newSettings);
+            try {
+              await api.updateSettings(newSettings);
+              setSettings(newSettings);
+              pushToast("success", "Settings saved");
+            } catch (e: any) { pushToast("error", "Settings save failed", e?.message); throw e; }
           }}
           onStatusesUpdate={async (newStatuses) => {
-            await api.updateStatuses(newStatuses);
-            setStatuses(newStatuses);
+            try {
+              await api.updateStatuses(newStatuses);
+              setStatuses(newStatuses);
+              pushToast("success", "Statuses saved");
+            } catch (e: any) { pushToast("error", "Statuses save failed", e?.message); throw e; }
           }}
         />
       )}
@@ -1049,16 +1075,22 @@ export default function App() {
         statuses={statuses}
         onClose={() => setIsBulkEditModalOpen(false)}
         onApplyBulkChange={async (data) => {
-          await api.bulkUpdate(data.ids, {
-            currentStatusId: data.newStatusId,
-            action: data.action,
-            reason: data.reason,
-            user: currentUser?.displayName || "User",
-            updateCalendar: data.updateCalendar,
-          });
-          setIsBulkEditModalOpen(false);
-          setSelectedIds([]);
-          loadData();
+          try {
+            await api.bulkUpdate(data.ids, {
+              currentStatusId: data.newStatusId,
+              action: data.action,
+              reason: data.reason,
+              user: currentUser?.displayName || "User",
+              updateCalendar: data.updateCalendar,
+            });
+            setIsBulkEditModalOpen(false);
+            setSelectedIds([]);
+            pushToast("success", `Bulk updated ${data.ids.length} entries`);
+            loadData();
+          } catch (e: any) {
+            pushToast("error", "Bulk update failed", e?.message || String(e));
+            throw e;
+          }
         }}
       />
 
