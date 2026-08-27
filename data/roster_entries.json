@@ -602,7 +602,7 @@
     "googleCalendarEventId": "4cp8evrhd6qfv309sm6k8eh74o",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "User",
     "clockIn": "",
     "clockOut": ""
@@ -621,7 +621,7 @@
     "googleCalendarEventId": "rn42havlsfo96o4ru10r4a6f1g",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -640,7 +640,7 @@
     "googleCalendarEventId": "pl06kgvgu8ue122i297b8tbldk",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -659,7 +659,7 @@
     "googleCalendarEventId": "735vihv9j7c1f12oirfime3dp4",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -678,7 +678,7 @@
     "googleCalendarEventId": "rfd85sqrjjjs6me4avjdvimoio",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -697,7 +697,7 @@
     "googleCalendarEventId": "22letdrqsv3t8kg1t9a93fabb4",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -716,7 +716,7 @@
     "googleCalendarEventId": "v3rjn6bd09dpctop7frl9r40qs",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -735,7 +735,7 @@
     "googleCalendarEventId": "p6a7bc8op5hubvidd1h16at3h4",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -754,7 +754,7 @@
     "googleCalendarEventId": "sf3d870u7ktdqmbanvhi52c7g0",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -773,7 +773,7 @@
     "googleCalendarEventId": "def6t4jtf690k83tjnlo4b5jso",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.072Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -783,19 +783,19 @@
     "date": "2026-08-26",
     "day": "Wednesday",
     "originalStatusId": "OT",
-    "changedStatusId": "HOL",
-    "currentStatusId": "HOL",
-    "action": "Normal Public Holiday",
+    "changedStatusId": null,
+    "currentStatusId": "OT",
+    "action": "WORK WITH OT",
     "notes": "",
     "ot": false,
     "googleCalendarSyncStatus": "Synced",
     "googleCalendarEventId": "80bnat4djmjmjrvp0v0src0d4c",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-27T10:28:17.214Z",
     "lastChangedBy": "Emal Yaditha",
-    "clockIn": "",
-    "clockOut": ""
+    "clockIn": "08:15",
+    "clockOut": "17:30"
   },
   {
     "id": "roster-2026-08-27",
@@ -811,12 +811,10 @@
     "googleCalendarEventId": "g69u6vsk0469g7mh40840e9vi0",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:55.445Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "08:15",
-    "clockOut": "17:30",
-    "otMorningHours": 0,
-    "otNightHours": 0
+    "clockOut": "17:30"
   },
   {
     "id": "roster-2026-08-28",
@@ -832,7 +830,7 @@
     "googleCalendarEventId": "co6el8tv3jodapoak9b4etubn8",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -842,17 +840,17 @@
     "date": "2026-08-29",
     "day": "Saturday",
     "originalStatusId": "HOL",
-    "changedStatusId": null,
-    "currentStatusId": "HOL",
-    "action": "Normal Holiday",
-    "notes": "",
+    "changedStatusId": "DOS",
+    "currentStatusId": "DOS",
+    "action": "WORK WITH DAY OFF SETTLEMENT",
+    "notes": "Changed with Eranda",
     "ot": false,
     "googleCalendarSyncStatus": "Synced",
     "googleCalendarEventId": "ltdj8bb4nod7epltt0937a2m9g",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
-    "lastChangedBy": null,
+    "updatedAt": "2026-08-27T10:29:15.257Z",
+    "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
   },
@@ -861,19 +859,21 @@
     "date": "2026-08-30",
     "day": "Sunday",
     "originalStatusId": "DOS",
-    "changedStatusId": null,
-    "currentStatusId": "DOS",
-    "action": "DOS(10.00)",
-    "notes": "",
+    "changedStatusId": "HOL",
+    "currentStatusId": "HOL",
+    "action": "Normal Public Holiday",
+    "notes": "Changed with Eranda",
     "ot": false,
     "googleCalendarSyncStatus": "Synced",
     "googleCalendarEventId": "ucl6noc6me3n7falpivj71rf10",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
-    "lastChangedBy": null,
+    "updatedAt": "2026-08-27T10:31:55.432Z",
+    "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
-    "clockOut": ""
+    "clockOut": "",
+    "otMorningHours": 0,
+    "otNightHours": 0
   },
   {
     "id": "roster-2026-08-31",
@@ -889,7 +889,7 @@
     "googleCalendarEventId": "273h0u8asm9qra1ifj90ovb4pk",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -908,7 +908,7 @@
     "googleCalendarEventId": "ioqf6id24vbtvdql4auh9t42lk",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -927,7 +927,7 @@
     "googleCalendarEventId": "n5l6rcgvctuertb5o5be9dc9a4",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -946,7 +946,7 @@
     "googleCalendarEventId": "a4ae58k1p5dir98ahiv0059528",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -965,7 +965,7 @@
     "googleCalendarEventId": "vulqkanc3obt7e2m965pua7eqg",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -984,7 +984,7 @@
     "googleCalendarEventId": "f8dvveh095p5gt23qpkfi7oksk",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1003,7 +1003,7 @@
     "googleCalendarEventId": "cgsps7o6qdrgjk91172eglmmu4",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1022,7 +1022,7 @@
     "googleCalendarEventId": "hrl91iv7gheb3foo8gnh56ntr0",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1041,7 +1041,7 @@
     "googleCalendarEventId": "54smiq64sudf7ef0r6hvm7ufeg",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1060,7 +1060,7 @@
     "googleCalendarEventId": "d30t32kprra28gag34g0c2bgfo",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1079,7 +1079,7 @@
     "googleCalendarEventId": "qe4ajfkfb2nseomn9ah9fodspo",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1098,7 +1098,7 @@
     "googleCalendarEventId": "c0isjfraea22kbq5hvvmpj77ok",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1117,7 +1117,7 @@
     "googleCalendarEventId": "nb0b4au16s4houlbbskgfdtg9o",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1136,7 +1136,7 @@
     "googleCalendarEventId": "6ineemn1sspp559tqaci5m6rqg",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": "Emal Yaditha",
     "clockIn": "",
     "clockOut": ""
@@ -1155,7 +1155,7 @@
     "googleCalendarEventId": "8amdl7v47mcmrij9vdnv6aa230",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""
@@ -1174,7 +1174,7 @@
     "googleCalendarEventId": "8gf4cf6656ts2sg9mssufej148",
     "calendarSyncError": null,
     "createdAt": "2026-08-14T18:01:07.339Z",
-    "updatedAt": "2026-08-24T16:44:53.073Z",
+    "updatedAt": "2026-08-24T21:21:22.737Z",
     "lastChangedBy": null,
     "clockIn": "",
     "clockOut": ""

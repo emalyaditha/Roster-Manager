@@ -93,15 +93,15 @@
   {
     "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
     "calc_date": "2026-08-26",
-    "roster_code": "HOL",
+    "roster_code": "OT",
     "scheduled_start": null,
     "scheduled_end": null,
-    "actual_clock_in": null,
-    "actual_clock_out": null,
-    "raw_ot_minutes": 0,
-    "billable_ot_minutes": 0,
-    "ot_type": "none",
-    "calculated_at": "2026-08-24T15:50:18.505Z"
+    "actual_clock_in": "2026-08-26T08:15:00+05:30",
+    "actual_clock_out": "2026-08-26T17:30:00+05:30",
+    "raw_ot_minutes": 555,
+    "billable_ot_minutes": 555,
+    "ot_type": "paid_ot",
+    "calculated_at": "2026-08-27T10:28:18.362Z"
   },
   {
     "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
@@ -115,5 +115,31 @@
     "billable_ot_minutes": 555,
     "ot_type": "paid_ot",
     "calculated_at": "2026-08-24T16:44:56.348Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "calc_date": "2026-08-29",
+    "roster_code": "DOS",
+    "scheduled_start": "08:15",
+    "scheduled_end": "17:30",
+    "actual_clock_in": null,
+    "actual_clock_out": null,
+    "raw_ot_minutes": 0,
+    "billable_ot_minutes": 0,
+    "ot_type": "day_off_settlement",
+    "calculated_at": "2026-08-27T10:29:16.408Z"
+  },
+  {
+    "employee_id": "956614c0-98c8-46ed-8b4b-e546990eb97a",
+    "calc_date": "2026-08-30",
+    "roster_code": "HOL",
+    "scheduled_start": null,
+    "scheduled_end": null,
+    "actual_clock_in": null,
+    "actual_clock_out": null,
+    "raw_ot_minutes": 0,
+    "billable_ot_minutes": 0,
+    "ot_type": "none",
+    "calculated_at": "2026-08-27T10:31:56.529Z"
   }
 ]
