@@ -4,9 +4,12 @@ import { RosterEntry, RosterStatusConfig } from '../types/roster';
 import { StatusBadge } from './StatusBadge';
 import { ClockTimePicker } from './ClockTimePicker';
 import { formatDateDisplay } from '../utils/date';
-import { ArrowRight, Calendar, AlertCircle, Calculator, Clock, CalendarDays } from 'lucide-react';
+import { ArrowRight, Calendar, AlertCircle, Calculator, Clock, CalendarDays, History } from 'lucide-react';
 import { canApplyLeaveToCode, isAlreadyLeaveCode } from '../utils/leave';
 import { sortByStatusDisplayOrder } from '../utils/statusOrder';
+import { api } from '../services/api';
+import { RosterChangeHistory } from '../types/roster';
+import { formatTimestamp } from '../utils/date';
 
 interface RosterChangeModalProps {
   isOpen: boolean;
@@ -47,6 +50,7 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
   const [otNightHours, setOtNightHours] = useState(entry?.otNightHours !== undefined ? String(entry.otNightHours) : '0');
   const [updateCalendar, setUpdateCalendar] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastHistory, setLastHistory] = useState<RosterChangeHistory | null>(null);
 
   useEffect(() => {
     if (entry) {
@@ -58,6 +62,15 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
       setOt(entry.ot || false);
       setOtMorningHours(entry.otMorningHours !== undefined ? String(entry.otMorningHours) : '0');
       setOtNightHours(entry.otNightHours !== undefined ? String(entry.otNightHours) : '0');
+      // Fetch last audit record to show Original vs Last Updated
+      api.getHistory(entry.id).then((list) => {
+        if (list.length > 0) {
+          const sorted = [...list].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+          setLastHistory(sorted[0]);
+        } else {
+          setLastHistory(null);
+        }
+      }).catch(() => setLastHistory(null));
     }
   }, [entry]);
 
@@ -307,21 +320,39 @@ export const RosterChangeModal: React.FC<RosterChangeModalProps> = ({
             );
           })()}
 
-          {/* Current vs Original Display */}
+          {/* Current vs Original vs Last Updated */}
           <div className="grid grid-cols-2 gap-3 p-3 bg-well rounded-lg border border-line text-xs">
             <div>
               <span className="text-[10px] font-semibold uppercase tracking-wide text-faint block mb-1">
                 Original Office Roster
               </span>
               <StatusBadge statusId={entry.originalStatusId} statuses={statuses} size="md" />
+              <span className="text-[9px] text-faint block mt-1">Never overwritten — sacred</span>
             </div>
             <div>
               <span className="text-[10px] font-semibold uppercase tracking-wide text-faint block mb-1">
                 Current Active Roster
               </span>
               <StatusBadge statusId={entry.currentStatusId} statuses={statuses} size="md" />
+              {entry.changedStatusId && (
+                <span className="text-[9px] text-faint block mt-1">Changed from {entry.originalStatusId} → {entry.currentStatusId}</span>
+              )}
+              {!entry.changedStatusId && (
+                <span className="text-[9px] text-faint block mt-1">Matches original</span>
+              )}
             </div>
           </div>
+          {lastHistory && (
+            <div className="p-2.5 bg-surface rounded-lg border border-line text-[11px] flex items-start gap-2">
+              <History className="w-3.5 h-3.5 text-faint mt-0.5 shrink-0" />
+              <div>
+                <span className="font-semibold text-fg block text-[10px] uppercase">Last Updated</span>
+                <span className="text-muted">{lastHistory.previousStatusId} → {lastHistory.newStatusId} • {formatTimestamp(lastHistory.timestamp)} • {lastHistory.user}</span>
+                <span className="text-faint block text-[10px] truncate">{lastHistory.reason}</span>
+              </div>
+            </div>
+          )}
+          <p className="text-[10px] text-muted text-center">You can change this day as many times as you want. Original is always preserved; hit the History icon in the table to see full trail.</p>
 
           {/* New Roster Status Selection */}
           <div>
